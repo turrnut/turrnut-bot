@@ -56,7 +56,10 @@ def log(msg,):
                 fobj.write(str(datetime.datetime.now()))
                 fobj.write("\n")
     except AttributeError as e:
-
+        return
+    except UnicodeEncodeError as e:
+        return
+    except UnicodeDecodeError as e:
         return
 
 
@@ -82,6 +85,7 @@ async def cant(mes):
 
 
 async def dostuff(instructions, message):
+    global myid
     global possibilities
     global spamhalt
     global logflag
@@ -90,20 +94,28 @@ async def dostuff(instructions, message):
         instruction.append(i)
     print(instruction)
     if len(instruction) > 2:
+        if instruction[1].lower() == "get":
+            await message.channel.send(str(instruction[2]).replace("<", "").replace(">", "").replace("@", ""))
         if instruction[1].lower() in ("send", "send_delete"):
-            message = ""
-            i = 3
-            while i < len(instruction):
-                message += instruction[i]
-                message += ' '
-                i += 1
-            info = {
-                "message": str(message),
-                "userid": int(instruction[2])
-            }
-            themsg = info["message"]
-            plog(f"the bot says to {str(mensaje.author)} -> {themsg}")
-            await client.get_user(info["userid"]).send(themsg)
+            if validMessage(message):
+                m = ""
+                i = 3
+                while i < len(instruction):
+                    m += instruction[i]
+                    m += ' '
+                    i += 1
+                info = {
+                    "message": str(m),
+                    "userid": int(instruction[2])
+                }
+                themsg = info["message"]
+                plog(f"the bot says to {str(message.author)} -> {themsg}")
+                if instruction[1].lower() == "send_delete":
+                    await message.delete()
+
+                await client.get_user(info["userid"]).send(themsg)
+            else:
+                await message.channel.send("YOU DONT HAVE PROPER PERMISSIONS!!!")
 
         if instruction[1].lower() in ("say", "say_delete"):
             say_delete = False
@@ -167,7 +179,7 @@ async def dostuff(instructions, message):
             for server in client.guilds:
                 print(server, ",", end="")
             print("\b  ")
-    if len(instruction) == 3:
+    if len(instruction) >= 3:
         if instruction[1] in ("spam", "spam_delete"):
             delete = False
             if instruction[1] == "spam_delete":
@@ -179,14 +191,22 @@ async def dostuff(instructions, message):
                     spamhalt = True
                 else:
                     if not spamhalt:
+                        count = int(instruction[2])
                         # LOG
+                        spammessage = ""
+                        j = 3
+                        while j < len(instruction):
+                            spammessage += str(instruction[j])
+                            spammessage += ' '
+                            j += 1
                         log(str(message.author) +
-                            " used the spam command, count=" + str(instruction[2]))
+                            " used the spam command, count=" + str(count))
                         if delete:
                             await message.delete()
                         i = 0
-                        while i < int(instruction[2]):
-                            await message.channel.send("I am a bot and I love to spam !!! (" + str(i+1) + ")")
+                        while i < count and not spamhalt and spammessage != "":
+                            k = str(i+1)
+                            await message.channel.send(f"{spammessage} ( { k } )")
                             i += 1
                     else:
                         spamhalt = False
@@ -275,7 +295,8 @@ async def on_message(message):
         if randomnumber < 5:
             # LOG
             log(str(message.author) + " got greeted by the random greeting system")
-            await message.channel.send(random.Random().choice(seq=("Heyyy, " + str(message.author) + ". Whats Up?", "Hello, " + str(message.author), str(message.author) + " hi, how are you?")))
+            at = "<@" + str(message.author.id) + ">"
+            await message.channel.send(random.Random().choice(seq=("Heyyy," + at + " . Whats Up?", "Hello, " + at, at + " hi, how are you?", f"yo {at}")))
 
     authorinfo = {"username": str(message.author),
                   "userid": int(message.author.id)}
