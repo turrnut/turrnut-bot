@@ -127,6 +127,8 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-#other
+# other
 *.token
-subbots/
+exint/interpreter.py
+interpreter.py
+exint/

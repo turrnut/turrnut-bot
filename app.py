@@ -6,6 +6,7 @@ import datetime
 import json
 import bruh
 import random
+import exint.interpreter as lang
 
 from tensorflow import keras
 from discord.ext import commands
@@ -20,6 +21,7 @@ from discord.ext.commands import Bot
 #   5. SuS
 #   6. say something
 #   7. MEME
+#   8. do math via EXINT
 #
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 # intents = discord.Intents.default()
@@ -50,12 +52,20 @@ with open(pathify("models|grades|possibilites.json"), "r") as fobj:
     possibilities = json.load(fobj)
 
 memesjson = {}
-with open(pathify("json|meme.json"), "r") as fobj:
-    memesjson = json.load(fobj)
-
 memes = []
-for k, v in memesjson.items():
-    memes.append(Meme(k, v))
+
+
+def load_meme():
+    global memes
+    global memesjson
+    with open(pathify("json|meme.json"), "r") as fobj:
+        memesjson = json.load(fobj)
+
+    for k, v in memesjson.items():
+        memes.append(Meme(k, v))
+
+
+load_meme()
 
 
 def log(msg,):
@@ -94,7 +104,7 @@ def plog(msg, ):
 
 
 def validMessage(mes):
-    return str(mes.author) in ("turrnut#9727", "Nickels#8378", "a-fork-in-soup#2611", "Nickels#3069", "Comte de Monte Cristo#4077", "Netcrosystem#8581")
+    return str(mes.author) in ("turrnut#9727", "Nickels#8378", "a-fork-in-soup#2611", "Nickels#3069", "a-knife-in-cake#4077", "Netcrosystem#8581")
 
 
 async def cant(mes):
@@ -111,8 +121,79 @@ async def dostuff(instructions, message):
     for i in instructions:
         instruction.append(i)
     print(instruction)
+
+    expression = ""
+
+    if instruction[1] == "calculate":
+        if len(instruction) == 2:
+            return
+        index = 0
+        for i in instruction:
+            if index > 1:
+                expression += i
+            index += 1
+
+        print(expression)
+
+        result, error = lang.run("<discord_runtime>", expression)
+        if error:
+            await message.channel.send(str(error.__repr__()))
+        else:
+            await message.channel.send(str(expression) + "=" + str(result.value))
+
+    if len(instruction) == 5:
+        if instruction[1].lower() == "add" and instruction[2] == "meme" and validMessage(message):
+            # LOG
+            log(f" {str(instruction[4])} added a meme: {instruction[3]}")
+            memesdictjson = {}
+            with open(pathify("json|meme.json"), "r") as f:
+                memesdictjson = json.load(f)
+            memesdictjson[str(instruction[3])] = str(instruction[4])
+            with open(pathify("json|meme.json"), "w") as f2:
+                memesdictjson = json.dump(memesdictjson, f2, indent=6)
+            await message.channel.send(f"Meme: { str(instruction[3]) } added.")
+        elif not validMessage(message):
+            # LOG
+            log(
+                f" {str(message.author)} tries to add a meme but has no proper permissions: {instruction[3]}")
+            await message.channel.send("bruh, you dont have proper permissions to add a meme! contact one of the admins to do that.")
+    if len(instruction) == 4:
+        if instruction[1].lower() == "get" and instruction[2] == "meme" and instruction[3] == "json":
+            c = ""
+            with open(pathify("json|meme.json"), "r") as ff:
+                c = ff.read()
+            await message.channel.send(c)
+
+        if instruction[1].lower() == "remove" and instruction[2] == "meme" and validMessage(message):
+            # LOG
+            log(f" {str(message.author)} removed a meme: {instruction[3]}")
+            memesdictjson = {}
+            with open(pathify("json|meme.json"), "r") as f:
+                memesdictjson = json.load(f)
+            r = []
+            for k, v in memesdictjson.items():
+                if k == instruction[3]:
+                    r.append(k)
+
+            for rr in r:
+                memesdictjson.pop(rr)
+
+            with open(pathify("json|meme.json"), "w") as f2:
+                memesdictjson = json.dump(memesdictjson, f2, indent=6)
+            await message.channel.send(f"Meme: { str(instruction[3]) } removed.")
+        elif not validMessage(message):
+            # LOG
+            log(
+                f" {str(message.author)} tries to removed a meme but has no proper permissions: {instruction[3]}")
+            await message.channel.send("bruh, you dont have proper permissions to remove a meme! contact one of the admins to do that.")
+
     if len(instruction) == 2:
         if instruction[1].lower() == "meme":
+            # LOG
+            log(str(message.author.name) + " prompted a random meme")
+
+            load_meme()
+
             meme = random.Random().choice(seq=memes)
             await message.channel.send(str(meme.name))
             await message.channel.send("As suggested by: " + str(meme.suggested))
@@ -308,6 +389,7 @@ async def on_message(message):
         return
     print(message.author,
           f"( { str(message.author.id) } ) : ", message.content, sep="", end="")
+    print("\a")
     if mensaje.guild == None:
         plog(f"{str(mensaje.author)} says -> {str(mensaje.content)}")
         print(" {DIRECT MESSAGE}")
