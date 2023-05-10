@@ -19,7 +19,7 @@ from discord.ext.commands import Bot
 #   4. spam
 #   5. SuS
 #   6. say something
-#
+#   7. MEME
 #
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 # intents = discord.Intents.default()
@@ -28,9 +28,18 @@ intents = discord.Intents.all()
 client = Bot(command_prefix="", intents=intents)
 mensaje = None
 logflag = True
+curse_words = ("fuck", "shit", "f*ck", "f**k", "fags", "nigger", "chink", "nigga", "sex",
+               "gay", "faggot", "faggots", "retard", "fag", "ass", "bitch", "asshole", "dick",
+               "penis", "stfu", "shut up", "kys", "wtf")
 spamhalt = False
 SERVER_NAME = ""
 MYSERVER = "Turrnut Republic(拖鞋社)"
+
+
+class Meme:
+    def __init__(self, name, suggested):
+        self.name = name
+        self.suggested = suggested
 
 
 def pathify(path):
@@ -39,6 +48,14 @@ def pathify(path):
 
 with open(pathify("models|grades|possibilites.json"), "r") as fobj:
     possibilities = json.load(fobj)
+
+memesjson = {}
+with open(pathify("json|meme.json"), "r") as fobj:
+    memesjson = json.load(fobj)
+
+memes = []
+for k, v in memesjson.items():
+    memes.append(Meme(k, v))
 
 
 def log(msg,):
@@ -77,7 +94,7 @@ def plog(msg, ):
 
 
 def validMessage(mes):
-    return str(mes.author) in ("turrnut#9727", "Nickels#8378", "a-fork-in-soup#2611", "Nickels#3069", "Comte de Monte Cristo#4077")
+    return str(mes.author) in ("turrnut#9727", "Nickels#8378", "a-fork-in-soup#2611", "Nickels#3069", "Comte de Monte Cristo#4077", "Netcrosystem#8581")
 
 
 async def cant(mes):
@@ -89,10 +106,16 @@ async def dostuff(instructions, message):
     global possibilities
     global spamhalt
     global logflag
+    global memes
     instruction = []
     for i in instructions:
         instruction.append(i)
     print(instruction)
+    if len(instruction) == 2:
+        if instruction[1].lower() == "meme":
+            meme = random.Random().choice(seq=memes)
+            await message.channel.send(str(meme.name))
+            await message.channel.send("As suggested by: " + str(meme.suggested))
     if len(instruction) > 2:
         if instruction[1].lower() == "get":
             await message.channel.send(str(instruction[2]).replace("<", "").replace(">", "").replace("@", ""))
@@ -180,7 +203,7 @@ async def dostuff(instructions, message):
                 print(server, ",", end="")
             print("\b  ")
     if len(instruction) >= 3:
-        if instruction[1] in ("spam", "spam_delete"):
+        if instruction[1].lower() in ("spam", "spam_delete"):
             delete = False
             if instruction[1] == "spam_delete":
                 delete = True
@@ -205,8 +228,8 @@ async def dostuff(instructions, message):
                             await message.delete()
                         i = 0
                         while i < count and not spamhalt and spammessage != "":
-                            k = str(i+1)
-                            await message.channel.send(f"{spammessage} ( { k } )")
+                            k = str(i+1)  # number of times
+                            await message.channel.send(f"{spammessage}")
                             i += 1
                     else:
                         spamhalt = False
@@ -278,6 +301,7 @@ async def on_member_join(member):
 @client.event
 async def on_message(message):
     global mensaje
+    global curse_words
     mensaje = message
     # print(message.guild.id)
     if message.author == client.user:
@@ -308,9 +332,9 @@ async def on_message(message):
         json.dump(authorinfo, fobj, indent=6)
     if message.content.lower() == 'what is my userid':
         await message.channel.send(str(message.author.id))
-    if message.content.lower() in ('amogus', 'sus', 'sussy baka'):
+    if 'sus' in message.content.lower() or 'amogus' in message.content.lower() or 'sussy baka' in message.content.lower():
         log(str(message.author) + " is sus. Ewww. ")
-        await message.channel.send(random.Random().choice(seq=('sus', 'AMOGUS', 'dun dun dun dun', 'yo sussy baka')))
+        await message.channel.send(random.Random().choice(seq=('sus', 'when the message is sus', 'AMOGUS', 'dun dun dun dun', 'yo sussy baka', 'https://tenor.com/view/19dollar-fortnite-card-among-us-amogus-sus-red-among-sus-gif-20549014')))
 
     instructions = message.content.split(' ')
     i = 0
@@ -318,6 +342,11 @@ async def on_message(message):
         if not instruction.strip(' ').strip('\t').strip('\r').strip('\n'):
             instructions.pop(i)
         i += 1
+    if not validMessage(message):
+        for ins in instructions:
+            if ins.lower() in curse_words:
+                await message.channel.send(f"<@" + str(message.author.id) + "> u have been warned. Watch your language.")
+                await message.delete()
     if len(instructions) > 0 and instructions[0].lower() == 'turrnut':
         await dostuff(instructions, message)
 token = ""
