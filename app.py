@@ -159,10 +159,14 @@ async def dostuff(instructions, message):
             await message.channel.send("bruh, you dont have proper permissions to add a meme! contact one of the admins to do that.")
     if len(instruction) == 4:
         if instruction[1].lower() == "get" and instruction[2] == "meme" and instruction[3] == "json":
-            c = ""
-            with open(pathify("json|meme.json"), "r") as ff:
-                c = ff.read()
-            await message.channel.send(c)
+            if validMessage(mensaje):
+                c = ""
+                with open(pathify("json|meme.json"), "r") as ff:
+                    c = ff.read()
+                await message.channel.send(c)
+            else:
+                await cant(mensaje)
+                return
 
         if instruction[1].lower() == "remove" and instruction[2] == "meme" and validMessage(message):
             # LOG
@@ -357,7 +361,7 @@ async def getguild(ctx):
 @client.event
 async def on_ready():
     # await tree.sync(guild=discord.Object(id=977378215360335952))
-    print(f'We have logged in as {client.user}')
+    print(f'Bot Name: {client.user}')
     print(f"servers the bot is in ( {len(client.guilds) } ): ", end="")
     for server in client.guilds:
         print(server, ",", end=" ")
