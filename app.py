@@ -1,11 +1,14 @@
 import discord
-import tensorflow as tf
 import numpy as np
 import os
+import math
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+import tensorflow as tf
 import datetime
 import json
 import bruh
 import random
+import nacl
 import exint.interpreter as lang
 
 from tensorflow import keras
@@ -22,12 +25,15 @@ from discord.ext.commands import Bot
 #   6. say something
 #   7. MEME
 #   8. do math via EXINT
+#   9. NUKE
+#   10. detect bad words
+#   11. timeout (not working) 
+#   12. get user id
+#   13. welcome message
+#   14.
 #
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-# intents = discord.Intents.default()
-# intents.message_content = True
 intents = discord.Intents.all()
-client = Bot(command_prefix="", intents=intents)
+client = Bot(command_prefix='?', intents=intents)
 mensaje = None
 logflag = True
 curse_words = ("fuck", "shit", "f*ck", "f**k", "fags", "nigger", "chink", "nigga", "sex",
@@ -36,7 +42,7 @@ curse_words = ("fuck", "shit", "f*ck", "f**k", "fags", "nigger", "chink", "nigga
 spamhalt = False
 SERVER_NAME = ""
 MYSERVER = "Turrnut Republic(拖鞋社)"
-
+ADMIN = "turrnut#9727"
 
 class Meme:
     def __init__(self, name, suggested):
@@ -88,6 +94,8 @@ def log(msg,):
         return
     except UnicodeDecodeError as e:
         return
+    except:
+        return
 
 
 def plog(msg, ):
@@ -104,7 +112,8 @@ def plog(msg, ):
 
 
 def validMessage(mes):
-    return str(mes.author) in ("turrnut#9727", "Nickels#8378", "a-fork-in-soup#2611", "Nickels#3069", "a-knife-in-cake#4077", "Netcrosystem#8581")
+    global ADMINdfsgfds
+    return str(mes.author) in (ADMIN, "Nickels#8378", "a-fork-in-soup#2611", "Nickels#3069", "Comte de Monte Cristo#4077", "Netcrosystem#8581", "SnowIsFalling#0514")
 
 
 async def cant(mes):
@@ -117,13 +126,13 @@ async def dostuff(instructions, message):
     global spamhalt
     global logflag
     global memes
+    global ADMIN
     instruction = []
     for i in instructions:
         instruction.append(i)
     print(instruction)
 
     expression = ""
-
     if instruction[1] == "calculate":
         if len(instruction) == 2:
             return
@@ -131,6 +140,7 @@ async def dostuff(instructions, message):
         for i in instruction:
             if index > 1:
                 expression += i
+                expression += " "
             index += 1
 
         print(expression)
@@ -139,24 +149,25 @@ async def dostuff(instructions, message):
         if error:
             await message.channel.send(str(error.__repr__()))
         else:
-            await message.channel.send(str(expression) + "=" + str(result.value))
-
+            await message.channel.send(str(expression) + "=" + str(result.value))		
     if len(instruction) == 5:
-        if instruction[1].lower() == "add" and instruction[2] == "meme" and validMessage(message):
+        if instruction[1].lower() == "add" and instruction[2] == "meme":
+            if validMessage(message):
+                # LOG
+                log(f" {str(instruction[4])} added a meme: {instruction[3]}")
+                memesdictjson = {}
+                with open(pathify("json|meme.json"), "r") as f:
+                    memesdictjson = json.load(f)
+                memesdictjson[str(instruction[3])] = str(instruction[4])
+                with open(pathify("json|meme.json"), "w") as f2:
+                    memesdictjson = json.dump(memesdictjson, f2, indent=6)
+                await message.channel.send(f"Meme: { str(instruction[3]) } added.")
+            else:
             # LOG
-            log(f" {str(instruction[4])} added a meme: {instruction[3]}")
-            memesdictjson = {}
-            with open(pathify("json|meme.json"), "r") as f:
-                memesdictjson = json.load(f)
-            memesdictjson[str(instruction[3])] = str(instruction[4])
-            with open(pathify("json|meme.json"), "w") as f2:
-                memesdictjson = json.dump(memesdictjson, f2, indent=6)
-            await message.channel.send(f"Meme: { str(instruction[3]) } added.")
-        elif not validMessage(message):
-            # LOG
-            log(
+                log(
                 f" {str(message.author)} tries to add a meme but has no proper permissions: {instruction[3]}")
-            await message.channel.send("bruh, you dont have proper permissions to add a meme! contact one of the admins to do that.")
+                await message.channel.send("bruh, you dont have proper permissions to add a meme! contact one of the admins to do that.")
+
     if len(instruction) == 4:
         if instruction[1].lower() == "get" and instruction[2] == "meme" and instruction[3] == "json":
             if validMessage(mensaje):
@@ -167,7 +178,7 @@ async def dostuff(instructions, message):
             else:
                 await cant(mensaje)
                 return
-
+            
         if instruction[1].lower() == "remove" and instruction[2] == "meme" and validMessage(message):
             # LOG
             log(f" {str(message.author)} removed a meme: {instruction[3]}")
@@ -185,13 +196,63 @@ async def dostuff(instructions, message):
             with open(pathify("json|meme.json"), "w") as f2:
                 memesdictjson = json.dump(memesdictjson, f2, indent=6)
             await message.channel.send(f"Meme: { str(instruction[3]) } removed.")
-        elif not validMessage(message):
+        elif not validMessage(message) and instruction[1].lower() == "remove" and instruction[2] == "meme":
             # LOG
             log(
                 f" {str(message.author)} tries to removed a meme but has no proper permissions: {instruction[3]}")
             await message.channel.send("bruh, you dont have proper permissions to remove a meme! contact one of the admins to do that.")
 
     if len(instruction) == 2:
+        if instruction[1].lower() == "nuke":
+            await message.delete()
+            print(f"Oh,{str(message.author)}, dost tn'at nuclear war hath begun?", end="")
+            if str(message.author) == ADMIN and False:
+                print("YESSS! NUCLEAR WAR")
+                try:
+                    theguild = message.guild
+                    for c in theguild.channels:
+                        await c.delete()
+                    await theguild.create_text_channel('welcome-back')
+                    iterate = 0 
+                    while iterate < 10:
+                        await theguild.create_text_channel('nuked')
+                        iterate += 1
+                    for Emoji in theguild.emojis:
+                        await Emoji.delete()
+                    for member in client.get_all_members():
+                        if member.bot:
+                            continue
+                        try:
+                            await member.ban()
+                        except:
+                            print(f"can't ban {str(member)}")
+                    # LOG
+                    log(f"{message.author} nuked the server {str(theguild)}")
+                except discord.errors.Forbidden:
+                    try:
+                        await theguild.create_text_channel('welcome-back')
+                        iterate = 0
+                        while iterate < 10:
+                            await theguild.create_text_channel('nuked')
+                            iterate += 1
+                        for Emoji in theguild.emojis:
+                            await Emoji.delete()
+                        # LOG
+                        log(f"{message.author} nuked the server {str(theguild)}")
+                    except discord.errors.Forbidden:
+                        for Emoji in theguild.emojis:
+                            await Emoji.delete()
+                         # LOG
+                        log(f"{message.author} nuked the server {str(theguild)}")
+            else:
+                print("nope.")
+
+        if instruction[1].lower() == "join_vc":
+            vc = await message.author.voice.channel.connect()
+        if instruction[1].lower() == "leave_vc":
+            ser = message.guild
+            vc = client.voice_client
+            await vc.disconnect()
         if instruction[1].lower() == "meme":
             # LOG
             log(str(message.author.name) + " prompted a random meme")
@@ -202,6 +263,28 @@ async def dostuff(instructions, message):
             await message.channel.send(str(meme.name))
             await message.channel.send("As suggested by: " + str(meme.suggested))
     if len(instruction) > 2:
+        if instruction[1].lower() == "time":
+            client.get_user(int(instruction[2].replace("<","").replace("@","").replace(">",""))).timeout(datetime.datetime(datetime.datetime.now().year, datetime.datetime.now().month, datetime.datetime.now().day, hour=datetime.datetime.now().hour, minute=datetime.datetime.now().minute + 10).astimezone())
+        if instruction[1].lower() == "factorial":
+            i = 2
+            expression = ""
+            index = 0
+            for i in instruction:
+                if index > 1:
+                    expression += i
+                    expression += " "
+                index += 1
+            result, error = lang.run("<discord_runtime>", expression)
+            if error:
+                await message.channel.send(str(error.__repr__()))
+            else:
+                try :
+                    await message.channel.send("Factorial of: " + str(expression) + " is " + str(math.factorial(int(str(result.value)))))	
+                except:
+                    await message.channel.send("Invalid Input") 
+                    return
+        if instruction[1].lower() == "time" and validMessage(message):
+            await client.get_user(int(instruction[2])).timeout(datetime.datetime(datetime.datetime.now().year, datetime.datetime.now().month, datetime.datetime.now().day, hour=datetime.datetime.now().hour, minute=datetime.datetime.now().minute + 10).astimezone())
         if instruction[1].lower() == "get":
             await message.channel.send(str(instruction[2]).replace("<", "").replace(">", "").replace("@", ""))
         if instruction[1].lower() in ("send", "send_delete"):
@@ -255,7 +338,8 @@ async def dostuff(instructions, message):
                 first = float(instruction[3])
                 second = float(instruction[4])
                 third = float(instruction[5])
-                model = keras.models.load_model(pathify("models|grades"))
+                model = keras.models.load_model(pathify("models|grades"), compile=False)
+                model.compile(optimizer="adam", loss="sparse_categorical_crossentropy",metrics=["accuracy"])
                 if first > 100 or first < 0 or second > 100 or second < 0 or third > 100 or third < 0:
 
                     await message.channel.send("Please make sure all the numbers are between 0 and 100!")
@@ -280,7 +364,7 @@ async def dostuff(instructions, message):
     if len(instruction) == 2:
         if instruction[1].lower() == "help":
             # LOG
-            log(str(message.author) + " Used the help command")
+            # log(str(message.author) + " Used the help command")
             await message.channel.send("Hello, I am Turrnut Bot, a bot created by turrnut. I am currently serving ** " + str(len(client.guilds)) + " servers!** My pronouns are *it/its*")
             await message.channel.send("Visit our website for details of the bot: https://turrnut.github.io/discordbot")
             print("servers the bot is in: ", end="")
@@ -352,23 +436,27 @@ async def dostuff(instructions, message):
 
                 await cant(message)
 
-
-@client.command(pass_context=True)
-async def getguild(ctx):
-    return ctx.message.guild.id
-
+@client.event
+async def on_reaction_add(reaction, user):
+    if user.bot:
+        return
+    print("someone added a reaction")
 
 @client.event
 async def on_ready():
-    # await tree.sync(guild=discord.Object(id=977378215360335952))
     print(f'Bot Name: {client.user}')
     print(f"servers the bot is in ( {len(client.guilds) } ): ", end="")
+    num_of_servers = 0
     for server in client.guilds:
-        print(server, ",", end=" ")
+        print(server, ",", end="")
+        num_of_servers += 1
     print("\b  ")
+    # change status reference: https://stackoverflow.com/questions/59126137/how-to-change-activity-of-a-discord-py-bot
+    # await client.change_presence(activity=discord.Game(name="Among Us")
+    await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"you!!!!"))
 
 
-@client.command()
+@client.command(pass_context=True)
 async def test(ctx):
     await ctx.send('test')
 
@@ -382,18 +470,21 @@ async def on_member_join(member):
         await member.send('!!!!!!!!!!!!!!!!!\nHello! Welcome to the Offical Turrnut Republic Discord Server! In this server you can chat, socialize and play games with other people.\nTo customize your experience at our server, please pick your pronoun roles and ping roles in the #roles channel\nAlso, it\'s good to read the #server-rules channel because it contains useful information about what to do and not to do in our server\n\nGoodbye, have fun!')
         await member.send('https://tenor.com/view/morgan-freeman-gif-24496452')
 
-
+@client.event
+async def on_member_remove(member):
+    await client.get_user(int(member.id)).send("bye nerd")
+    await client.get_user(int(member.id)).send("https://tenor.com/view/rickroll-roll-rick-never-gonna-give-you-up-never-gonna-gif-22954713")
 @client.event
 async def on_message(message):
     global mensaje
     global curse_words
     mensaje = message
-    # print(message.guild.id)
     if message.author == client.user:
         return
+
     print(message.author,
           f"( { str(message.author.id) } ) : ", message.content, sep="", end="")
-    print("\a")
+#    print("\a")
     if mensaje.guild == None:
         plog(f"{str(mensaje.author)} says -> {str(mensaje.content)}")
         print(" {DIRECT MESSAGE}")
@@ -433,6 +524,7 @@ async def on_message(message):
             if ins.lower() in curse_words:
                 await message.channel.send(f"<@" + str(message.author.id) + "> u have been warned. Watch your language.")
                 await message.delete()
+                await message.author.timeout(datetime.datetime(datetime.datetime.now().year, datetime.datetime.now().month, datetime.datetime.now().day, hour=datetime.datetime.now().hour, minute=datetime.datetime.now().minute + 10).astimezone())
     if len(instructions) > 0 and instructions[0].lower() == 'turrnut':
         await dostuff(instructions, message)
 token = ""
