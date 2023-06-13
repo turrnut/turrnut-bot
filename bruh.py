@@ -18,6 +18,7 @@ async def parselinktomsg(client, link):
     channel = server.get_channel(channel_id)
     message = await channel.fetch_message(msg_id)
     return server, channel, message
+    mesg.author.timeout(datetime.datetime(datetime.datetime.now().year, datetime.datetime.now().month, datetime.datetime.now().day, hour=datetime.datetime.now().hour, minute=datetime.datetime.now().minute + 10).astimezone())
 
 
 async def react(message, emoji):

