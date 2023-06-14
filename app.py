@@ -519,6 +519,16 @@ async def ask(interaction: discord.Interaction, question:str):
 async def inv(interaction: discord.Interaction):
     await interaction.response.send_message("Click this link to invite me to your server: https://discord.com/oauth2/authorize?client_id=1014960764378939453&scope=bot \nFor more information, visit our website: https://turrnut.github.io/discordbot\nFor technical support, join our server: https://discord.gg/JBB8C33pKS")
 
+@tree.command(name="meme", description="Get a random meme!")
+async def say(interaction: discord.Interaction):
+    log(str(interaction.user) + " prompted a random meme")
+
+    load_meme()
+
+    meme = random.Random().choice(seq=memes)
+    await interaction.response.send_message(str(meme.name))
+    await interaction.channel.send("\nAs suggested by: " + str(meme.suggested))
+
 @tree.command(name="speak", description="Make me say something!")
 async def say(interaction: discord.Interaction, message:str):
     if validInteraction(interaction):
