@@ -17,7 +17,7 @@ from discord.ext import commands
 
 from discord.ext.commands import Bot
 
-# Features:
+# Features list:
 #   1. randomly send greeting messages
 #   2. predict grade (Slash)
 #   3. logs
@@ -31,7 +31,8 @@ from discord.ext.commands import Bot
 #   11. timeout
 #   12. get user id
 #   13. welcome message
-#   14. fortune-telling
+#   14. fortune-telling (Slash)
+#   15. turrnut bank
 #
 intents = discord.Intents.all()
 client = Bot(command_prefix='?', intents=intents)
@@ -51,7 +52,10 @@ class Meme:
     def __init__(self, name, suggested):
         self.name = name
         self.suggested = suggested
-
+class Money:
+    def __init__(self, id, balance):
+        self.id = id
+        self.balance = balance
 
 def pathify(path):
     return path.replace('|', os.sep)
@@ -62,7 +66,7 @@ with open(pathify("models|grades|possibilites.json"), "r") as fobj:
 
 memesjson = {}
 memes = []
-
+money = []
 
 def load_meme():
     global memes
@@ -73,7 +77,25 @@ def load_meme():
     for k, v in memesjson.items():
         memes.append(Meme(k, v))
 
+def load_money():
+    global money
+    money = []
+    moneyjson = {}
+    with open(pathify("money|money.json"), "r") as fobj:
+        moneyjson = json.load(fobj)
+    for k,v in moneyjson.items():
+        money.append(Money(k, v))
 
+def save_money():
+    global money
+    moneyjson = {}
+    for mon in money:
+        print(f"Money ID: {mon.id} , BALANCE: {mon.balance}")
+        moneyjson[mon.id] = mon.balance
+    with open(pathify("money|money.json"), "w") as fobj:
+        json.dump(moneyjson, fobj, indent=6)
+
+load_money()
 load_meme()
 
 
@@ -487,7 +509,124 @@ async def dostuff(instructions, message):
 
                 await cant(message)
 
+@tree.command(name="give", description="Give someone an amount of turrcoins")
+@app_commands.describe(receiver="The person who receive this money")
+@app_commands.describe(amount="How much money to transfer")
+async def give(interaction: discord.Interaction, receiver: discord.Member, amount: float):
+    global money
+    load_money()
+    hasacc = False
+    for mon in money:
+        if str(mon.id) == str(interaction.user.id):
+            hasacc = True
+            break
+    if not hasacc:
+        money.append(Money(str(interaction.user.id), str(0)))
+    save_money()
+    load_money()
+    
+    index = 0
+    for mon in money:
+        if str(mon.id) == str(interaction.user.id):
+            break
+        index += 1
+    load_money()
+    account = money.pop(index)
+    if amount > float(account.balance):
+        await interaction.response.send_message(f"Can't complete transcation. You only have {str(account.balance)} coins but you attempt to transfer {amount}", ephemeral=True)
+        return
+    if amount < 0:
+        await interaction.response.send_message(f"Can't complete transcation. the amount is negative", ephemeral=True)
+        return
+    if amount > float(account.balance):
+        await interaction.response.send_message(f"Can't complete transcation. {amount} is a negative number", ephemeral=True)
+        return
+    if str(receiver.id) == str(interaction.user.id):
+        await interaction.response.send_message(f"Can't complete transcation. You can't give yourself money", ephemeral=True)
+        return
+    hasacc = False
+    for mon in money:
+        if str(mon.id) == str(receiver.id):
+            hasacc = True
+            break
+    if not hasacc:
+        money.append(Money(str(receiver.id), str(0)))
+    save_money()
+    load_money()
+    index = 0
+    for mon in money:
+        if str(mon.id) == str(receiver.id):
+            break
+        index += 1
+    load_money()
+    rec = money.pop(index)
+    print(f"AMOUNT: {amount}")
+    e1 = float(account.balance) - float(amount)
+    e2 = float(rec.balance) + float(amount)
+    account.balance = str(e1)
+    rec.balance = str(e2)
+
+    print(f"giver:{account.balance}, receiver: {rec.balance}")
+    money.append(account)
+    money.append(rec)
+    save_money()
+    load_money()
+    await interaction.response.send_message(f"<@{interaction.user.id}> gave <@{receiver.id}> {amount} turrcoins")
+
+def mykey(obj: Money):
+    return float(obj.balance)
+
+@tree.command(name="rank", description="See the top ranked turrcoin owners")
+async def rank(interaction: discord.Interaction):
+    global money
+    load_money()
+    copy = money
+    copy.sort(key=mykey, reverse=True)
+    until = 20 if len(money) > 20 else len(money)
+    resp = ""
+    i = 1
+    for c in copy:
+        if i < until:
+            break
+        resp += f"{i}"
+        if i in (1,11) : resp += "st"
+        if i in (2,12) : resp += "nd"
+        if i in (3,13) : resp += "rd"
+        resp += f": <@{c.id}> ({str(c.balance)} coins)\n"
+        i+= 1
+    resp += f"{len(copy)} Bank accounts in total."
+    await interaction.response.send_message(resp)
+
+@tree.command(name="balance", description="Check how much turrcoins you have")
+@app_commands.describe(person="Leave blank to check your own balance")
+async def balance(interaction: discord.Interaction, person: discord.Member=None):
+    global money
+    load_money()
+    hasacc = False
+    theid = None
+    if person == None:
+    	theid = interaction.user.id
+    else:
+        theid = person.id
+    for mon in money:
+        if str(mon.id) == str(theid):
+            hasacc = True
+            break
+    if not hasacc:
+        money.append(Money(str(theid), str(0)))
+    save_money()
+    load_money()
+    index = 0
+    for mon in money:
+        if str(mon.id) == str(theid):
+            break
+        index += 1
+    await interaction.response.send_message(f"User: <@{str(theid)}>\nAccount Balance:{money[index].balance}")
+
 @tree.command(name="predict-grade", description="Enter your grades for first three quarters to get the prediction of the final quarter!")
+@app_commands.describe(first="First quater grade")
+@app_commands.describe(second="Second quater grade")
+@app_commands.describe(third="Third quater grade")
 async def predictgrade(interaction: discord.Interaction, first:float, second:float, third:float):
     model = keras.models.load_model(pathify("models|grades"), compile=False)
     model.compile(optimizer="adam", loss="sparse_categorical_crossentropy",metrics=["accuracy"])
@@ -530,6 +669,7 @@ async def say(interaction: discord.Interaction):
     await interaction.channel.send("\nAs suggested by: " + str(meme.suggested))
 
 @tree.command(name="speak", description="Make me say something!")
+@app_commands.describe(message="What do you want me to say?")
 async def say(interaction: discord.Interaction, message:str):
     if validInteraction(interaction):
         await interaction.response.send_message("ok", ephemeral=True)
