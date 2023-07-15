@@ -41,6 +41,8 @@ from discord.ext.commands import Bot
 #   16. bank money manipulation
 #   17. truth or dare (Slash only)
 #   18. never have i ever (Slash only)
+#   19. would you rather (Slash only)
+#   20. add reactions
 #
 
 # Links that might be useful
@@ -57,6 +59,7 @@ ytdl = youtube_dl.YoutubeDL(yt_dl_opts)
 
 ffmpeg_opts = {"options": "-vn"}
 
+react_all = []
 tree = client.tree
 mensaje = None
 logflag = True
@@ -66,11 +69,15 @@ curse_words = ("fags", "nigger", "chink", "nigga",
 spamhalt = False
 SERVER_NAME = ""
 MYSERVER = "Turrnut Republic(拖鞋社)"
-ADMIN = "turrnut#0"
-TREASURER = "netcrosystem#0"
+ADMIN = "turrnut"
+TREASURER = "netcrosystem"
 guilds = []
 AWARD = 5
 ignore_bad_words = (1112529128273477724,)
+embec = 0x22B14C
+
+wyr = ("Would you rather have the ability to see 10 minutes into the future or 150 years into the future?", "Would you rather have telekinesis (the ability to move things with your mind) or telepathy (the ability to read minds)?", "Would you rather team up with Wonder Woman or Captain Marvel?", "Would you rather be forced to sing along or dance to every single song you hear?", "Would you rather find true love today or win the lottery next year?", "Would you rather be in jail for five years or be in a coma for a decade?", "Would you rather have another 10 years with your partner or a one-night stand with your celebrity crush?", "Would you rather be chronically under-dressed or overdressed?", "Would you rather have everyone you know be able to read your thoughts or for everyone you know to have access to your Internet history?", "Would you rather lose your sight or your memories?", "Would you rather have universal respect or unlimited power?", "Would you rather give up air conditioning and heating for the rest of your life or give up the Internet for the rest of your life?", "Would you rather swim in a pool full of Nutella or a pool full of maple syrup?", "Would you rather labor under a hot sun or extreme cold?", "Would you rather stay in during a snow day or build a fort?", "Would you rather buy 10 things you don't need every time you go shopping or always forget the one thing that you need when you go to the store?", "Would you rather never be able to go out during the day or never be able to go out at night?", "Would you rather have a personal maid or a personal chef?", "Would you rather be 11 feet tall or nine inches tall?", "Would you rather have Beyoncé's talent or Jay-Z's business acumen?", "Would you rather be an extra in an Oscar-winning movie or the lead in a box office bomb?", "Would you rather vomit on your hero or have your hero vomit on you?", "Would you rather communicate only in emoji or never be able to text at all ever again?", "Would you rather be royalty 1,000 years ago or an average person today?", "Would you rather lounge by the pool or on the beach?", "Would you rather wear the same socks for a month or the same underwear for a week?", "Would you rather work an overtime shift with your annoying boss or spend full day with your mother-in-law?", "Would you rather cuddle a koala or pal around with a panda?", "Would you rather have a sing-off with Ariana Grande or a dance-off with Rihanna?", "Would you rather always have B.O. and not know it or always smell B.O. on everyone else?", "Would you rather watch nothing but Hallmark Christmas movies or nothing but horror movies?", "Would you rather always be 10 minutes late or always be 20 minutes early?", "Would you rather spend a week in the forest or a night in a real haunted house?", "Would you rather find a rat in your kitchen or a roach in your bed?", "Would you rather have a pause or a rewind button in your life?", "Would you rather always have a full phone battery or a full gas tank?", "Would you rather lose all your teeth or lose a day of your life every time you kissed someone?", "Would you rather drink from a toilet or pee in a litter box?", "Would you rather be forced to live the same day over and over again for a full year, or take 3 years off the end of your life?", "Would you rather never eat watermelon ever again or be forced to eat watermelon with every meal?", "Would you rather get a paper cut every time you turn a page or bite your tongue every time you eat?", "Would you rather oversleep every day for a week or not get any sleep at all for four days?", "Would you rather die in 20 years with no regrets or live to 100 with a lot of regrets?", "Would you rather sip gin with Ryan Reynolds or shoot tequila with Dwayne \"The Rock\" Johnson?", "Would you rather get trapped in the middle of a food fight or a water balloon fight?", "Would you rather walk to work in heels or drive to work in reverse?", "Would you rather spend a year at war or a year in prison?", "Would you rather die before or after your partner?", "Would you rather have a child every year for 20 years or never have any children at all?", "Would you rather take amazing selfies but look terrible in all other photos or be photogenic everywhere but in your selfies?", "Would you rather be gassy on a first date or your wedding night?", "Would you rather Danny DeVito or Danny Trejo play you in a movie?", "Would you rather be able to take back anything you say or hear any conversation that is about you?", "Would you rather have skin that changes color based on your emotions or tattoos appear all over your body depicting what you did yesterday?", "Would you rather hunt and butcher your own meat or never eat meat again?", "Would you rather lose all of your friends but keep your BFF or lose your BFF but keep the rest of your buds?", "Would you rather have people spread a terrible lie about you or have people spread terrible but true tales about you?", "Would you rather walk in on your parents or have them walk in on you?", "Would you rather be the absolute best at something that no one takes seriously or be average at something well respected?", "Would you rather have unlimited battery life on all of your devices or have free WiFi wherever you go?", "Would you rather have Billie Eilish's future or Madonna's legacy?", "Would you rather have a third nipple or an extra toe?", "Would you rather solve world hunger or global warming?", "Would you rather have to wear every shirt inside out or every pair of pants backward?", "Would you rather live in a treehouse or in a cave?", "Would you rather win $25,000 or your best friend win $100,000?", "Would you rather be in history books for something terrible or be forgotten completely after you die?", "Would you rather travel the world for free for a year or have $50,000 to spend however you please?", "Would you rather your to only be able to talk to your dog or for your dog to be able to talk to only you—and everyone thinks you're nuts?", "Would you rather have a mullet for a year or be bald (no wigs!) for six months?", "Would you rather go back to the past and meet your loved ones who passed away or go to the future to meet your children or grandchildren to be?", "Would you rather have Angelina Jolie's lips or with Jennifer Aniston's hair?", "Would you rather stay the age you are physically forever or stay the way you are now financially forever?", "Would you rather be in a zombie apocalypse or a robot apocalypse?", "Would you rather be alone all your life or surrounded by really annoying people?", "Would you rather give up your cellphone for a month or bathing for a month?", "Would you rather spend a day cleaning your worst enemy's house or have your crush spend the day cleaning your house?", "Would you rather spend a year entirely alone or a year without a home?", "Would you rather buy all used underwear or all used toothbrushes?", "Would you rather have a photographic memory or an IQ of 200?", "Would you rather go on a cruise with your boss or never go on vacation ever again?", "Would you rather forget your partner's birthday or your anniversary every year?", "Would you rather have to wear stilettos to sleep or have to wear slippers everywhere you go?", "Would you rather change the outcome of the last election or get to decide the outcome of the next election?", "Would you rather lose the ability to read or lose the ability to speak?", "Would you rather smooch Chris Pratt, Chris Pine, Chris Evans or Chris Hemsworth?", "Would you rather be beautiful and stupid or unattractive but a genius?", "Would you rather have seven fingers on each hand or seven toes on each foot?", "Would you rather work the job you have now for a year at double your current rate of pay or have one year off with what you are making now?", "Would you rather be always stuck in traffic but find a perfect parking spot or never hit traffic but always take forever to park?", "Would you rather have super-sensitive taste buds or super-sensitive hearing?", "Would you rather ask your ex or a total stranger for a favor?", "Would you rather go on tour with Elton John or Cher?", "Would you rather eat only pizza for a year or not eat any pizza for five years?", "Would you rather never get another present in your life but always pick the perfect present for everyone else or keep getting presents but giving terrible ones to everyone else?", "Would you rather sleep in a doghouse or let stray dogs sleep in your bed?", "Would you rather be able to speak any language or be able to communicate with animals?", "Would you rather have all of your messages and photos leak publicly or never use a cellphone ever again?", "Would you rather run at 100 mph or fly at 20 mph?", "Would you rather have Adele's voice or Normani's dance moves?", "Would you rather have to wear sweatpants everywhere for the rest of your life or never wear sweatpants again?", "Would you rather have 10,000 spoons when all you need is a knife or always have a knife but never be able to use spoons?", "Would you rather detect every lie you hear or get away with every lie you tell?", "Would you rather be the funniest person in a room or the smartest person in a room?", "Would you rather talk like Yoda or breathe like Darth Vader?", "Would you rather people knew all the details of your finances or all the details of your love life?", "Would you rather listen to your least-favorite song on a loop for a year or never listen to any music at all for a year?", "Would you rather go vegan for a month or only eat meat and dairy for a month?", "Would you rather clean up someone else's vomit or someone else's blood?", "Would you rather work for Michael Scott or Mr. Burns?", "Would you rather spend the weekend with pirates or ninjas?", "Would you rather end every phone call with \"I love you\" or accidentally call your partner the wrong name during a fight?", "Would you rather get your paycheck given to you in pennies or never be able to use cash again?", "Would you rather see Lady Gaga in a movie or see Bradley Cooper in concert?", "Would you rather win the lottery but have to spend it all in one day or triple your current salary forever?", "Would you rather live until you are 200 and look your age or look like you're 22 your whole life, but die at age 65?", "Would you rather give up cursing forever or give up ice cream for 12 years?", "Would you rather hear a comforting lie or an uncomfortable truth?", "Would you rather be locked for a week in a room that's overly bright or a room that's totally dark?", "Would you rather someone see all the photos in your phone or read all your text messages?  ", "Would you rather have a South Park-themed wedding or a Family Guy-themed funeral?", "Would you rather have to hunt and gather all of your food or eat McDonald's for every meal?", "Would you rather have fortune or fame?", "Would you rather celebrate the Fourth of July with Taylor Swift or Christmas with Mariah Carey?", "Would you rather only be able to listen to one song for the rest of your life or only be able to watch one movie for the rest of your life?", "Would you rather never use social media again or never watch another movie ever again?", "Would you rather have police hunting you down for a crime you didn't commit or a serial killer actually hunting you?", "Would you rather live a peaceful life in a small cabin in the woods or a drama-filled life in a mansion in a big city?", "Would you rather find your soulmate or your calling?", "Would you rather drink sour milk or brush your teeth with soap?", "Would you rather steal Duchess Meghan or Duchess Kate's style?", "Would you rather never get a cold ever again or never be stuck in traffic ever again?", "Would you rather be tall and average looking or three feet tall but beautiful?", "Would you rather visit the International Space Station for a week or spend a week in a hotel at the bottom of the ocean?", "Would you rather confess to cheating on your partner or catch your partner cheating on you?", "Would you rather have all traffic lights you approach be green or never have to stand in line again?", "Would you rather share an onscreen kiss with Leonardo DiCaprio or George Clooney?", "Would you rather never eat Christmas cookies ever again or never eat Halloween candy ever again?", "Would you rather lose your long-term memory or your short-term memory?", " You Rather question", "Would you rather have a mullet or a perm?", "Would you rather be stranded in the jungle or in the desert?", "Would you rather everyone you love forget your birthday or everyone you love sing \"Happy Birthday\" to you for 24 hours straight?", "Would you rather be invisible or be able to fly?", "Would you rather spend every weekend indoors or spend every weekend outdoors?", "Would you rather party with Jennifer Lopez and Alex Rodriguez or with Kim Kardashian and Kanye West?", "Would you rather give up wine for a year or drink nothing but wine for a year?", "Would you rather start a colony on another planet or be the leader of a country on Earth?", "Would you rather live in a house haunted by friendly ghosts or be a ghost reliving your average day after you die?", "Would you rather have one wish granted today or 10 wishes granted 20 years from now?", "Would you rather get hit on by someone 20 years older than you or someone 20 years younger than you?", "Would you rather fall down in public or pass gas in public?", "Would you rather only eat raw food or only eat TV dinners?", "Would you rather run as fast as The Flash or be as strong as Superman?", "Would you rather never have a wedgie or never have anything stuck in your teeth ever again?", "Would you rather marry the most attractive person you've ever met or the best cook you've ever met?", "Would you rather sing karaoke with Gwen Stefani or with Kelly Clarkson?", "Would you rather go back to kindergarten with everything you know now or know now everything your future self will learn?", "Would you rather be able to read minds or predict the future?", "Would you rather take a pill a day for nutrients and to feel full, but never eat anything again or eat whatever you want but never really feel full?", "Would you rather be an unknown superhero or an infamous villain?", "Would you rather always have an annoying song stuck in your head or always have an itch that you can't reach?", "Would you rather never be able to keep anyone else's secrets or have someone tell all of your secrets?", "Would you rather be Batman or Iron Man?", "Would you rather be married to someone stunning who doesn't think you're attractive or be married to someone ugly who thinks you're gorgeous?", "Would you rather have a third ear or a third eye?", "Would you rather have $1 million now or $5,000 a week for the rest of your life?", "Would you rather binge-watch Sex And the City or Girls?", "Would you rather be rich working a job you hate or poor working a job you love?", "Would you rather wear real fur or fake jewels?", "Would you rather work a high-paying job that you hate or your dream job with only just enough money for rent, food and utilities?", "Would you rather wake up naked in a forest five miles from home or in your underwear at work?", "Would you rather go backstage with your favorite band or be an extra on your favorite TV show?", "Would you rather never eat your favorite food for the rest of your life or only eat your favorite food?", "Would you rather be able to erase your own memories or be able to erase someone else's memories?", "Would you rather be so afraid of heights that you can’t go to the second floor of a building or be so afraid of the sun that you can only leave the house on rainy days?", "Would you rather have a rap battle against Nicki Minaj or Lizzo?", "Would you rather save your best friend's life if it meant five strangers would die or save five strangers if it meant sacrificing your best friend?", "Would you rather give up coffee or soda forever?", "Would you rather find a $100 bill floating in a public toilet or a $20 bill in your own pocket?", "Would you rather wear nothing but neon orange or neon green for an entire year?", "Would you rather eat the same thing for every meal for a year or be able to eat whatever you wanted, but only once every three days?", "Would you rather get drunk off of one sip of alcohol or never get drunk no matter how much booze you imbibe?", "Would you rather sell all of your possessions or sell one of your organs?", "Would you rather clean a toilet with your toothbrush or a floor with your tongue?", "Would you rather be asked the same question over and over again or never be spoken to ever again?", "Would you rather be reincarnated as a fly or just stop existing when you die?", "Would you rather be serenaded by Justin Bieber or Justin Timberlake?", "Would you rather be unable to close any door once it's open or be unable to open any door once it's closed?", "Would you rather throw the best parties but have to clean up the mess by yourself or never go to a party again?", "Would you rather have a tattoo of the title of the last book you read or the last TV show you watched?", "Would you rather wear clothes that were always way too big or a couple sizes too small?", "Would you rather give your parents or your boss access to your browser history?", "Would you rather only be able to wash your hair twice a year or only be able to check your phone once a day?", "Would you rather have a tennis lesson from Serena Williams or a soccer lesson from Meghan Rapinoe?", "Would you rather have a permanent unibrow or no eyebrows at all?", "Would you rather have aliens be real and covered up by the government or have no extraterrestrial life at all in the universe?", "Would you rather be caught liking your ex's Instagram pics or your partner's ex's Instagram pics?", "Would you rather never eat cookies ever again or only ever drink water?", "Would you rather donate your organs to those who need them or donate your entire body to science?", "Would you rather be criticized or be ignored?", "Would you rather work alongside Dwight Schrute or Homer Simpson?", "Would you rather be punished for a crime you didn't commit or have someone else take credit for one of your major accomplishments?", "Would you rather eat an undercooked meal or a burnt meal?", "Would you rather get a cooking lesson from Gordon Ramsay or Ina Garten?", "Would you rather have your boss or your parents look through your text messages?", "Would you rather have your first child when you're 18 or when you're 50?", "Would you rather star in a Star Warsor a Marvel film?", "Would you rather wear heels to the gym or sneakers to a wedding?", "Would you rather give up brushing your hair or give us brushing your teeth?", "Would you rather master every musical instrument or every type of sport?", "Would you rather always have wet socks or a small rock in your shoe?", "Would you rather have Celine Dion or Eminem perform the soundtrack to your life?", "Would you rather be the class clown or the teacher's pet?", "Would you rather bathe in the dishwater or wash dishes in your bathwater?", "Would you rather show up to a job interview with stained pants or pit stains?", "Would you rather never age physically or never age mentally?", "Would you rather date someone with bad breath or bad manners?", "Would you rather never wear makeup ever again or wear a full face of the wrong shades every day?", "Would you rather read the book or watch the movie?", "Would you rather have a slumber party with Anna Kendrick or go to a comedy show with Rebel Wilson?", "Would you rather eat chocolate on pizza or never eat chocolate ever again?", "Would you rather have X-ray vision of people you find unattractive or everyone else have X-ray vision of you?", "Would you rather have your own theme park or your own zoo?", "Would you rather be the star player on a losing team or warm the bench on a championship roster?", "Would you rather know when you're going to die or how you're going to die?", "Would you rather lose all of your teeth or all of your hair?", "Would you rather watch nothing but The Officeor Friends for the rest of your life?", "Would you rather lose your keys or your phone?", "Would you rather live in a home with no electricity or in a home with no running water?", "Would you rather be rich with no friends or poor and popular?", "Would you rather look strong and be weak or look weak and be strong?", "Would you rather have your style critiqued by Anna Wintour or Miranda Priestly?", "Would you rather wear one or seven colors everyday?", "Would you rather sneeze nonstop for 15 minutes once every day or sneeze once every three minutes of the day while you're awake?", "Would you rather walk barefoot in a public bathroom or through poison ivy?", "Would you rather have the ability to see 10 years into your own future or six months into the future of the world?", "Would you rather nobody remember who you are at your 20-year class reunion or have everybody comment on how old you look?", "Would you rather shoot hoops with LeBron James or toss a football with Tom Brady?", "Would you rather live through an episode of Orange Is The New Black or Black Mirror?", "Would you rather only be able to listen to Christmas songs all year round or only be able to watch nothing but horror movies?", "Would you rather be a genius everyone thinks is an idiot or an idiot everyone thinks is a genius?", "Would you rather win on Survivor or on The Bachelor or The Bachelorette?", "Would you rather be beloved by the general public but your family and friends hate you, or be hated by the general public but your family and friends love you?", "Would you rather be color blind or lose your sense of taste?", "Would you rather live on a desert island with your celebrity crush or in a mansion with your ex?", "Would you rather pass gas every time you meet someone new or burp every time you kiss someone?", "Would you rather have tea with Queen Elizabeth or a beer with Prince Harry?", "Would you rather give up the Internet or showering for a month?", "Would you rather get away with a terrible crime but live in fear of someone discovering it or go to prison for three years for a crime you didn't commit?", "Would you rather be forced to live the same day over and over again for a full year or take three years off the end of your life?")
+
 nhie = (   
 	"Lost an argument with my pet.","Worn a dinosaur suit in public, besides on Halloween.","Impulse bought a ridiculous item while drunk.","Switched places with a twin.","Binge-watched an entire TV series in one sitting.","Secretly watched ahead in a TV show after promising a friend or partner you would watch together.	   ,				  "
 	"Raided a child’s Halloween candy stash.","Pretended that I loved a present I secretly hated.","Hoarded office supplies.","Won a dance-off.","Re-enacted the “Lady and the Tramp” kiss.","Microwaved noodles without adding water first.","Ate the last piece of pizza without asking.","Cleaned my room by shoving the mess in the closet.","Been retweeted or followed by a celebrity.","Given someone else my Netflix password.","Unironically used a cheesy pick-up line on someone.","Convinced myself I was dying after checking WebMD.","Brought a parent on a date with me.","Called someone the wrong name more than once.","Told a child that Santa was not real.","Accidentally texted something embarrassing to the wrong person.","Been secretly relieved when plans got cancelled because you didn’t want to leave the house.","Pretended I needed to make a phone call to get out of an awkward conversation with a coworker.","Had a Myspace account.","Ordered delivery from a restaurant that was less than one mile away.","Stole someone’s lunch out of the break room fridge.","Worked all day in my pajamas.","Tried to talk during a Zoom meeting without unmuting myself.","Worked at the same company as a spouse.","Worked at the same company as a parent.","Had a work snack stash.","Changed careers.","Had a medical emergency at work.","Brought my pet into the office.","Broken my vow to eat healthy because there was cake or donuts in the breakroom.","Snooped a coworker’s social media.","Snooped a client’s social media.","Got a really nice present from a client.","Got a really nice present from a boss.","Learned to play an instrument.","Learned to speak a second language.","Called in sick at work to attend an event.","Gotten a speeding ticket.","Been sky-diving.","Played a prank on a coworker.","Played a prank on my boss.","Visited all 50 states.","Worked at a fast food restaurant.","Worked at a family business.","Quit a job in a day or less.","Lied in a job interview.","Taken a nap during the workday while working from home.","Had a crush on a coworker.","Had a crush on a client.","Forgotten a coworker’s name.","Pretended I didn’t see an error sign on a copier because I didn’t feel like fixing it.","Stayed cool as a cucumber so that customers could not tell there was an issue.","Froze up during an interview","Been late to an interview.","Made my coworkers watch a YouTube video.","Baked a cake or pie from scratch.","Broken a bone.","Got stitches.","Stayed overnight in a hospital.","Won the lottery.","Met a celebrity.","Surfed.","Hitch-hiked.","Been to a live concert.","Gone hunting.","Competed in the Olympics.","Gotten a tattoo.","Gotten a piercing.","Lived in another country.","Been vegetarian.","Been vegan.","Missed a flight.","Eaten alligator.","Gotten a concussion.","Been on a road trip.","Been thrown a surprise party.","Ran a marathon.","Ridden an elephant.","Grown a vegetable from seed.","Started a company.","Played video games for 10+ hours a day.","Helped a friend move.","Lost my wallet.","Done my own car repairs.","Built a piece of furniture.","Volunteered at the same charity for years.","Dated a friend’s ex.","Thrown a gender reveal party.","Won a spelling bee.","Started a club","Started a petition.","Had an embarrassing nickname.","Wiped a booger on a piece of furniture.","Wore the same underpants two days in a row.","Stepped in a pet’s puke.","Had food poisoning.","Sat on a wet toilet seat in a public restroom.","Trailed dog doo inside on my shoe.","Been thrown up on by a stranger.","Walked around in public with baby vomit on my shirt.","Had feet so smelly they made bystanders gag.","Eaten an earthworm.","Eaten a spider.","Eaten a scorpion.","Drank rotten milk.","Scratched my behind in public.","Had food come out of my nose.","Stepped in a dead animal.","Been gifted a dead mouse or bird by a cat.","Swallowed my own vomit.","Accidentally wore someone else’s underpants.","Used someone else’s toothbrush.","Used a toothbrush that fell on the floor without washing it first.","Invoked the “5 second rule” (aka, eat something off the floor.)","Bitten my fingernails.","Bitten my toenails.","Clipped my nails in public.","Shaved in public.","Burped and blown it in someone else’s face.","Used the bathroom without washing my hands after.","Slept on the same sheets for two months.","Got stuck in a porta-potty.","Let a pet eat something out of my mouth.","Took out gum and stuck it somewhere “for later.”","Worn a speedo in public.","Had an injury so serious I could see my own bone.","Passed gas in a crowded elevator.","Seen snow in real life.","Appeared in a movie.","Been ski-ing or snowboarding.","Gone horseback riding.","Been to Disneyworld or Disneyland.","Been to the Olympics.","Gone over a month without doing laundry.","Slept in a hostel.","Been to a Hollywood movie premiere.","Been prom king/queen or homecoming king/queen.","Been valedictorian.","Published a book.","Locked my keys in the car.","Performed standup comedy.","Been on a blind date.","Accidentally injured myself in a really strange way.","Been on a gameshow.","Adopted or fostered a child.","Gotten a makeover.","Mastered a magic trick.","Been a wedding officiant.","Gone on a shopping spree.","Designed an app.","Accidentally wore the same outfit as someone else at an event.","Had a stranger do something really kind for me.","Written and recorded a song.","Been a member of a wedding party.","Read 50+ books in one year.","Climbed a mountain.","Stolen someone else’s story and passed it off as my own.","Been to a wedding where someone got left at the altar.","Thrown a party for a pet.","Been cat-fished.","Eaten out 3+ times in one day.","Been to a drag show.","Written a celebrity fanmail.","Seen one of the 7 wonders of the world in person.","Ridden a mechanical bull.","Been to a hookah bar.","Knit a piece of clothing.","Been in a music video.","Written angsty poetry.","Had a post go viral.","Been involved in a car accident.","Piloted a plane.","Switched college majors.","Been attacked by a wild animal.","Cosplayed.","Been to a rodeo.","Saw the Aurora Borealis in person.","Disliked one of my neighbors.","Gone wine tasting.","Brewed my own beer.","Eloped.","Ghosted someone.","Skipped school.","Gotten detention.","Snooped on a date’s social media.","Dated someone my friends and family hated.","Worn body paint.","Been to a foam party.","Changed all of the names in the contacts of someone’s phone.","Lied about my age.","Been zip-lining.","Worked a really bizarre or unusual job.","Met my doppleganger.","Made my own Halloween costume.","Won a giant stuffed animal at a carnival or amusement park.","Ridden a roller coaster 10+ times in a row.","Gotten a professional psychic reading.","Started a social media account for a pet.","Jumped into a swimming pool with all my clothes on.","Been storm-chasing.","Eaten an ostrich egg.","Eaten food garnished with gold flakes.","Staged an elaborate photoshoot for an Instagram post.","Broke out into random song in the middle of a conversation.","Encountered quicksand in real life.","Walked in a fashion show.","Been to 3+ countries in one day.","Dyed my hair a neon color.","Gotten pickpocketed.","Camped out to get a good place in line.","Crashed a wedding.","Pretended to have an accent.","Mispronounced a word for years.","Gotten acupuncture.","Argued with a pet.","Filmed a makeup tutorial.","Cried when a fictional character died.","Completed an entire coloring book.","Sewed a button on a sweater.","Solved a 1,000+ piece jigsaw puzzle.","Designed a video game.","Met an internet friend in real life.","Learned how to ride a bike.","Tripped over my own shoe laces.","Flown a kite.","Traveled abroad.","Seen a ghost.","Been allergic to nuts.","Been on safari.","Screamed during a horror movie.","Won a costume contest.","Made a basket in basketball without looking.","Had a crush on a friend’s sibling.","Hit a home run.","Scored a touchdown.","Performed the lead in a play.","Sleep-walked.","Been part of a parade.","Dressed up like a chicken.","Forgotten my phone in a cab.","Had my luggage lost during a flight.","Ran a website.","Worn pajamas in public.","Had a pen pal.","Eaten a fried candy bar.","Ran out of the room because I saw a spider.","Sang in the shower.","Participated in an internet challenge.","Ate all of the marshmallows out of a box of cereal and left the healthy bits.","Played an April Fool’s Day prank.","Been rafting.",
@@ -114,6 +121,15 @@ class NHIEButton(discord.ui.View):
 	async def btn(self, interaction:discord.Interaction, button: discord.ui.Button):
 		global nhie
 		await interaction.response.send_message(f"Requested by: <@{interaction.user.id}>\nType: **NHIE**\nNever have I ever {random.Random().choice(seq=nhie)}", view=NHIEButton())
+
+class WYRButton(discord.ui.View):
+	def __init__ (self):
+		super().__init__()
+	@discord.ui.button(label="Would you rather", style=ButtonStyle.blurple)
+	async def btn(self, interaction:discord.Interaction, button: discord.ui.Button):
+		global wyr
+		await interaction.response.send_message(f"Requested by: <@{interaction.user.id}>\nType: **WYR**\n{random.Random().choice(seq=wyr)}", view=WYRButton())
+
 
 class Meme:
 	def __init__(self, name, suggested):
@@ -221,11 +237,11 @@ def plog(msg, ):
 
 def validMessage(mes):
 	global ADMIN
-	return str(mes.author) in (ADMIN, "nickelsthenby#0", "Nickels#3069", "Comte de Monte Cristo#4077", "netcrosystem#0", "rainisfalling#0", "a.fork.in.soup#0")
+	return str(mes.author) in (ADMIN, "nickelsthenby", "Nickels#3069", "_monte_cristo_", "netcrosystem", "a.lil.depresso.espresso")
 
 def validInteraction(mes):
 	global ADMIN
-	return str(mes.user) in (ADMIN, "nickelsthenby#0", "Nickels#3069", "Comte de Monte Cristo#4077", "netcrosystem#0", "SnowIsFalling#0514", "a.fork.in.soup#0")
+	return str(mes.user) in (ADMIN, "nickelsthenby", "Nickels#3069", "_monte_cristo_", "netcrosystem", "a.lil.depresso.espresso")
 
 
 async def cant(mes):
@@ -242,6 +258,7 @@ async def dostuff(instructions, message):
 	global money
 	global tree
 	global ignore_bad_words
+	global react_all
 	instruction = []
 	for i in instructions:
 		instruction.append(i)
@@ -270,6 +287,23 @@ async def dostuff(instructions, message):
 		else:
 			await message.channel.send(str(expression) + "=" + str(result.value))		
 	if len(instruction) == 5:
+		if instruction[1].lower() == "react" and instruction[3] == "to":
+			if not validMessage(message):
+				await cant()
+				return
+			emoji = instruction[2]
+			link = instruction[4]
+			link = link.split('/')
+			server_id = int(link[4])
+			channel_id = int(link[5])
+			msg_id = int(link[6])
+			print(f"serverid: {server_id}, channelid: {channel_id}, msgid: {msg_id}")
+
+			server = client.get_guild(server_id)
+			channel = server.get_channel(channel_id)
+			mesg = await channel.fetch_message(msg_id)
+			await mesg.add_reaction(emoji)
+			message.delete()
 		if instruction[1].lower() == "coins" and instruction[2].lower() == "grant":
 			if not str(message.author) in (TREASURER, ADMIN):
 				await cant(message)
@@ -363,6 +397,12 @@ async def dostuff(instructions, message):
 			await message.channel.send("bruh, you dont have proper permissions to remove a meme! contact one of the admins to do that.")
 
 	if len(instruction) == 2:
+		if instruction[1].lower() == "restart":
+			if str(message.author) != ADMIN:
+				message.channel.send("Nice try.")
+				return
+			message.channel.send("Restart **Successful**.")
+
 		if instruction[1].lower() == "nuke":
 			await message.delete()
 			print(f"Oh,{str(message.author)}, dost tn'at nuclear war hath begun?", end="")
@@ -414,6 +454,18 @@ async def dostuff(instructions, message):
 			vc = client.voice_client
 			await vc.disconnect()
 	if len(instruction) > 2:
+		if instruction[1].lower() == "react_all":
+			if validMessage(message):
+				react_all.append(instruction[2])
+			else:
+				await cant()
+				return
+		if instruction[1].lower() == "react_all_remove":
+			if validMessage(message):
+				react_all.remove(instruction[2])
+			else:
+				await cant()
+				return
 		if instruction[1].lower() == "time":
 			if not validMessage(message):
 				cant(message)
@@ -492,7 +544,8 @@ async def dostuff(instructions, message):
 					"userid": int(instruction[2].replace("@", "").replace(">", "").replace("<", ""))
 				}
 				themsg = info["message"]
-				plog(f"the bot says to {str(message.author)} -> {themsg}")
+				userid = info["userid"]
+				plog(f"the bot says to {str(userid)} -> {themsg}")
 				if instruction[1].lower() == "send_delete":
 					await message.delete()
 
@@ -633,6 +686,7 @@ async def dostuff(instructions, message):
 async def calc(interaction:discord.Interaction, expression: str):
 
 	result, error = lang.run("<discord_runtime>", expression)
+	print("\n\nDone calculation >:)))\n")
 	if error:
 		await interaction.response.send_message(str(error.__repr__()),ephemeral=True)
 	else:
@@ -690,42 +744,63 @@ async def fact(interaction:discord.Interaction, expression: str):
 			await interaction.response.send_message("Invalid Input", ephemeral=True) 
 			return
 
-@tree.command(name="play", description="Play music")
-@app_commands.describe(song="What song you want to play?")
-@app_commands.choices(song=[
-	app_commands.Choice(name="Never gonna give you up",value="https://www.youtube.com/watch?v=dQw4w9WgXcQ")
-])
-async def music(ctx:discord.Interaction, song: app_commands.Choice[str]):
-	global voice_clients
-	global ytdl
-	global ffmpeg_opts
-	url = song.value
-
-	voice_channel = ctx.user.voice
-	if voice_channel == None:
-		await ctx.response.send_message(f"You are not in a voice channel!")
-		return
-	voice_channel = voice_channel.channel
-	channel = None
-	if voice_channel != None:
-		channel = voice_channel.name
-		vc = await voice_channel.connect()
-		voice_clients[vc.guild.id] = vc
-		
-		info = ytdl.extract_info(f"ytsearch:{url}", download=False)['entries'][0]
-
-		print("\n\nyYOYOYOYOOYOOYOYO!!!\n\n")
-
-		player = discord.FFmpegOpusAudio(info['formats'][0]['url'], before_options="-reconnect 9 -reconnect_streamed 9 -reconnect_delay_max 5")
-
-		vc.play(player)
-
-		await ctx.response.send_message(f"Now playing {song.name} in {channel}")
+# @tree.command(name="play", description="Play music")
+# @app_commands.describe(song="What song you want to play?")
+# @app_commands.choices(song=[
+# 	app_commands.Choice(name="Never gonna give you up",value="https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+# ])
+# async def music(ctx:discord.Interaction, song: app_commands.Choice[str]):
+# 	global voice_clients
+# 	global ytdl
+# 	global ffmpeg_opts
+# 	url = song.value
+# 
+# 	voice_channel = ctx.user.voice
+# 	if voice_channel == None:
+# 		await ctx.response.send_message(f"You are not in a voice channel!")
+# 		return
+# 	voice_channel = voice_channel.channel
+# 	channel = None
+# 	if voice_channel != None:
+# 		channel = voice_channel.name
+# 		vc = await voice_channel.connect()
+# 		voice_clients[vc.guild.id] = vc
+# 		
+# 		info = ytdl.extract_info(f"ytsearch:{url}", download=False)['entries'][0]
+# 
+# 		print("\n\nyYOYOYOYOOYOOYOYO!!!\n\n")
+# 
+# 		player = discord.FFmpegOpusAudio(info['formats'][0]['url'], before_options="-reconnect 9 -reconnect_streamed 9 -reconnect_delay_max 5")
+# 
+# 		vc.play(player)
+# 
+# 		await ctx.response.send_message(f"Now playing {song.name} in {channel}")
 
 @tree.command(name="never-have-i-ever", description="Never have I ever...?")
 async def nh(interaction: discord.Interaction):
 	global nhie
 	await interaction.response.send_message(f"Requested by: <@{interaction.user.id}>\nType: **NHIE**\nNever have I ever {random.Random().choice(seq=nhie)}", view=NHIEButton())
+
+@tree.command(name="suggest", description="Suggestion a new feature!")
+@app_commands.describe(suggestion="What feature would you like to suggest?")
+async def sugg(interaction: discord.Interaction, suggestion:str):
+	global embec
+	
+	suggs = ""
+	with open(pathify("suggestions|suggestions.txt"),"r") as f:
+		suggs = f.read()
+
+	with open(pathify("suggestions|suggestions.txt"),"w") as f2:
+		f2.write(f"{suggs}{str(interaction.user)} ({str(interaction.user.id)}) : {suggestion}\n")
+	
+	embe = discord.Embed(title="New suggestion", description=f"By <@{interaction.user.id}>", color=embec)
+	embe.add_field(name="Suggestion:", value=suggestion, inline=False)
+	await interaction.response.send_message(embed=embe)
+
+@tree.command(name="would-you-rather", description="Play the would you rather game!")
+async def wy(interaction: discord.Interaction):
+	global wyr
+	await interaction.response.send_message(f"Requested by: <@{interaction.user.id}>\nType: **WYR**\n{random.Random().choice(seq=wyr)}", view=WYRButton())
 
 @tree.command(name="truth-or-dare", description="TRUTH or DARE??!! Use this command to play!")
 @app_commands.describe(type="Leave blank for a random question")
@@ -823,6 +898,7 @@ def mykey(obj: Money):
 @tree.command(name="leaderboard", description="See the top ranked turrcoin owners")
 async def rank(interaction: discord.Interaction):
 	global money
+	global embec
 	load_money()
 	money.sort(key=mykey, reverse=True)
 	until = 20
@@ -851,7 +927,7 @@ async def rank(interaction: discord.Interaction):
 			elif int(you) in (3,13) : resp += f"\nYou(<@{str(interaction.user.id)}>) are in **{you}rd** place."
 			else: resp += f"\nYou(<@{str(interaction.user.id)}>) are in **{you}th** place."
 	resp += f"\n{len(money)} Bank accounts in total."
-	embe = discord.Embed(title="Turrcoins Leaderboard", description="Top 20 turrcoin holders", color=0x00ff00)
+	embe = discord.Embed(title="Turrcoins Leaderboard", description="Top 20 turrcoin holders", color=embec)
 	embe.add_field(name="Ranking", value=resp, inline=False)
 	await interaction.response.send_message(embed=embe)
 
@@ -914,12 +990,29 @@ async def ask(interaction: discord.Interaction, question:str):
 	await interaction.response.send_message(q)
 
 @tree.command(name="help", description="Need technical support or learn more about the bot? Use this command!")
-async def inv(interaction: discord.Interaction):
-	num_of_servers = 0
-	for server in client.guilds:
-		num_of_servers += 1
-	await interaction.channel.send(f"<:turrnut:1124769501087543358><:turrnut:1124769501087543358><:turrnut:1124769501087543358><:turrnut:1124769501087543358><:turrnut:1124769501087543358><:turrnut:1124769501087543358><:turrnut:1124769501087543358><:turrnut:1124769501087543358><:turrnut:1124769501087543358><:turrnut:1124769501087543358>")
-	await interaction.response.send_message(f"Hello, I am <@{str(client.user.id)}>\n# I am currently in {num_of_servers} servers!\n## My pronouns are it/its.\n### Click this link to invite me to your server: https://discord.com/oauth2/authorize?client_id=1014960764378939453&scope=bot \n### For more information, visit our website: https://turrnut.github.io/discordbot\n### For technical support, join our server: https://discord.gg/JBB8C33pKS")
+@app_commands.describe(command="Which command would you like to look at?")
+@app_commands.choices(command=[
+	app_commands.Choice(name="/ask",value="ask"),
+	app_commands.Choice(name="/calculate",value="calc")
+])
+async def inv(interaction: discord.Interaction, command: app_commands.Choice[str]="None!"):
+	global embec
+	if command == "None!":
+		num_of_servers = 0
+		for server in client.guilds:
+			num_of_servers += 1
+
+		await interaction.response.send_message(f"# <:turrnut:1124769501087543358><:turrnut:1124769501087543358><:turrnut:1124769501087543358><:turrnut:1124769501087543358><:turrnut:1124769501087543358><:turrnut:1124769501087543358><:turrnut:1124769501087543358><:turrnut:1124769501087543358><:turrnut:1124769501087543358><:turrnut:1124769501087543358>\nHello, I am <@{str(client.user.id)}>\n# I am currently in {num_of_servers} servers!\n## My pronouns are it/its.\n### Click this link to invite me to your server: https://discord.com/oauth2/authorize?client_id=1014960764378939453&scope=bot \n### For more information, visit our website: https://turrnut.github.io/discordbot\n### For technical support, join our server: https://discord.gg/JBB8C33pKS")
+		return
+
+	elif command.value == "ask":
+		embe = discord.Embed(title="Command /ask", description=f"Consult the oracle! Ask the fortune teller a question and it will randomly generate an answer", color=embec)
+		embe.add_field(name="Required: question", value="What do you want to ask? Put it here!", inline=True)
+		await interaction.response.send_message(embed=embe)
+	elif command.value == "calc":
+		embe = discord.Embed(title="Command /calculate", description=f"Use the turrnut expression evaluator via this command", color=embec)
+		embe.add_field(name="Required: expression", value="Use + for addition, - for subtraction, * for multiplication, / for division and ^ for power. There is no need to put an \"=\" sign at the end.", inline=True)
+		await interaction.response.send_message(embed=embe)
 
 @tree.command(name="meme", description="Get a random meme!")
 async def say(interaction: discord.Interaction):
@@ -936,6 +1029,7 @@ async def say(interaction: discord.Interaction):
 async def say(interaction: discord.Interaction, message:str):
 	if validInteraction(interaction):
 		await interaction.response.send_message("ok", ephemeral=True)
+		print(str(interaction.user) + " Made me say \"" + message + "\"")
 		await interaction.channel.send(message)
 	else:
 		await interaction.response.send_message(message)
@@ -982,7 +1076,12 @@ async def on_message(message):
 	global mensaje
 	global ignore_bad_words
 	global curse_words
+	global react_all
 	mensaje = message
+
+	for react in react_all:
+		await message.add_reaction(react)
+
 	if message.author == client.user:
 		return
 
@@ -1002,7 +1101,6 @@ async def on_message(message):
 	#		log(str(message.author) + " got greeted by the random greeting system")
 	#		at = "<@" + str(message.author.id) + ">"
 	#		await message.channel.send(random.Random().choice(seq=("Heyyy," + at + " . Whats Up?", "Hello, " + at, at + " hi, how are you?", f"yo {at}")) + str("😏😏"))
-
 	authorinfo = {"username": str(message.author),
 				  "userid": int(message.author.id)}
 	theusername = authorinfo["username"]
