@@ -15,12 +15,24 @@ import exint.interpreter as lang
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 import tensorflow as tf
-
+import pickle
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import tensorflow_text as text
 from tensorflow import keras
+from time import sleep
+from keras import Sequential
+from keras.layers import *
+from keras.preprocessing.text import Tokenizer
+from keras_preprocessing.sequence import pad_sequences
+
 from discord import app_commands, ButtonStyle
 from discord.ext import commands
 
 from discord.ext.commands import Bot
+
+from youtube_dl import YoutubeDL
 
 # Features list:
 #   1. randomly send greeting messages
@@ -52,13 +64,6 @@ from discord.ext.commands import Bot
 intents = discord.Intents.all()
 client = Bot(command_prefix='?', intents=intents)
 
-voice_clients = {}
-
-yt_dl_opts = {"format" : "bestaudio/best"}
-ytdl = youtube_dl.YoutubeDL(yt_dl_opts)
-
-ffmpeg_opts = {"options": "-vn"}
-
 react_all = []
 tree = client.tree
 mensaje = None
@@ -68,13 +73,43 @@ curse_words = ("fags", "nigger", "chink", "nigga",
 			   "penis", "stfu", "shutup", "kys", "meth", "cock", "dik")
 spamhalt = False
 SERVER_NAME = ""
+howmanywords = "20"
 MYSERVER = "Turrnut Republic(拖鞋社)"
-ADMIN = "turrnut"
-TREASURER = "netcrosystem"
+ADMIN = "977377574789472278" # turrnut
+TREASURER = "811101581272547359" # netcro
+LIST = (ADMIN,
+	TREASURER,
+	"917059800154652732", # nickels(main)
+	"1025854689142657055", # fork in soup
+	"984242137879162920", # karma
+	"874094518234923060", # garrett
+	)
 guilds = []
-AWARD = 5
+AWARD = 10
 ignore_bad_words = (1112529128273477724,)
 embec = 0x22B14C
+len_tags = 0
+questions = []
+answers = []
+xs = []
+ys = []
+total_words = 0
+word_index = {}
+tokenizer = None
+padtype = "post"
+corpus = []
+trunctype = "post"
+chatmodel = keras.models.load_model(f"models{os.sep}chat", compile=False)
+chatmodel.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+
+itemslist = [
+	app_commands.Choice(name="Turrnut Car", value="car"),
+	app_commands.Choice(name="Turrnut Home", value="home"),
+	app_commands.Choice(name="Turrnut Ring", value="ring")
+]
+
+with open(f"chat.pickle", "rb") as f:
+        	len_tags, questions, answers, xs, ys, total_words, word_index, tokenizer, corpus = pickle.load(f)
 
 wyr = ("Would you rather have the ability to see 10 minutes into the future or 150 years into the future?", "Would you rather have telekinesis (the ability to move things with your mind) or telepathy (the ability to read minds)?", "Would you rather team up with Wonder Woman or Captain Marvel?", "Would you rather be forced to sing along or dance to every single song you hear?", "Would you rather find true love today or win the lottery next year?", "Would you rather be in jail for five years or be in a coma for a decade?", "Would you rather have another 10 years with your partner or a one-night stand with your celebrity crush?", "Would you rather be chronically under-dressed or overdressed?", "Would you rather have everyone you know be able to read your thoughts or for everyone you know to have access to your Internet history?", "Would you rather lose your sight or your memories?", "Would you rather have universal respect or unlimited power?", "Would you rather give up air conditioning and heating for the rest of your life or give up the Internet for the rest of your life?", "Would you rather swim in a pool full of Nutella or a pool full of maple syrup?", "Would you rather labor under a hot sun or extreme cold?", "Would you rather stay in during a snow day or build a fort?", "Would you rather buy 10 things you don't need every time you go shopping or always forget the one thing that you need when you go to the store?", "Would you rather never be able to go out during the day or never be able to go out at night?", "Would you rather have a personal maid or a personal chef?", "Would you rather be 11 feet tall or nine inches tall?", "Would you rather have Beyoncé's talent or Jay-Z's business acumen?", "Would you rather be an extra in an Oscar-winning movie or the lead in a box office bomb?", "Would you rather vomit on your hero or have your hero vomit on you?", "Would you rather communicate only in emoji or never be able to text at all ever again?", "Would you rather be royalty 1,000 years ago or an average person today?", "Would you rather lounge by the pool or on the beach?", "Would you rather wear the same socks for a month or the same underwear for a week?", "Would you rather work an overtime shift with your annoying boss or spend full day with your mother-in-law?", "Would you rather cuddle a koala or pal around with a panda?", "Would you rather have a sing-off with Ariana Grande or a dance-off with Rihanna?", "Would you rather always have B.O. and not know it or always smell B.O. on everyone else?", "Would you rather watch nothing but Hallmark Christmas movies or nothing but horror movies?", "Would you rather always be 10 minutes late or always be 20 minutes early?", "Would you rather spend a week in the forest or a night in a real haunted house?", "Would you rather find a rat in your kitchen or a roach in your bed?", "Would you rather have a pause or a rewind button in your life?", "Would you rather always have a full phone battery or a full gas tank?", "Would you rather lose all your teeth or lose a day of your life every time you kissed someone?", "Would you rather drink from a toilet or pee in a litter box?", "Would you rather be forced to live the same day over and over again for a full year, or take 3 years off the end of your life?", "Would you rather never eat watermelon ever again or be forced to eat watermelon with every meal?", "Would you rather get a paper cut every time you turn a page or bite your tongue every time you eat?", "Would you rather oversleep every day for a week or not get any sleep at all for four days?", "Would you rather die in 20 years with no regrets or live to 100 with a lot of regrets?", "Would you rather sip gin with Ryan Reynolds or shoot tequila with Dwayne \"The Rock\" Johnson?", "Would you rather get trapped in the middle of a food fight or a water balloon fight?", "Would you rather walk to work in heels or drive to work in reverse?", "Would you rather spend a year at war or a year in prison?", "Would you rather die before or after your partner?", "Would you rather have a child every year for 20 years or never have any children at all?", "Would you rather take amazing selfies but look terrible in all other photos or be photogenic everywhere but in your selfies?", "Would you rather be gassy on a first date or your wedding night?", "Would you rather Danny DeVito or Danny Trejo play you in a movie?", "Would you rather be able to take back anything you say or hear any conversation that is about you?", "Would you rather have skin that changes color based on your emotions or tattoos appear all over your body depicting what you did yesterday?", "Would you rather hunt and butcher your own meat or never eat meat again?", "Would you rather lose all of your friends but keep your BFF or lose your BFF but keep the rest of your buds?", "Would you rather have people spread a terrible lie about you or have people spread terrible but true tales about you?", "Would you rather walk in on your parents or have them walk in on you?", "Would you rather be the absolute best at something that no one takes seriously or be average at something well respected?", "Would you rather have unlimited battery life on all of your devices or have free WiFi wherever you go?", "Would you rather have Billie Eilish's future or Madonna's legacy?", "Would you rather have a third nipple or an extra toe?", "Would you rather solve world hunger or global warming?", "Would you rather have to wear every shirt inside out or every pair of pants backward?", "Would you rather live in a treehouse or in a cave?", "Would you rather win $25,000 or your best friend win $100,000?", "Would you rather be in history books for something terrible or be forgotten completely after you die?", "Would you rather travel the world for free for a year or have $50,000 to spend however you please?", "Would you rather your to only be able to talk to your dog or for your dog to be able to talk to only you—and everyone thinks you're nuts?", "Would you rather have a mullet for a year or be bald (no wigs!) for six months?", "Would you rather go back to the past and meet your loved ones who passed away or go to the future to meet your children or grandchildren to be?", "Would you rather have Angelina Jolie's lips or with Jennifer Aniston's hair?", "Would you rather stay the age you are physically forever or stay the way you are now financially forever?", "Would you rather be in a zombie apocalypse or a robot apocalypse?", "Would you rather be alone all your life or surrounded by really annoying people?", "Would you rather give up your cellphone for a month or bathing for a month?", "Would you rather spend a day cleaning your worst enemy's house or have your crush spend the day cleaning your house?", "Would you rather spend a year entirely alone or a year without a home?", "Would you rather buy all used underwear or all used toothbrushes?", "Would you rather have a photographic memory or an IQ of 200?", "Would you rather go on a cruise with your boss or never go on vacation ever again?", "Would you rather forget your partner's birthday or your anniversary every year?", "Would you rather have to wear stilettos to sleep or have to wear slippers everywhere you go?", "Would you rather change the outcome of the last election or get to decide the outcome of the next election?", "Would you rather lose the ability to read or lose the ability to speak?", "Would you rather smooch Chris Pratt, Chris Pine, Chris Evans or Chris Hemsworth?", "Would you rather be beautiful and stupid or unattractive but a genius?", "Would you rather have seven fingers on each hand or seven toes on each foot?", "Would you rather work the job you have now for a year at double your current rate of pay or have one year off with what you are making now?", "Would you rather be always stuck in traffic but find a perfect parking spot or never hit traffic but always take forever to park?", "Would you rather have super-sensitive taste buds or super-sensitive hearing?", "Would you rather ask your ex or a total stranger for a favor?", "Would you rather go on tour with Elton John or Cher?", "Would you rather eat only pizza for a year or not eat any pizza for five years?", "Would you rather never get another present in your life but always pick the perfect present for everyone else or keep getting presents but giving terrible ones to everyone else?", "Would you rather sleep in a doghouse or let stray dogs sleep in your bed?", "Would you rather be able to speak any language or be able to communicate with animals?", "Would you rather have all of your messages and photos leak publicly or never use a cellphone ever again?", "Would you rather run at 100 mph or fly at 20 mph?", "Would you rather have Adele's voice or Normani's dance moves?", "Would you rather have to wear sweatpants everywhere for the rest of your life or never wear sweatpants again?", "Would you rather have 10,000 spoons when all you need is a knife or always have a knife but never be able to use spoons?", "Would you rather detect every lie you hear or get away with every lie you tell?", "Would you rather be the funniest person in a room or the smartest person in a room?", "Would you rather talk like Yoda or breathe like Darth Vader?", "Would you rather people knew all the details of your finances or all the details of your love life?", "Would you rather listen to your least-favorite song on a loop for a year or never listen to any music at all for a year?", "Would you rather go vegan for a month or only eat meat and dairy for a month?", "Would you rather clean up someone else's vomit or someone else's blood?", "Would you rather work for Michael Scott or Mr. Burns?", "Would you rather spend the weekend with pirates or ninjas?", "Would you rather end every phone call with \"I love you\" or accidentally call your partner the wrong name during a fight?", "Would you rather get your paycheck given to you in pennies or never be able to use cash again?", "Would you rather see Lady Gaga in a movie or see Bradley Cooper in concert?", "Would you rather win the lottery but have to spend it all in one day or triple your current salary forever?", "Would you rather live until you are 200 and look your age or look like you're 22 your whole life, but die at age 65?", "Would you rather give up cursing forever or give up ice cream for 12 years?", "Would you rather hear a comforting lie or an uncomfortable truth?", "Would you rather be locked for a week in a room that's overly bright or a room that's totally dark?", "Would you rather someone see all the photos in your phone or read all your text messages?  ", "Would you rather have a South Park-themed wedding or a Family Guy-themed funeral?", "Would you rather have to hunt and gather all of your food or eat McDonald's for every meal?", "Would you rather have fortune or fame?", "Would you rather celebrate the Fourth of July with Taylor Swift or Christmas with Mariah Carey?", "Would you rather only be able to listen to one song for the rest of your life or only be able to watch one movie for the rest of your life?", "Would you rather never use social media again or never watch another movie ever again?", "Would you rather have police hunting you down for a crime you didn't commit or a serial killer actually hunting you?", "Would you rather live a peaceful life in a small cabin in the woods or a drama-filled life in a mansion in a big city?", "Would you rather find your soulmate or your calling?", "Would you rather drink sour milk or brush your teeth with soap?", "Would you rather steal Duchess Meghan or Duchess Kate's style?", "Would you rather never get a cold ever again or never be stuck in traffic ever again?", "Would you rather be tall and average looking or three feet tall but beautiful?", "Would you rather visit the International Space Station for a week or spend a week in a hotel at the bottom of the ocean?", "Would you rather confess to cheating on your partner or catch your partner cheating on you?", "Would you rather have all traffic lights you approach be green or never have to stand in line again?", "Would you rather share an onscreen kiss with Leonardo DiCaprio or George Clooney?", "Would you rather never eat Christmas cookies ever again or never eat Halloween candy ever again?", "Would you rather lose your long-term memory or your short-term memory?", " You Rather question", "Would you rather have a mullet or a perm?", "Would you rather be stranded in the jungle or in the desert?", "Would you rather everyone you love forget your birthday or everyone you love sing \"Happy Birthday\" to you for 24 hours straight?", "Would you rather be invisible or be able to fly?", "Would you rather spend every weekend indoors or spend every weekend outdoors?", "Would you rather party with Jennifer Lopez and Alex Rodriguez or with Kim Kardashian and Kanye West?", "Would you rather give up wine for a year or drink nothing but wine for a year?", "Would you rather start a colony on another planet or be the leader of a country on Earth?", "Would you rather live in a house haunted by friendly ghosts or be a ghost reliving your average day after you die?", "Would you rather have one wish granted today or 10 wishes granted 20 years from now?", "Would you rather get hit on by someone 20 years older than you or someone 20 years younger than you?", "Would you rather fall down in public or pass gas in public?", "Would you rather only eat raw food or only eat TV dinners?", "Would you rather run as fast as The Flash or be as strong as Superman?", "Would you rather never have a wedgie or never have anything stuck in your teeth ever again?", "Would you rather marry the most attractive person you've ever met or the best cook you've ever met?", "Would you rather sing karaoke with Gwen Stefani or with Kelly Clarkson?", "Would you rather go back to kindergarten with everything you know now or know now everything your future self will learn?", "Would you rather be able to read minds or predict the future?", "Would you rather take a pill a day for nutrients and to feel full, but never eat anything again or eat whatever you want but never really feel full?", "Would you rather be an unknown superhero or an infamous villain?", "Would you rather always have an annoying song stuck in your head or always have an itch that you can't reach?", "Would you rather never be able to keep anyone else's secrets or have someone tell all of your secrets?", "Would you rather be Batman or Iron Man?", "Would you rather be married to someone stunning who doesn't think you're attractive or be married to someone ugly who thinks you're gorgeous?", "Would you rather have a third ear or a third eye?", "Would you rather have $1 million now or $5,000 a week for the rest of your life?", "Would you rather binge-watch Sex And the City or Girls?", "Would you rather be rich working a job you hate or poor working a job you love?", "Would you rather wear real fur or fake jewels?", "Would you rather work a high-paying job that you hate or your dream job with only just enough money for rent, food and utilities?", "Would you rather wake up naked in a forest five miles from home or in your underwear at work?", "Would you rather go backstage with your favorite band or be an extra on your favorite TV show?", "Would you rather never eat your favorite food for the rest of your life or only eat your favorite food?", "Would you rather be able to erase your own memories or be able to erase someone else's memories?", "Would you rather be so afraid of heights that you can’t go to the second floor of a building or be so afraid of the sun that you can only leave the house on rainy days?", "Would you rather have a rap battle against Nicki Minaj or Lizzo?", "Would you rather save your best friend's life if it meant five strangers would die or save five strangers if it meant sacrificing your best friend?", "Would you rather give up coffee or soda forever?", "Would you rather find a $100 bill floating in a public toilet or a $20 bill in your own pocket?", "Would you rather wear nothing but neon orange or neon green for an entire year?", "Would you rather eat the same thing for every meal for a year or be able to eat whatever you wanted, but only once every three days?", "Would you rather get drunk off of one sip of alcohol or never get drunk no matter how much booze you imbibe?", "Would you rather sell all of your possessions or sell one of your organs?", "Would you rather clean a toilet with your toothbrush or a floor with your tongue?", "Would you rather be asked the same question over and over again or never be spoken to ever again?", "Would you rather be reincarnated as a fly or just stop existing when you die?", "Would you rather be serenaded by Justin Bieber or Justin Timberlake?", "Would you rather be unable to close any door once it's open or be unable to open any door once it's closed?", "Would you rather throw the best parties but have to clean up the mess by yourself or never go to a party again?", "Would you rather have a tattoo of the title of the last book you read or the last TV show you watched?", "Would you rather wear clothes that were always way too big or a couple sizes too small?", "Would you rather give your parents or your boss access to your browser history?", "Would you rather only be able to wash your hair twice a year or only be able to check your phone once a day?", "Would you rather have a tennis lesson from Serena Williams or a soccer lesson from Meghan Rapinoe?", "Would you rather have a permanent unibrow or no eyebrows at all?", "Would you rather have aliens be real and covered up by the government or have no extraterrestrial life at all in the universe?", "Would you rather be caught liking your ex's Instagram pics or your partner's ex's Instagram pics?", "Would you rather never eat cookies ever again or only ever drink water?", "Would you rather donate your organs to those who need them or donate your entire body to science?", "Would you rather be criticized or be ignored?", "Would you rather work alongside Dwight Schrute or Homer Simpson?", "Would you rather be punished for a crime you didn't commit or have someone else take credit for one of your major accomplishments?", "Would you rather eat an undercooked meal or a burnt meal?", "Would you rather get a cooking lesson from Gordon Ramsay or Ina Garten?", "Would you rather have your boss or your parents look through your text messages?", "Would you rather have your first child when you're 18 or when you're 50?", "Would you rather star in a Star Warsor a Marvel film?", "Would you rather wear heels to the gym or sneakers to a wedding?", "Would you rather give up brushing your hair or give us brushing your teeth?", "Would you rather master every musical instrument or every type of sport?", "Would you rather always have wet socks or a small rock in your shoe?", "Would you rather have Celine Dion or Eminem perform the soundtrack to your life?", "Would you rather be the class clown or the teacher's pet?", "Would you rather bathe in the dishwater or wash dishes in your bathwater?", "Would you rather show up to a job interview with stained pants or pit stains?", "Would you rather never age physically or never age mentally?", "Would you rather date someone with bad breath or bad manners?", "Would you rather never wear makeup ever again or wear a full face of the wrong shades every day?", "Would you rather read the book or watch the movie?", "Would you rather have a slumber party with Anna Kendrick or go to a comedy show with Rebel Wilson?", "Would you rather eat chocolate on pizza or never eat chocolate ever again?", "Would you rather have X-ray vision of people you find unattractive or everyone else have X-ray vision of you?", "Would you rather have your own theme park or your own zoo?", "Would you rather be the star player on a losing team or warm the bench on a championship roster?", "Would you rather know when you're going to die or how you're going to die?", "Would you rather lose all of your teeth or all of your hair?", "Would you rather watch nothing but The Officeor Friends for the rest of your life?", "Would you rather lose your keys or your phone?", "Would you rather live in a home with no electricity or in a home with no running water?", "Would you rather be rich with no friends or poor and popular?", "Would you rather look strong and be weak or look weak and be strong?", "Would you rather have your style critiqued by Anna Wintour or Miranda Priestly?", "Would you rather wear one or seven colors everyday?", "Would you rather sneeze nonstop for 15 minutes once every day or sneeze once every three minutes of the day while you're awake?", "Would you rather walk barefoot in a public bathroom or through poison ivy?", "Would you rather have the ability to see 10 years into your own future or six months into the future of the world?", "Would you rather nobody remember who you are at your 20-year class reunion or have everybody comment on how old you look?", "Would you rather shoot hoops with LeBron James or toss a football with Tom Brady?", "Would you rather live through an episode of Orange Is The New Black or Black Mirror?", "Would you rather only be able to listen to Christmas songs all year round or only be able to watch nothing but horror movies?", "Would you rather be a genius everyone thinks is an idiot or an idiot everyone thinks is a genius?", "Would you rather win on Survivor or on The Bachelor or The Bachelorette?", "Would you rather be beloved by the general public but your family and friends hate you, or be hated by the general public but your family and friends love you?", "Would you rather be color blind or lose your sense of taste?", "Would you rather live on a desert island with your celebrity crush or in a mansion with your ex?", "Would you rather pass gas every time you meet someone new or burp every time you kiss someone?", "Would you rather have tea with Queen Elizabeth or a beer with Prince Harry?", "Would you rather give up the Internet or showering for a month?", "Would you rather get away with a terrible crime but live in fear of someone discovering it or go to prison for three years for a crime you didn't commit?", "Would you rather be forced to live the same day over and over again for a full year or take three years off the end of your life?")
 
@@ -147,9 +182,45 @@ def pathify(path):
 with open(pathify("models|grades|possibilites.json"), "r") as fobj:
 	possibilities = json.load(fobj)
 
+items = {}
+
+with open(pathify("money|items.json"), "r") as fobj:
+	items = json.load(fobj)
+
 memesjson = {}
 memes = []
 money = []
+
+def load_items():
+	global items
+	with open(pathify("money|items.json"), "r") as fobj:
+		items = json.load(fobj)
+
+def save_items():	
+	global items
+	with open(pathify("money|items.json"), "w") as fobj:
+		items = json.dump(items, fobj, indent=6)
+
+def buy_items(userid:str, item:str, quantity:int):
+	global items
+	global money
+	try:
+		items[item]["users"][userid]
+	except KeyError:
+		items[item]["users"][userid] = "0"
+	
+	if quantity * float(items[item]["price"]) > float(money[find_money(Money(userid, 0))].balance):
+		return False
+
+	items[item]["users"][userid] = str(float(items[item]["users"][userid]) + quantity)
+	money[find_money(Money(userid, 0))].balance = float(money[find_money(Money(userid, 0))].balance) - quantity * float(items[item]["price"])
+	
+	save_money()
+	load_money()
+
+	save_items()
+	load_items()
+	return True
 
 def load_meme():
 	global memes
@@ -193,7 +264,7 @@ def find_money(obj: Money):
 
 load_money()
 load_meme()
-
+load_items()
 
 def log(msg,):
 	try:
@@ -237,11 +308,13 @@ def plog(msg, ):
 
 def validMessage(mes):
 	global ADMIN
-	return str(mes.author) in (ADMIN, "nickelsthenby", "Nickels#3069", "_monte_cristo_", "netcrosystem", "a.lil.depresso.espresso")
+	global LIST
+	return str(mes.author.id) in LIST
 
 def validInteraction(mes):
 	global ADMIN
-	return str(mes.user) in (ADMIN, "nickelsthenby", "Nickels#3069", "_monte_cristo_", "netcrosystem", "a.lil.depresso.espresso")
+	global LIST
+	return str(mes.user.id) in LIST
 
 
 async def cant(mes):
@@ -303,9 +376,9 @@ async def dostuff(instructions, message):
 			channel = server.get_channel(channel_id)
 			mesg = await channel.fetch_message(msg_id)
 			await mesg.add_reaction(emoji)
-			message.delete()
+			await message.delete()
 		if instruction[1].lower() == "coins" and instruction[2].lower() == "grant":
-			if not str(message.author) in (TREASURER, ADMIN):
+			if not str(message.author.id) in (TREASURER, ADMIN):
 				await cant(message)
 				return
 			amount = float(instruction[3])
@@ -319,7 +392,7 @@ async def dostuff(instructions, message):
 			return
 
 		if instruction[1].lower() == "coins" and instruction[2].lower() == "take":
-			if not str(message.author) in (TREASURER, ADMIN):
+			if not str(message.author.id) in (TREASURER, ADMIN):
 				await cant(message)
 				return
 			amount = float(instruction[3])
@@ -354,7 +427,7 @@ async def dostuff(instructions, message):
 
 	if len(instruction) == 4:
 		if instruction[1].lower() == "coins" and instruction[2].lower() == "set_all":
-			if not str(message.author) in (TREASURER, ADMIN):
+			if not str(message.author.id) in (TREASURER, ADMIN):
 				await cant(message)
 				return
 			print(f"COINS SET ALL {instruction[3]}")
@@ -621,7 +694,9 @@ async def dostuff(instructions, message):
 			delete = False
 			if instruction[1] == "spam_delete":
 				delete = True
-			if validMessage(message):
+			# if validMessage(message) or message.author.guild_permissions.manage_messages:
+			# if validMessage(message):
+			if str(message.author.id) == ADMIN:
 				if instruction[2] == "halt":
 					# LOG
 					log(str(message.author) + " halted the spam")
@@ -681,6 +756,60 @@ async def dostuff(instructions, message):
 
 				await cant(message)
 
+@tree.command(name="buy", description="Buy stuff using turrcoins!")
+@app_commands.describe(item=f"What would you like to buy?")
+@app_commands.describe(quantity=f"How many would you like to buy?")
+@app_commands.choices(item=itemslist)
+async def buy(interaction:discord.Interaction,item:app_commands.Choice[str],quantity:int):
+	global money
+	global items
+	embe = discord.Embed(color=embec)
+	
+	embe.set_author(name=str(interaction.user.display_name), icon_url=interaction.user.avatar)
+	embe.set_footer(text=f"{datetime.datetime.now()}")
+	if quantity <= 0:
+		embe.add_field(name="Error", value="Quantity is 0 or negative.", inline=False)
+	elif not buy_items(str(interaction.user.id), item.value, quantity):
+		cost = str(quantity * float(items[item.value]["price"]))
+		msg = f"{str(quantity)} {item.name} costs {cost} turrcoins, You only have {float(money[find_money(Money(interaction.user.id, 0))].balance)}."
+		embe.add_field(name="Error",value=msg,inline=False)
+	else :
+		cost = str(quantity * float(items[item.value]["price"]))
+		print("COST EVALUTED")
+		msg = f"You bought {str(quantity)} {item.name} for {cost} turrcoins.\nYour balance is {float(money[find_money(Money(interaction.user.id, 0))].balance)}."
+		embe.add_field(name="Success",value=msg,inline=False)
+	await interaction.response.send_message(embed=embe)
+
+
+
+@tree.command(name="item", description="Check Item")
+@app_commands.describe(item=f"What item would you like to check")
+@app_commands.describe(user=f"What user do you want to check the item on? Leave blank to check your own.")
+@app_commands.choices(item=itemslist)
+async def item_check(interaction:discord.Interaction,item:app_commands.Choice[str],user:discord.User):
+	global items
+	userid = user.id
+	username = user.display_name
+	useravatar = user.avatar
+
+	embe = discord.Embed(color=embec)
+	
+	embe.set_author(name=f"Items of {username}", icon_url=useravatar)
+	embe.set_footer(text=f"{datetime.datetime.now()}")
+	
+	itemname = item.name
+	count = 0
+	try:
+		count = items[item.value]["users"][str(userid)]
+	except KeyError:
+		print("BRUH")
+	descr = items[item.value]["desc"]
+	
+	embe.add_field(name=f"Item name",value=f"{itemname}",inline=False)
+	embe.add_field(name=f"Quantity",value=f"{count}",inline=False)
+	embe.add_field(name=f"Item Description",value=f"{descr}",inline=False)
+	await interaction.response.send_message(embed=embe)
+
 @tree.command(name="calculate", description="Try the turrnut mathematic and logical calculator!")
 @app_commands.describe(expression="Arithmetic or boolean expression")
 async def calc(interaction:discord.Interaction, expression: str):
@@ -692,7 +821,47 @@ async def calc(interaction:discord.Interaction, expression: str):
 	else:
 		await interaction.response.send_message(str(expression) + "=" + str(result.value))
 
-@tree.command(name="daily", description="Get your daily turrcoin award using this command.")
+@tree.command(name="chat", description="Interact with the turrnut chatbot!")
+@app_commands.describe(prompt=f"Prompt for the chatbot")
+@app_commands.describe(version=f"What version of the Chatbot you want to use?")
+@app_commands.choices(version=[
+	app_commands.Choice(name="Version 1.1", value=1.1)
+])
+async def chat(interaction:discord.Interaction, prompt: str, version:app_commands.Choice[float]):
+	await interaction.response.defer()
+	global chatmodel
+	global howmanywords
+	global tokenizer
+	global padtype
+	global trunctype
+	global corpus
+	res = ""
+	prompt = [prompt]
+	disclaimer = "Disclaimer: Turrnut Chatbot may display inaccurate or offensive contents that does not represents Turrnut's views."
+	default = 1.1
+	if version.value == 1.1:
+		
+		seqs = tokenizer.texts_to_sequences(prompt)
+		padded = pad_sequences(seqs, maxlen=int(howmanywords),padding=padtype,truncating=trunctype)
+		print("Padded:", padded)
+		pred = chatmodel.predict(padded)[0]
+		argmx = np.argmax(pred)
+		if pred[argmx] > .7:
+			rdc = corpus[argmx]["response"]
+			res = f"{random.Random().choice(seq=rdc)}"
+		else:
+			res = f"Sorry, I didn't understand that. Try ask a different question"
+	embe = discord.Embed(title=f"Chat", description=f"{version.name}", color=embec)
+	
+	embe.set_author(name=str(interaction.user.display_name), icon_url=interaction.user.avatar)
+	embe.add_field(name="You:", value=prompt[0], inline=False)
+	embe.add_field(name="Bot:", value=res, inline=False)
+	embe.set_footer(text=disclaimer)
+	await interaction.followup.send(embed=embe)
+
+
+	
+@tree.command(name="collect", description="Get your turrcoin award using this command.")
 async def daily(interaction:discord.Interaction):
 	global money
 	global AWARD
@@ -717,8 +886,8 @@ async def daily(interaction:discord.Interaction):
 	if not str(interaction.user.id) in awards:
 		new = True
 	else:
-		if float(awards[str(interaction.user.id)]) > float(float(time.time())) - 86400:
-			await interaction.response.send_message(f"You already got your award today! Try again in ||{ str(round(float(float(86400 - (float(float(time.time())) - float(awards[str(interaction.user.id)]))) / 60.0 / 60.0), 3 )) } hours||")
+		if float(awards[str(interaction.user.id)]) > float(float(time.time())) - 7200:
+			await interaction.response.send_message(f"Try again in ||{ str(round(float(float(7200 - (float(float(time.time())) - float(awards[str(interaction.user.id)]))) / 60.0), 3 )) } minutes||")
 			return
 	awards[str(interaction.user.id)] = str(float(time.time()))
 	with open(pathify("awards|awards.json"), "w") as fobj2:
@@ -729,7 +898,6 @@ async def daily(interaction:discord.Interaction):
 	await interaction.response.send_message(f"Congrats <@{interaction.user.id}>, you have just earned {str(AWARD)} turrcoins!")
 	save_money()
 	load_money()
-	
 
 @tree.command(name="factorial", description="Calculator but with factorials")
 @app_commands.describe(expression="Arithmetic expression")
@@ -744,37 +912,96 @@ async def fact(interaction:discord.Interaction, expression: str):
 			await interaction.response.send_message("Invalid Input", ephemeral=True) 
 			return
 
-# @tree.command(name="play", description="Play music")
-# @app_commands.describe(song="What song you want to play?")
-# @app_commands.choices(song=[
-# 	app_commands.Choice(name="Never gonna give you up",value="https://www.youtube.com/watch?v=dQw4w9WgXcQ")
-# ])
-# async def music(ctx:discord.Interaction, song: app_commands.Choice[str]):
-# 	global voice_clients
-# 	global ytdl
-# 	global ffmpeg_opts
-# 	url = song.value
-# 
-# 	voice_channel = ctx.user.voice
-# 	if voice_channel == None:
-# 		await ctx.response.send_message(f"You are not in a voice channel!")
-# 		return
-# 	voice_channel = voice_channel.channel
-# 	channel = None
-# 	if voice_channel != None:
-# 		channel = voice_channel.name
-# 		vc = await voice_channel.connect()
-# 		voice_clients[vc.guild.id] = vc
-# 		
-# 		info = ytdl.extract_info(f"ytsearch:{url}", download=False)['entries'][0]
-# 
-# 		print("\n\nyYOYOYOYOOYOOYOYO!!!\n\n")
-# 
-# 		player = discord.FFmpegOpusAudio(info['formats'][0]['url'], before_options="-reconnect 9 -reconnect_streamed 9 -reconnect_delay_max 5")
-# 
-# 		vc.play(player)
-# 
-# 		await ctx.response.send_message(f"Now playing {song.name} in {channel}")
+isplaying = False
+ispaused = False
+queue = []
+ytdl_opts = {"format" : "bestaudio", "noplaylist" : "True"}
+ffmpeg_opts = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
+vc = None
+
+async def search_music(song):
+	with YoutubeDL(ytdl_opts) as ytdl:
+		try:
+			info = ytdl.extract_info(f"ytsearch:{song}",download=False)["entries"][0]
+			return {"source" : info["formats"][0]["url"], "title" : info["title"] }
+		except: return None
+def music_next():
+	if len(queue) > 0:
+		isplaying = True
+		url = queue[0][0]["source"]
+		queue.pop(0)
+		vc.play(discord.FFmpegPCMAudio(url, **ffmpeg_opts), after=lambda arg:music_next())
+		return
+	isplaying=False
+
+@tree.command(name="pause", description="Pause the current song.")
+async def pause(interaction:discord.Interaction):
+	if isplaying:
+		isplaying = False
+		ispaused = True
+		vc.pause()
+		await interaction.response.send_message("Song **paused**")
+		return
+	await interaction.response.send_message("No song is playing.")
+
+@tree.command(name="resume", description="Resume the paused song.")
+async def resume(interaction:discord.Interaction):
+	if ispaused:
+		isplaying = True
+		ispaused = False
+		vc.resume()
+		await interaction.response.send_message("Song **resumed**")
+		return
+	await interaction.response.send_message("No song is paused.")
+
+@tree.command(name="play", description="Play music")
+@app_commands.describe(song="What song you want to play?")
+@app_commands.choices(song=[
+	app_commands.Choice(name="Never gonna give you up",value="https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+])
+async def music(interaction:discord.Interaction, song: app_commands.Choice[str]):
+	global isplaying
+	global ispaused
+	global queue
+	global vc
+	isplaying = False
+	ispaused = False
+	queue = []
+	vc = None
+
+	url = song.value
+	voicech = interaction.user.voice
+	if voicech is None:
+		await interaction.response.send_message("You are not in a voice channel!")
+		return
+	voicech = interaction.user.voice.channel
+	if voicech is None:
+		await interaction.response.send_message("You are not in a voice channel!")
+		return
+	if ispaused:
+		vc.resume()
+		return
+	thesong = await search_music(url)
+	if type(thesong) == None:
+		await interaction.response.send_message("An unknown error occured, please try a different song.", ephemeral=True)
+		return
+	queue.append([thesong, voicech])
+	if not isplaying:
+		url = ""
+	if len(queue) > 0:
+		isplaying = True
+		theurl = queue[0][0]["source"]
+
+		if vc == None or not vc.is_connected():
+			vc = await queue[0][1].connect()
+			if vc == None:
+				await interaction.response.send_message("Error: Cannot connect to the voice channel.")
+			return
+		await vc.move_to(queue[0][1])
+		queue.pop(0)
+		vc.play(discord.FFmpegPCMAudio(theurl, **ffmpeg_opts), after=lambda arg:music_next())
+
+		await interaction.response.send_message(f"Now playing {song.name}!")
 
 @tree.command(name="never-have-i-ever", description="Never have I ever...?")
 async def nh(interaction: discord.Interaction):
@@ -828,12 +1055,14 @@ async def tod(interaction: discord.Interaction, type: app_commands.Choice[int]=N
 		return
 	await interaction.response.send_message(f"Requested by: <@{interaction.user.id}>\nType: **Dare**\n{random.Random().choice(seq=dare)}", view=TODButton())
 
-@tree.command(name="give", description="Give someone an amount of turrcoins")
+@tree.command(name="pay", description="Give someone an amount of turrcoins")
 @app_commands.describe(receiver="The person who receive this money")
 @app_commands.describe(amount="How much money to transfer")
 async def give(interaction: discord.Interaction, receiver: discord.Member, amount: float):
 	global money
 	load_money()
+	send = ""
+	fail = True
 	hasacc = False
 	for mon in money:
 		if str(mon.id) == str(interaction.user.id):
@@ -852,17 +1081,13 @@ async def give(interaction: discord.Interaction, receiver: discord.Member, amoun
 	load_money()
 	account = money.pop(index)
 	if amount > float(account.balance):
-		await interaction.response.send_message(f"Can't complete transcation. You only have {str(account.balance)} coins but you attempt to transfer {amount}", ephemeral=True)
-		return
+		send = f"Can't complete transcation. You only have {str(account.balance)} coins but you attempt to transfer {amount}"
 	if amount < 0:
-		await interaction.response.send_message(f"Can't complete transcation. the amount is negative", ephemeral=True)
-		return
+		send = f"Can't complete transcation. the amount is negative"
 	if amount > float(account.balance):
-		await interaction.response.send_message(f"Can't complete transcation. {amount} is a negative number", ephemeral=True)
-		return
+		send = f"Can't complete transcation. {amount} is a negative number"
 	if str(receiver.id) == str(interaction.user.id):
-		await interaction.response.send_message(f"Can't complete transcation. You can't give yourself money", ephemeral=True)
-		return
+		send = f"Can't complete transcation. You can't give yourself money"
 	hasacc = False
 	for mon in money:
 		if str(mon.id) == str(receiver.id):
@@ -890,7 +1115,16 @@ async def give(interaction: discord.Interaction, receiver: discord.Member, amoun
 	money.append(rec)
 	save_money()
 	load_money()
-	await interaction.response.send_message(f"<@{interaction.user.id}> gave <@{receiver.id}> {amount} turrcoins")
+	
+	fail = False
+	val = "Failure"
+	if not fail:
+		val = "Success"
+	embe = discord.Embed(title=f"Transaction", description=f"<@{interaction.user.id}> to <@{receiver.id}>", color=embec)
+	
+	embe.add_field(name=f"Paid: {amount} turrcoins", value=val, inline=False)
+	embe.set_footer(text=f"{datetime.datetime.now()}")
+	await interaction.response.send_message(embed=embe, ephemeral=fail)
 
 def mykey(obj: Money):
 	return float(obj.balance)
@@ -955,7 +1189,12 @@ async def balance(interaction: discord.Interaction, person: discord.Member=None)
 		if str(mon.id) == str(theid):
 			break
 		index += 1
-	await interaction.response.send_message(f"User: <@{str(theid)}>\nAccount Balance:{money[index].balance}")
+	embe = discord.Embed(title=f"Turrnut bank", description=f"Account balance for user: <@{str(theid)}>", color=embec)
+	
+	embe.set_author(name=str(interaction.user.display_name), icon_url=interaction.user.avatar)
+	embe.add_field(name=f"{money[index].balance}", value=f"Turrcoins", inline=False)
+	embe.set_footer(text=f"{datetime.datetime.now()}")
+	await interaction.response.send_message(embed=embe)
 
 @tree.command(name="predict-grade", description="Enter your grades for first three quarters to get the prediction of the final quarter!")
 @app_commands.describe(first="First quater grade")
@@ -993,10 +1232,25 @@ async def ask(interaction: discord.Interaction, question:str):
 @app_commands.describe(command="Which command would you like to look at?")
 @app_commands.choices(command=[
 	app_commands.Choice(name="/ask",value="ask"),
-	app_commands.Choice(name="/calculate",value="calc")
+	app_commands.Choice(name="/balance", value="bal"),
+	app_commands.Choice(name="/calculate",value="calc"),
+	app_commands.Choice(name="/chat",value="chat"),
+	app_commands.Choice(name="/collect",value="day"),
+	app_commands.Choice(name="/factorial",value="fact"),
+	app_commands.Choice(name="/pay",value="pay"),
+	app_commands.Choice(name="/help",value="help"),
+	app_commands.Choice(name="/leaderboard",value="rank"),
+	app_commands.Choice(name="/meme",value="meme"),
+	app_commands.Choice(name="/never-have-i-ever",value="nhie"),
+	app_commands.Choice(name="/predict-grade",value="grade"),
+	app_commands.Choice(name="/speak",value="speak"),
+	app_commands.Choice(name="/suggest",value="sug"),
+	app_commands.Choice(name="/truth-or-dare",value="tod"),
+	app_commands.Choice(name="/would-you-rather",value="wyr"),
 ])
 async def inv(interaction: discord.Interaction, command: app_commands.Choice[str]="None!"):
 	global embec
+	global howmanywords
 	if command == "None!":
 		num_of_servers = 0
 		for server in client.guilds:
@@ -1009,30 +1263,141 @@ async def inv(interaction: discord.Interaction, command: app_commands.Choice[str
 		embe = discord.Embed(title="Command /ask", description=f"Consult the oracle! Ask the fortune teller a question and it will randomly generate an answer", color=embec)
 		embe.add_field(name="Required: question", value="What do you want to ask? Put it here!", inline=True)
 		await interaction.response.send_message(embed=embe)
+
 	elif command.value == "calc":
 		embe = discord.Embed(title="Command /calculate", description=f"Use the turrnut expression evaluator via this command", color=embec)
-		embe.add_field(name="Required: expression", value="Use + for addition, - for subtraction, * for multiplication, / for division and ^ for power. There is no need to put an \"=\" sign at the end.", inline=True)
+		embe.add_field(name="**Required**: expression", value="Use + for addition, - for subtraction, * for multiplication, / for division and ^ for power. There is no need to put an \"=\" sign at the end. Create variables using 'val'.", inline=True)
 		await interaction.response.send_message(embed=embe)
 
+	elif command.value == "chat":
+		embe = discord.Embed(title="Command /chat", description=f"Interact with the turrnut chatbot!", color=embec)
+		embe.add_field(name="**Required**: prompt", value=f"Prompt for the chatbot.", inline=True)
+		embe.add_field(name="**Required**: version", value=f"Specifiy the version of the chatbot you want to use.", inline=True)
+		await interaction.response.send_message(embed=embe)
+	
+	elif command.value == "bal":
+		embe = discord.Embed(title="Command /balance", description=f"Check to see how many turrcoins you have. Turrcoins are a type of currency created by me.", color=embec)
+		embe.add_field(name="**Optional**: person", value="Leave blank if you want to check your own balance.", inline=True)
+		await interaction.response.send_message(embed=embe)
+
+	elif command.value == "day":
+		embe = discord.Embed(title="Command /collect", description=f"Get turrcoins that refreshes every 2 hours! If you don't have an account, use /balance to create one first.", color=embec)
+		await interaction.response.send_message(embed=embe)
+
+	elif command.value == "fact":
+		embe = discord.Embed(title="Command /calculate", description=f"Use the turrnut expression evaluator via this command", color=embec)
+		embe.add_field(name="**Required**: expression", value="Use the same syntax as you would use for /calculate, the final result will be the factorial of the original result", inline=True)
+		await interaction.response.send_message(embed=embe)
+
+	elif command.value == "pay":
+		embe = discord.Embed(title="Command /give", description=f"Transfer a certain amount of turrcoinss to another user.", color=embec)
+		embe.add_field(name="**Required**: receiver", value="Specify to whom you wish to transfer the turrcoins", inline=True)
+		embe.add_field(name="**Required**: amount", value="Specify the amount of turrcoins you intend to transfer", inline=True)
+		await interaction.response.send_message(embed=embe)
+	
+	elif command.value == "rank":
+		embe = discord.Embed(title="Command /leaderboard", description=f"See the top 20 turrcoin holders!", color=embec)
+		await interaction.response.send_message(embed=embe)
+
+	elif command.value == "help":
+		embe = discord.Embed(title="Command /help", description=f"Display a help message", color=embec)
+		embe.add_field(name="**Optional**: command", value="If you need help with a specific command, use this parameter, otherwise, leave it blank.", inline=True)
+		await interaction.response.send_message(embed=embe)
+
+	elif command.value == "meme":
+		embe = discord.Embed(title="Command /meme", description=f"Get a random meme!", color=embec)
+		await interaction.response.send_message(embed=embe)
+
+	elif command.value == "nhie":
+		embe = discord.Embed(title="Command /never-have-i-ever", description=f"Play the Never Have I Ever game!", color=embec)
+		await interaction.response.send_message(embed=embe)
+
+	elif command.value == "grade":
+		embe = discord.Embed(title="Command /predict-grade", description=f"A command for students: enter your first, second and third quarter grade to get a prediction of what your final quarter grade might be. This command use turrnut's AI.", color=embec)
+		embe.add_field(name="**Required**: first", value="Your first quarter grade(A number between 0 and 100)", inline=True)
+		embe.add_field(name="**Required**: second", value="Your second quarter grade(A number between 0 and 100)", inline=True)
+		embe.add_field(name="**Required**: third", value="Your third quarter grade(A number between 0 and 100)", inline=True)
+		await interaction.response.send_message(embed=embe)
+
+	elif command.value == "speak":
+		embe = discord.Embed(title="Command /speak", description=f"Make the bot say something.", color=embec)
+		embe.add_field(name="**Required**: message", value="What do you want the bot to say?", inline=True)
+		await interaction.response.send_message(embed=embe)
+
+	elif command.value == "suggest":
+		embe = discord.Embed(title="Command /suggest", description=f"Suggest a new feature to the bot", color=embec)
+		embe.add_field(name="**Required**: suggestion", value="What is your suggestion?", inline=True)
+		await interaction.response.send_message(embed=embe)
+
+	elif command.value == "tod":
+		embe = discord.Embed(title="Command /truth-or-dare", description=f"Play the Truth or Dare game!", color=embec)
+		embe.add_field(name="**Optional**: type", value="Specify what kind of question do you want: truth, dare, or random. If left blank, it will be random", inline=True)
+		await interaction.response.send_message(embed=embe)
+
+	elif command.value == "wyr":
+		embe = discord.Embed(title="Command /wyr", description=f"Play the Would you rather game!", color=embec)
+		await interaction.response.send_message(embed=embe)
+
+	else:
+		embe = discord.Embed(title=f"Command {command.name}", description=f"Coming soon...", color=embec)
+		await interaction.response.send_message(embed)
+	
+
+
 @tree.command(name="meme", description="Get a random meme!")
-async def say(interaction: discord.Interaction):
+async def mem(interaction: discord.Interaction):
 	log(str(interaction.user) + " prompted a random meme")
 
 	load_meme()
-
 	meme = random.Random().choice(seq=memes)
+	# await interaction.response.send_message("https://cdn.discordapp.com/attachments/1126943272271622205/1137119843934552085/image.png")
 	await interaction.response.send_message(str(meme.name))
-	await interaction.channel.send("\nAs suggested by: " + str(meme.suggested))
+	# await interaction.channel.send("\nAs suggested by: " + str(meme.suggested))
 
 @tree.command(name="speak", description="Make me say something!")
-@app_commands.describe(message="What do you want me to say?")
-async def say(interaction: discord.Interaction, message:str):
-	if validInteraction(interaction):
-		await interaction.response.send_message("ok", ephemeral=True)
-		print(str(interaction.user) + " Made me say \"" + message + "\"")
-		await interaction.channel.send(message)
-	else:
-		await interaction.response.send_message(message)
+@app_commands.describe(message="What to do you want me to say?")
+@app_commands.describe(replyto="Reply to a message(link). Leave blank if none.")
+async def speakkc(interaction: discord.Interaction, message:str, replyto:str=None):
+	try:
+		if validInteraction(interaction) or interaction.user.guild_permissions.manage_messages:
+			if replyto == None:
+				await interaction.response.send_message("Sent.", ephemeral=True)
+				print(str(interaction.user) + " Made me say \"" + message + "\"")
+				await interaction.channel.send(message)
+				return
+			else:
+				link = replyto
+				link = link.split('/')
+				server_id = int(link[4])
+				channel_id = int(link[5])
+				msg_id = int(link[6])
+				print(f"serverid: {server_id}, channelid: {channel_id}, msgid: {msg_id}")
+
+				server = client.get_guild(server_id)
+				channel = server.get_channel(channel_id)
+				mesg = await channel.fetch_message(msg_id)
+				await mesg.reply(message)
+				return
+		await interaction.response.send_message("You can't use this command, you don't have `Manage Messages` permission",ephemeral=True)
+	except AttributeError as e:
+		if replyto == None:
+			await interaction.response.send_message("Sent.", ephemeral=True)
+			print(str(interaction.user) + " Made me say \"" + message + "\" in DMs")
+			await interaction.channel.send(message)
+			return
+		else:
+			link = replyto
+			link = link.split('/')
+			server_id = int(link[4])
+			channel_id = int(link[5])
+			msg_id = int(link[6])
+			print(f"serverid: {server_id}, channelid: {channel_id}, msgid: {msg_id}")
+
+			server = client.get_guild(server_id)
+			channel = server.get_channel(channel_id)
+			mesg = await channel.fetch_message(msg_id)
+			await mesg.reply(message)
+			return	
 
 @client.event
 async def on_reaction_add(reaction, user):
@@ -1111,9 +1476,9 @@ async def on_message(message):
 		json.dump(authorinfo, fobj, indent=6)
 	if message.content.lower() == 'what is my userid':
 		await message.channel.send(str(message.author.id))
-	if 'sus' in message.content.lower() or 'amogus' in message.content.lower() or 'sussy baka' in message.content.lower():
+	if 'sus' in message.content.lower() or 'amogus' in message.content.lower() or 'among us' in message.content.lower() or 'sussy baka' in message.content.lower():
 		log(str(message.author) + " is sus. Ewww. ")
-		await message.channel.send(random.Random().choice(seq=('sus', 'when the message is sus', 'AMOGUS', 'dun dun dun dun', 'yo sussy baka', 'https://tenor.com/view/19dollar-fortnite-card-among-us-amogus-sus-red-among-sus-gif-20549014')))
+		await message.reply(random.Random().choice(seq=('sus', 'when the message is sus', 'AMOGUS', '**EMERGENCY MEETING**\n\n*dun dun dun dun*', 'yo sussy baka', 'https://tenor.com/view/19dollar-fortnite-card-among-us-amogus-sus-red-among-sus-gif-20549014')))
 
 	instructions = message.content.split(' ')
 	i = 0

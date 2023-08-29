@@ -1,0 +1,28 @@
+{
+      "ring": {
+            "price": "9.0",
+            "desc": "In brilliance and gold, the Turrnut Ring gleams,\nA lavish gem, adorning dreams,\nDiamonds dance 'round its lustrous core,\nA symbol of power forevermore.\n\nWith elegance and grace, it graces the hand,\nA treasure of beauty, rare and grand.\nA testament to love's eternal fling,\nIn every heart, it reigns as king.",
+            "users": {
+                  "23": "0",
+                  "977377574789472278": "4.0",
+                  "1025854689142657055": "1.0"
+            }
+      },
+      "car": {
+            "price": "100",
+            "desc": "The Turrnut Car is a marvel of automotive engineering, redefining the driving experience with its groundbreaking design and cutting-edge technology. Its sleek and aerodynamic silhouette ensures a smooth ride, while the eco-friendly electric motor delivers impressive acceleration and a whisper-quiet journey. The spacious interior boasts luxurious comfort and innovative features, seamlessly integrated for a futuristic feel. Safety remains a top priority, with advanced driver-assistance systems and robust structural integrity. The Turrnut Car's range is exceptional, making long journeys a breeze. Embracing sustainability, this car takes strides towards a greener future, making it an ideal choice for the modern driver seeking excellence.",
+            "users": {
+                  "23": "0",
+                  "977377574789472278": "6.0"
+            }
+      },
+      "home": {
+            "price": "500",
+            "desc": "Turrnut Home embodies the epitome of luxurious living, captivating all who step through its grand entrance. This architectural masterpiece blends modern aesthetics with timeless elegance, featuring state-of-the-art smart home technology for ultimate convenience and comfort. Every detail, from the handcrafted finishes to the expansive windows that bathe the rooms in natural light, exudes sophistication and charm. Nestled in a serene location, it offers a private oasis away from the bustling world. The lush landscapes, bespoke amenities, and a harmonious fusion of indoor and outdoor spaces make Turrnut Home an exquisite haven, enchanting its residents with a life of unparalleled opulence.",
+            "users": {
+                  "123": "0",
+                  "977377574789472278": "4.0",
+                  "820541682415960064": "0"
+            }
+      }
+}

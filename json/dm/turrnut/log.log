@@ -1,0 +1,421 @@
+
+turrnut says -> turrnut time https://discord.com/channels/891534373818621963/942566949685186570/1123407298996482141 | 2023-07-16 10:32:24.268818
+turrnut says -> turrnut time https://discord.com/channels/891534373818621963/942566949685186570/1123397336702386297 | 2023-07-16 10:33:10.292342
+turrnut says -> turrnut time https://discord.com/channels/891534373818621963/942566949685186570/1123407298996482141 2d | 2023-07-17 10:54:50.127080
+turrnut says -> turrnut time https://discord.com/channels/891534373818621963/942566949685186570/1123407298996482141 2 | 2023-07-17 10:55:14.007144
+the bot says to 760212951826432072 -> heya, wasup  | 2023-08-01 15:20:20.200443
+the bot says to 977377574789472278 -> e  | 2023-08-01 15:20:27.865642
+the bot says to 1125541844122599434 -> RESPOND  | 2023-08-02 16:59:14.019380
+the bot says to 1125541844122599434 -> RESPOND  | 2023-08-02 16:59:16.288990
+the bot says to 1125541844122599434 -> RESPOND  | 2023-08-02 16:59:16.460626
+the bot says to 1125541844122599434 -> RESPOND  | 2023-08-02 16:59:16.652346
+the bot says to 977377574789472278 -> RESPOND  | 2023-08-02 16:59:35.219220
+the bot says to 1125541844122599434 -> RESPOND  | 2023-08-02 16:59:37.336515
+the bot says to 1125541844122599434 -> RESPOND  | 2023-08-02 16:59:37.727709
+the bot says to 1125541844122599434 -> RESPOND  | 2023-08-02 16:59:38.024339
+the bot says to 1125541844122599434 -> RESPOND  | 2023-08-02 16:59:38.358979
+the bot says to 1125541844122599434 -> RESPOND  | 2023-08-02 16:59:38.731230
+the bot says to 1125541844122599434 -> RESPOND  | 2023-08-02 16:59:39.162444
+the bot says to 1125541844122599434 -> RESPOND  | 2023-08-02 16:59:39.382660
+the bot says to 1125541844122599434 -> RESPOND  | 2023-08-02 16:59:39.587440
+the bot says to 1125541844122599434 -> RESPOND  | 2023-08-02 16:59:39.763993
+the bot says to 1018243459150270516 -> RESPOND  | 2023-08-02 17:00:09.741284
+the bot says to 1018243459150270516 -> RESPOND  | 2023-08-02 17:00:10.059958
+the bot says to 1018243459150270516 -> RESPOND  | 2023-08-02 17:00:10.454176
+the bot says to 1018243459150270516 -> RESPOND  | 2023-08-02 17:00:10.761820
+the bot says to 1018243459150270516 -> RESPOND  | 2023-08-02 17:00:11.293627
+the bot says to 1018243459150270516 -> RESPOND  | 2023-08-02 17:00:11.572858
+the bot says to 1018243459150270516 -> RESPOND  | 2023-08-02 17:00:12.220631
+the bot says to 1018243459150270516 -> RESPOND  | 2023-08-02 17:00:12.709377
+the bot says to 1018243459150270516 -> RESPOND  | 2023-08-02 17:00:13.305737
+the bot says to 1018243459150270516 -> RESPOND  | 2023-08-02 17:00:13.545871
+the bot says to 1018243459150270516 -> RESPOND  | 2023-08-02 17:00:13.767964
+the bot says to 1018243459150270516 -> RESPOND  | 2023-08-02 17:00:14.094702
+the bot says to 1018243459150270516 -> RESPOND  | 2023-08-02 17:00:14.358383
+the bot says to 1018243459150270516 -> RESPOND  | 2023-08-02 17:00:14.570662
+the bot says to 1018243459150270516 -> RESPOND  | 2023-08-02 17:00:14.912893
+the bot says to 1018243459150270516 -> RESPOND  | 2023-08-02 17:00:15.174000
+the bot says to 1018243459150270516 -> RESPOND  | 2023-08-02 17:00:23.748894
+the bot says to 1018243459150270516 -> RESPOND  | 2023-08-02 17:00:24.125678
+the bot says to 1018243459150270516 -> RESPOND  | 2023-08-02 17:00:24.361425
+the bot says to 1125541844122599434 -> will you respond to <@977377574789472278> please  | 2023-08-02 17:01:26.468466
+the bot says to 1125541844122599434 -> # FOR THE LAST TIME WILL YOU RESPOND TO <@977377574789472278>  | 2023-08-02 17:03:15.226677
+the bot says to 977377574789472278 -> # FOR THE LAST TIME WILL YOU RESPOND TO <@977377574789472278>  | 2023-08-02 17:03:36.846524
+the bot says to 1125541844122599434 -> # YES OR NO  | 2023-08-02 17:04:02.852736
+turrnut says -> turrnut coins take 7810000 <@977377574789472278> | 2023-08-05 21:05:49.860005
+turrnut says -> turrnut coins take 6000 <@1014960764378939453> | 2023-08-05 21:06:19.404389
+turrnut says -> turrnut coins take 500 984242137879162920 | 2023-08-05 22:33:22.098195
+turrnut says -> turrnut coins take 500 @turrnut | 2023-08-05 22:33:37.328448
+turrnut says -> turrnut coins take 500 @turrnut | 2023-08-05 22:33:42.702303
+turrnut says -> turrnut coins take 500 977377574789472278 | 2023-08-05 22:34:02.568631
+turrnut says -> ```python
+import socket
+import threading
+
+HEADER = 64
+PORT = 6787
+SERVER = socket.gethostbyname(socket.gethostname())
+FORMAT = 'utf-8'
+ADDR = (SERVER, PORT)
+DISCONN = "?DISCONN"
+
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.bind(ADDR)
+
+def receive_msg(connection, addr):
+    print(f"{addr[0]}:{addr[1]} connected to {SERVER}:{PORT} ")
+
+    while True:
+        msg_len = connection.recv(HEADER).decode(FORMAT)
+        if not msg_len: break
+        msg_len = int(msg_len)
+        msg = connection.recv(msg_len).decode(FORMAT)
+        if msg == DISCONN:
+            print(f"{addr[0]}:{addr[1]} DISCONNECTED")
+            return
+        print(f"{addr[0]}:{addr[1]} -> {msg}")
+    connection.close()
+def start():
+    print(f"SERVER STARTED {SERVER}:{PORT}")
+    server.listen()
+    while True:
+        print(f"Active Connections: {threading.active_count() - 1}")
+        connection, addr = server.accept()
+        thread = threading.Thread(target=receive_msg, args=(connection,addr))
+        thread.start()
+        print(f"Active Connections: {threading.active_count() - 1}")
+start()
+``` | 2023-08-19 21:25:25.681298
+turrnut says -> ```python
+
+import socket
+import sys
+import threading
+HEADER = 64
+PORT = 6787
+FORMAT = 'utf-8'
+DISCONN = '?DISCONN'
+SERVER = "10.0.0.75"
+
+ADDR = (SERVER, PORT)
+
+MYSERVER = socket.gethostbyname(socket.gethostname())
+MYADDR = (MYSERVER, PORT)
+
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.bind(MYADDR)
+
+def receive_msg(connection, addr):
+    print(f"{addr[0]}:{addr[1]} connected to {MYSERVER}:{PORT} ")
+
+    while True:
+        msg_len = connection.recv(HEADER).decode(FORMAT)
+        if not msg_len: break
+        msg_len = int(msg_len)
+        msg = connection.recv(msg_len).decode(FORMAT)
+        if msg == DISCONN:
+            print(f"{addr[0]}:{addr[1]} DISCONNECTED")
+            return
+        print(f"{addr[0]}:{addr[1]} -> {msg}")
+    connection.close()
+def start():
+    print(f"MYSERVER STARTED {MYSERVER}:{PORT}")
+    server.listen()
+    while True:
+        print(f"Active Connections: {threading.active_count() - 1}")
+        connection, addr = server.accept()
+        thread = threading.Thread(target=receive_msg, args=(connection,addr))
+        thread.start()
+        print(f"Active Connections: {threading.active_count() - 1}")
+
+##
+
+def send(msg) :
+    msg = msg.encode(FORMAT)
+    msg_len = len(msg)
+    send_len = str(msg_len).encode(FORMAT)
+    send_len += b' ' * (HEADER - len(send_len))
+    client.send(send_len)
+    client.send(msg)
+
+try:
+    serv = threading.Thread(target=start)
+    serv.start()
+    while True:
+        ip = input("SERVER:")
+        if ip == "q": break
+        port = input("port")
+        if port == "q": break
+        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client.connect((ip,port))
+        while True:
+            msg = input("MSG: ")
+            start()
+            if msg == DISCONN:
+                send(DISCONN)
+                break
+            send(msg)
+except EOFError:    
+    send(DISCONN)
+except KeyboardInterrupt:
+    send(DISCONN)
+except Error as e:
+    print(e)
+    sys.exit(1)
+    
+    
+
+``` | 2023-08-19 21:39:04.869182
+turrnut says -> ```
+import socket
+import sys
+import threading
+HEADER = 64
+PORT = 6787
+FORMAT = 'utf-8'
+DISCONN = '?DISCONN'
+SERVER = "10.0.0.75"
+
+ADDR = (SERVER, PORT)
+
+MYSERVER = socket.gethostbyname(socket.gethostname())
+MYADDR = (MYSERVER, PORT)
+
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.bind(MYADDR)
+
+def receive_msg(connection, addr):
+    print(f"{addr[0]}:{addr[1]} connected to {MYSERVER}:{PORT} ")
+
+    while True:
+        msg_len = connection.recv(HEADER).decode(FORMAT)
+        if not msg_len: break
+        msg_len = int(msg_len)
+        msg = connection.recv(msg_len).decode(FORMAT)
+        if msg == DISCONN:
+            print(f"{addr[0]}:{addr[1]} DISCONNECTED")
+            return
+        print(f"{addr[0]}:{addr[1]} -> {msg}")
+    connection.close()
+def start():
+    print(f"MYSERVER STARTED {MYSERVER}:{PORT}")
+    server.listen()
+    while True:
+        print(f"Active Connections: {threading.active_count() - 1}")
+        connection, addr = server.accept()
+        thread = threading.Thread(target=receive_msg, args=(connection,addr))
+        thread.start()
+        print(f"Active Connections: {threading.active_count() - 1}")
+
+##
+
+def send(msg) :
+    msg = msg.encode(FORMAT)
+    msg_len = len(msg)
+    send_len = str(msg_len).encode(FORMAT)
+    send_len += b' ' * (HEADER - len(send_len))
+    client.send(send_len)
+    client.send(msg)
+
+serv = threading.Thread(target=start)
+serv.start()
+
+try:
+    while True:
+        ip = input("SERVER:")
+        if ip == "q": break
+        port = PORT
+        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client.connect((ip,int(port)))
+        while True:
+            msg = input("MSG: ")
+            if msg == DISCONN:
+                send(DISCONN)
+                break
+            send(msg)
+except EOFError:    
+    send(DISCONN)
+except KeyboardInterrupt:
+    send(DISCONN)
+except Error as e:
+    print(e)
+    sys.exit(1)
+    
+    
+
+``` | 2023-08-19 21:53:00.924870
+turrnut says -> asdf | 2023-08-19 21:59:23.190099
+turrnut says -> ```
+import socket
+import sys
+import threading
+HEADER = 64
+PORT = 6787
+FORMAT = 'utf-8'
+DISCONN = '?DISCONN'
+SERVER = "10.0.0.75"
+
+ADDR = (SERVER, PORT)
+
+MYSERVER = socket.gethostbyname(socket.gethostname())
+MYADDR = (MYSERVER, PORT)
+
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.bind(MYADDR)
+
+def receive_msg(connection, addr):
+    print(f"{addr[0]}:{addr[1]} connected to {MYSERVER}:{PORT} ")
+
+    while True:
+        msg_len = connection.recv(HEADER).decode(FORMAT)
+        if not msg_len: break
+        msg_len = int(msg_len)
+        msg = connection.recv(msg_len).decode(FORMAT)
+        if msg == DISCONN:
+            print(f"{addr[0]}:{addr[1]} DISCONNECTED")
+            return
+        print(f"{addr[0]}:{addr[1]} -> {msg}")
+    connection.close()
+def start():
+    print(f"MYSERVER STARTED {MYSERVER}:{PORT}")
+    server.listen()
+    while True:
+        print(f"Active Connections: {threading.active_count() - 1}")
+        connection, addr = server.accept()
+        thread = threading.Thread(target=receive_msg, args=(connection,addr))
+        thread.start()
+        print(f"Active Connections: {threading.active_count() - 1}")
+
+##
+
+def send(msg) :
+    msg = msg.encode(FORMAT)
+    msg_len = len(msg)
+    send_len = str(msg_len).encode(FORMAT)
+    send_len += b' ' * (HEADER - len(send_len))
+    client.send(send_len)
+    client.send(msg)
+
+serv = threading.Thread(target=start)
+serv.start()
+
+try:
+    while True:
+        ip = input("SERVER:")
+        if ip == "q": break
+        port = PORT
+        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client.connect((ip,int(port)))
+        while True:
+            msg = input("MSG: ")
+            if msg == DISCONN:
+                send(DISCONN)
+                break
+            send(msg)
+except EOFError:    
+    send(DISCONN)
+except KeyboardInterrupt:
+    send(DISCONN)
+except Error as e:
+    print(e)
+    sys.exit(1)
+    
+    
+```` | 2023-08-19 22:00:45.289582
+turrnut says -> import socket
+import sys
+import threading
+HEADER = 64
+PORT = 6787
+FORMAT = 'utf-8'
+DISCONN = '?DISCONN'
+SERVER = "10.0.0.75"
+
+ADDR = (SERVER, PORT)
+
+MYSERVER = socket.gethostbyname(socket.gethostname())
+MYADDR = (MYSERVER, PORT)
+
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.bind(MYADDR)
+
+def receive_msg(connection, addr):
+    print(f"{addr[0]}:{addr[1]} connected to {MYSERVER}:{PORT} ")
+
+    while True:
+        msg_len = connection.recv(HEADER).decode(FORMAT)
+        if not msg_len: break
+        msg_len = int(msg_len)
+        msg = connection.recv(msg_len).decode(FORMAT)
+        if msg == DISCONN:
+            print(f"{addr[0]}:{addr[1]} DISCONNECTED")
+            return
+        print(f"{addr[0]}:{addr[1]} -> {msg}")
+    connection.close()
+def start():
+    print(f"MYSERVER STARTED {MYSERVER}:{PORT}")
+    server.listen()
+    while True:
+        print(f"Active Connections: {threading.active_count() - 1}")
+        connection, addr = server.accept()
+        thread = threading.Thread(target=receive_msg, args=(connection,addr))
+        thread.start()
+        print(f"Active Connections: {threading.active_count() - 1}")
+
+##
+
+def send(msg) :
+    msg = msg.encode(FORMAT)
+    msg_len = len(msg)
+    send_len = str(msg_len).encode(FORMAT)
+    send_len += b' ' * (HEADER - len(send_len))
+    client.send(send_len)
+    client.send(msg)
+
+serv = threading.Thread(target=start)
+serv.start()
+
+while True:
+    ip = input("SERVER:")
+    if ip == "q": break
+    port = PORT
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client.connect((ip,int(port)))
+    while True:
+        msg = input("MSG: ")
+        if msg == DISCONN:
+            send(DISCONN)
+            break
+        send(msg) | 2023-08-19 22:30:57.278902
+turrnut says -> turrnut send 1133931783122079754 I AM WHORE | 2023-08-20 15:42:19.221427
+the bot says to 1133931783122079754 -> I AM WHORE  | 2023-08-20 15:42:19.229291
+turrnut says -> turrnut send 1133931783122079754 free COOOKIE | 2023-08-20 15:42:58.380145
+the bot says to 1133931783122079754 -> free COOOKIE  | 2023-08-20 15:42:58.380145
+turrnut says -> turrnut send 1133931783122079754 YYAAAAAYYYY | 2023-08-20 15:43:01.758153
+the bot says to 1133931783122079754 -> YYAAAAAYYYY  | 2023-08-20 15:43:01.766149
+turrnut says -> turrnut send 1133931783122079754 urmom | 2023-08-20 15:44:05.931256
+the bot says to 1133931783122079754 -> urmom  | 2023-08-20 15:44:05.936775
+turrnut says -> turrnut send 1133931783122079754 ursister | 2023-08-20 15:50:21.489844
+the bot says to 1133931783122079754 -> ursister  | 2023-08-20 15:50:21.505851
+turrnut says -> https://discord.com/channels/@me/1133944504626446528/1142889010897895455 | 2023-08-20 15:54:49.250304
+turrnut says -> https://discord.gg/3WahMPWQ | 2023-08-25 15:56:02.975580
+turrnut says -> Hello Luf,
+
+I wanted to bring to your attention that your brother has been accessing your account without your knowledge. I initially posed a question, but it vanished due to his ongoing chat with me. Could you kindly respond to the message provided in this link: https://discord.com/channels/@me/1133944504626446528/1142889010897895455 ?
+
+Also, as a precaution, you might want to consider changing your password. Your account security is important.
+
+Best wishes,
+Turrnut | 2023-08-28 16:51:36.257519
+the bot says to 1133931783122079754 -> hey  | 2023-08-28 16:56:41.279414
+the bot says to 1133931783122079754 -> hey  | 2023-08-28 16:56:41.716992
+the bot says to 1133931783122079754 -> hey  | 2023-08-28 16:56:41.992591
+the bot says to 1133931783122079754 -> hey  | 2023-08-28 16:56:42.294712
+the bot says to 1133931783122079754 -> hey  | 2023-08-28 16:56:42.555808
+the bot says to 1133931783122079754 -> hey  | 2023-08-28 16:56:42.871938
+the bot says to 1133931783122079754 -> hey  | 2023-08-28 16:56:43.119920
+the bot says to 1133931783122079754 -> hey  | 2023-08-28 16:56:43.317048
+the bot says to 1133931783122079754 -> hey  | 2023-08-28 16:56:43.636884
+the bot says to 1133931783122079754 -> i love perhapz  | 2023-08-28 17:06:26.277065
+the bot says to 1133931783122079754 -> but they died  | 2023-08-28 17:06:52.565116
+the bot says to 1133931783122079754 -> YOU DON'T KNOW HOW IT FEELS!!!! YOU DON'T KNOW WHAT IT WAS LIKE TO HAVE THE ONE YOU LOVE TO DIEEEE!!!!  | 2023-08-28 17:13:55.326690
