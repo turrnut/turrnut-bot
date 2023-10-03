@@ -5,7 +5,11 @@
             "users": {
                   "23": "0",
                   "977377574789472278": "4.0",
-                  "1025854689142657055": "1.0"
+                  "1025854689142657055": "1.0",
+                  "820541682415960064": "1.0",
+                  "1133931783122079754": "1.0",
+                  "711282706293456967": "0",
+                  "980121390306983997": "0"
             }
       },
       "car": {
@@ -13,7 +17,12 @@
             "desc": "The Turrnut Car is a marvel of automotive engineering, redefining the driving experience with its groundbreaking design and cutting-edge technology. Its sleek and aerodynamic silhouette ensures a smooth ride, while the eco-friendly electric motor delivers impressive acceleration and a whisper-quiet journey. The spacious interior boasts luxurious comfort and innovative features, seamlessly integrated for a futuristic feel. Safety remains a top priority, with advanced driver-assistance systems and robust structural integrity. The Turrnut Car's range is exceptional, making long journeys a breeze. Embracing sustainability, this car takes strides towards a greener future, making it an ideal choice for the modern driver seeking excellence.",
             "users": {
                   "23": "0",
-                  "977377574789472278": "6.0"
+                  "977377574789472278": "916.0",
+                  "820541682415960064": "6.0",
+                  "1133931783122079754": "0.0",
+                  "1014960764378939453": "84.0",
+                  "1047642306326564945": "5.0",
+                  "811101581272547359": "1.0"
             }
       },
       "home": {
@@ -21,8 +30,23 @@
             "desc": "Turrnut Home embodies the epitome of luxurious living, captivating all who step through its grand entrance. This architectural masterpiece blends modern aesthetics with timeless elegance, featuring state-of-the-art smart home technology for ultimate convenience and comfort. Every detail, from the handcrafted finishes to the expansive windows that bathe the rooms in natural light, exudes sophistication and charm. Nestled in a serene location, it offers a private oasis away from the bustling world. The lush landscapes, bespoke amenities, and a harmonious fusion of indoor and outdoor spaces make Turrnut Home an exquisite haven, enchanting its residents with a life of unparalleled opulence.",
             "users": {
                   "123": "0",
-                  "977377574789472278": "4.0",
-                  "820541682415960064": "0"
+                  "977377574789472278": "100071.0",
+                  "820541682415960064": "1003.0",
+                  "984242137879162920": "1.0",
+                  "1133931783122079754": "0.0"
+            }
+      },
+      "tank": {
+            "price": "777",
+            "desc": "The TurrTank is highly regarded for its exceptional mobility, robust armor, and formidable firepower. Its innovative design allows it to maneuver effortlessly in varied terrains while offering superior protection to its crew. With its cutting-edge weaponry, it stands as a formidable force on the battlefield, ensuring a strong offensive and defensive capability. This tank's performance and versatility make it a highly sought-after asset for modern military operations.",
+            "users": {
+                  "977377574789472278": "497.0",
+                  "820541682415960064": "220001004631291.0",
+                  "984242137879162920": "1.0",
+                  "1025854689142657055": "5135.0",
+                  "1047642306326564945": "3.0",
+                  "811101581272547359": "125.0",
+                  "1133931783122079754": "8.0"
             }
       }
 }

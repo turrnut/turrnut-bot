@@ -84,6 +84,7 @@ LIST = (ADMIN,
 	"984242137879162920", # karma
 	"874094518234923060", # garrett
 	)
+susflag = False
 guilds = []
 AWARD = 10
 ignore_bad_words = (1112529128273477724,)
@@ -102,10 +103,13 @@ trunctype = "post"
 chatmodel = keras.models.load_model(f"models{os.sep}chat", compile=False)
 chatmodel.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
+orders = []
+
 itemslist = [
 	app_commands.Choice(name="Turrnut Car", value="car"),
 	app_commands.Choice(name="Turrnut Home", value="home"),
-	app_commands.Choice(name="Turrnut Ring", value="ring")
+	app_commands.Choice(name="Turrnut Ring", value="ring"),
+	app_commands.Choice(name="TurrTank", value="tank")
 ]
 
 with open(f"chat.pickle", "rb") as f:
@@ -122,22 +126,41 @@ truth = ("If you could be invisible for a day, what’s the first thing you woul
 
 dare = ("Pick someone in this room and ask them for a date.","Let another person post an Instagram caption on your behalf.","Hand over your phone to another player who can send a single text saying anything they want to anyone they want","Let the other players go through your phone for one minute.","Smell another player's armpit.","Smell another player's barefoot.","Eat a bite of a banana peel.","Do an impression of another player until someone can figure out who it is.","Say pickles at the end of every sentence you say until it's your turn again.","Imitate a TikTok star until another player guesses who you're portraying.","Act like a chicken until your next turn.","Talk in a British accent until your next turn.","Send a heart-eye emoji to your crush’s Instagram story.","Call a friend, pretend it's their birthday, and sing them Happy Birthday to You.","Name a famous person that looks like each player in the room.","Show us your best dance moves.","Eat a packet of hot sauce straight.","Let another person draw a tattoo on your back with a permanent marker.","Put on a blindfold and touch the other players' faces until you can figure out who's who.","Bite into a raw onion without slicing it.","Go outside and try to “summon” the rain as loud as possible.","Serenade the person to your right for a full minute.","Do 20 squats.","Let the other players redo your hairstyle.","Eat a condiment of your choice straight from the bottle.","Dump out your purse, backpack, or pockets and do a show and tell of what's inside.","Let the player to your right redo your makeup with their eyes closed.","Prank call one of your family members.","Let another player create a hat out of toilet paper — and you have to wear it for the rest of the game.		","Do a plank for a full minute.","Do your sassiest runway walk.","Put five ice cubes in your mouth (you can't chew them, you just have to let them melt—brrr).","Bark like a dog until it’s your next turn.","Draw your favorite movie and have the other person guess it (Pictionary-style).","Repeat everything the person to your right says until your next turn.","Demonstrate how you style your hair in the mirror (without actually using the mirror).","Play air guitar for one minute.","Empty a glass of cold water onto your head outside.","Go on Instagram Live and do a dramatic reading of one of your textbooks.","In the next 10 minutes, find a way to scare another player and make it a surprise.","Lick a bar of soap.","Talk to a pillow as if it’s your crush.","Post the oldest selfie on your phone to Snapchat or Instagram stories (and leave it up!).","Attempt the first TikTok dance on your FYP.","Imitate a celebrity of the group’s choosing every time you talk for the next 10 minutes.","Go to your crush’s Instagram page and like something from several weeks ago.","Do karaoke to a song of the group’s choosing.","Post a photo (any photo) to social with a heartfelt dedication to a celebrity of the group’s choosing.","Find your very first crush on social and DM them.","Peel a banana using just your toes.","Let the group mix together five of whatever liquids they find in the fridge, then drink it.","Wear another player’s socks like gloves for the next five minutes.","Put on makeup without looking in the mirror, then leave it like that for the rest of the game.","Describe the most attractive quality of every person in the room.","Sing like an opera singer instead of speaking for the next five minutes.","Let everyone pose you in an embarrassing position and post a picture to Instagram.","Allow the person to your right to draw on your face with a Sharpie.","Jump in the pool (or shower) with all your clothes on!","Stand outside your house and wave to everyone who passes in the next minute.","Pretend to be underwater for the next 10 minutes.","Make out with a pillow.","Let everyone go through your Snapchat history.","Post a flirty comment on the first Instagram picture that you see.","Give the person to your right a foot massage (with their consent).","Pretend to be a ballerina until your next turn.","Serenade the person next to you.","Try to fit your whole fist in your mouth.","Read aloud the most personal text you’ve sent in recent days.","Reveal your screen time report to your friends.","Go outside and howl at the moon like a wolf.","Read the last text message you sent out loud.","Show the weirdest item you have in your purse/pockets.","Call the first person in your contacts list and sing them “Happy Birthday.”","Do your best impression of a fish out of water.","Give another player your phone and let them send a social media DM to anyone they want.","Do as many push-ups as you can in one minute.","Give a one-word “roast” to each other player.","Speak in an Australian accent until your next turn.","Let another player tickle you but don’t laugh!","Spin in a swivel chair for 30 seconds and then try to walk a straight line.","Go outside and sing “Never gonna give you up” by Rick Astley at full volume.","Let another player draw a tattoo on your arm in permanent marker.","Hold the plank position until it’s your turn again.","Tell each player who you think their celebrity look alike is.","Show off your best dance moves for the full duration of a song.","Narrate the game in a newscaster voice for three turns.","Walk next door with a measuring cup and ask for a cup of sugar.","Switch clothes with another player for the rest of the game.","Put on a blindfold and touch each players’ face until you can guess who each player is.","Let another player pour a glass of water on your head.","Give a shoulder rub to the player to your right (if they are comfortable).","Attempt to juggle two or three items of the asker’s choosing.","Perform a dramatic version of a monologue from a favorite TV show or movie.","Show the most embarrassing photo on your phone.","Comment a fire emoji on the first five pictures on your Instagram feed.","Do an impression of another player until your next turn.","Try to drink a glass of water without using your hands.","Allow the other players to blindfold you and try to guess three food items from the pantry just by smell.","Do your best interpretive dance/gymnastics floor routine.","Go outside and do your best wolf howl at the moon.","Post an unflattering selfie to your favorite social media account.","Talk and act like a celebrity until the group can guess who you are (this could go multiple turns!)","If you have to get up for the rest of the game, no walking allowed. You can crawl on all fours, roll, somersault, hop on one foot etc., but no walking!","Remove your socks with your teeth.","Go outside and pretend to mow grass with an invisible mower — sounds and all.","Act out a commercial for a product chosen by the other players.","Sing instead of speaking any time you talk for three turns.","Make a silly face and keep it that way until someone in the group laughs.","Do a freestyle rap about the other players for one minute.","Show the group your internet search history.","Let another player style your hair and leave it that way for the rest of the game.","Video chat the person of your choice but pick your nose through the entire conversation.","Put your shoes on the wrong feet and keep them there for the rest of the game.","Call a random acquaintance and tell them you want to break up.","Let the other players pose you and remain in that position until your next turn.","Allow someone else in the group to blindfold you and feed you one item out of the fridge.","Lead the group in a mini yoga class for one minute.","How old are you? Whatever your age is, do that many squats.","Perform a dance routine to a boy band song of the group’s choice.","Let another player draw a washable marker mustache on you.",)
 
+
+def order_id_unique(order):
+	for order in orders:
+		if order.order_id == self.order_id:
+			return False
+	return True
+def generate_id():
+	return str(random.Random().choice(seq=range(1000))) + str(random.Random().choice(seq=range(1000)))
+class Order:
+	def __init__ (self, fromm, to):
+		self.fromm = fromm
+		self.to = to
+		self.order_id = generate_id()
+		while not order_id_unique(self):
+			for order in orders:
+				if order.order_id == self.order_id:
+					self.order_id = generate_id()
+		print(f"NEW ORDER(ID is:{self.order.id})")
+
 class TODButton(discord.ui.View):
 	def __init__ (self):
 		super().__init__()
 	@discord.ui.button(label="Truth", style=ButtonStyle.green)
-	async def truth(self, interaction:discord.Interaction, button: discord.ui.Button):
+	async def truth(self, interaction:discord.Interaction, button: discord.ui.Button, emoji="✅"):
 		self.disabled=True
 		global truth
 		await interaction.response.send_message(f"Requested by: <@{interaction.user.id}>\nType: **Truth**\n{random.Random().choice(seq=truth)}", view=TODButton())
 
-	@discord.ui.button(label="Dare", style=ButtonStyle.red)
+	@discord.ui.button(label="Dare", style=ButtonStyle.red, emoji="🚫")
 	async def dare(self, interaction:discord.Interaction, button: discord.ui.Button):
 		self.disabled=True
 		global dare
 		await interaction.response.send_message(f"Requested by: <@{interaction.user.id}>\nType: **Dare**\n{random.Random().choice(seq=dare)}", view=TODButton())
 
-	@discord.ui.button(label="Random", style=ButtonStyle.blurple)
+	@discord.ui.button(label="Random", style=ButtonStyle.blurple, emoji="❔")
 	async def btn(self, interaction:discord.Interaction, button: discord.ui.Button):
 		self.disabled=True
 		global truth
@@ -149,6 +172,28 @@ class TODButton(discord.ui.View):
 			listtt = truth
 			qtype = "Truth"
 		await interaction.response.send_message(f"Requested by: <@{interaction.user.id}>\nType: **{qtype}**\n{random.Random().choice(seq=listtt)}", view=TODButton())
+
+class SellButton(discord.ui.View):
+	def __init__ (self):
+		super().__init__()
+	@discord.ui.button(label="Confirm", style=ButtonStyle.green)
+	async def confirm(self, interaction:discord.Interaction, button: discord.ui.Button):
+		self.disabled=True
+		await interaction.response.send_message(f"confirmed")
+		await interaction.message.delete()
+
+
+	@discord.ui.button(label="Decline", style=ButtonStyle.red)
+	async def decline(self, interaction:discord.Interaction, button: discord.ui.Button):
+		seller = False
+		sellee = False
+		print(interaction.user.id, "CLICKED DECLINE") 
+		print(self)
+		msg = await interaction.original_response()
+		msg.edit("declined", view=None)
+		await interaction.response.send_message(f"declined")
+
+
 class NHIEButton(discord.ui.View):
 	def __init__ (self):
 		super().__init__()
@@ -221,6 +266,7 @@ def buy_items(userid:str, item:str, quantity:int):
 	save_items()
 	load_items()
 	return True
+
 
 def load_meme():
 	global memes
@@ -326,6 +372,7 @@ async def dostuff(instructions, message):
 	global possibilities
 	global spamhalt
 	global logflag
+	global susflag
 	global memes
 	global ADMIN
 	global money
@@ -389,6 +436,7 @@ async def dostuff(instructions, message):
 			save_money()
 			load_money()
 			await message.channel.send("ok")
+			log(f"COINS {str(amount)} GRANT BY {message.author}({message.author.id}) to {person}")
 			return
 
 		if instruction[1].lower() == "coins" and instruction[2].lower() == "take":
@@ -406,6 +454,7 @@ async def dostuff(instructions, message):
 			save_money()
 			load_money()
 			await message.channel.send("ok")
+			log(f"COINS {str(amount)} GRANT BY {message.author}({message.author.id}) to {person}")
 			return
 			
 		if instruction[1].lower() == "add" and instruction[2] == "meme":
@@ -690,6 +739,40 @@ async def dostuff(instructions, message):
 				print(server, ",", end="")
 			print("\b  ")
 	if len(instruction) >= 3:
+		if instruction[1].lower() in ("range", "range_delete"):
+			delete = False
+			if instruction[1] == "range_delete":
+				delete = True
+			# if validMessage(message) or message.author.guild_permissions.manage_messages:
+			# if validMessage(message):
+			till = int(instruction [3])
+			if str(message.author.id) == ADMIN:
+				if instruction[2] == "halt":
+					# LOG
+					log(str(message.author) + " halted the range spam")
+					spamhalt = True
+				else:
+					if not spamhalt:
+						i = int(instruction[2])
+						log(str(message.author) +
+							" used the range spam command, from=" + str(i) + ", to=" + str(till))
+						if delete:
+							await message.delete()
+						if till > i:
+							while i <= till and not spamhalt:
+								k = str(i)  # number of times
+								await message.channel.send(f"{k}")
+								i += 1
+						elif till < i:
+							while i >= till and not spamhalt:
+								k = str(i)  # number of times
+								await message.channel.send(f"{k}")
+								i -= 1
+						elif till == i:
+							await message.channel.send(f"{i}")
+					else:
+						spamhalt = False
+						return
 		if instruction[1].lower() in ("spam", "spam_delete"):
 			delete = False
 			if instruction[1] == "spam_delete":
@@ -748,13 +831,115 @@ async def dostuff(instructions, message):
 						await message.channel.send("Logging is currently enabled.")
 					else:
 						await message.channel.send("Logging is currently disabled.")
+		elif instruction[1] == "sus":
+			if validMessage(message):
+				if instruction[2] == "enable":
+					# LOG
+					susflag = True
+					log(str(message.author) + " Enabled Sus")
+					await message.channel.send("Sus enabled")
+				if instruction[2] == "disable":
+					log(str(message.author) + " Disabled Sus")
+					# LOG
+					susflag = False
+					await message.channel.send("Sus disabled")
+				if instruction[2] == "check":
+					# LOG
+					log(str(message.author) + " Check logged, it is" + str(susflag))
+					if logflag:
+						await message.channel.send("Sus is currently enabled.")
+					else:
+						await message.channel.send("Sus is currently disabled.")
 
 			else:
 				# LOG
 				log(str(message.author) +
-					"tries to use use log but has no proper permission")
+					"tries to use use sus but has no proper permission")
 
 				await cant(message)
+
+def check_sell_items(fromm:str, to:str, item:str, quan:int):
+	global items
+	global money
+	try:
+		items[item]["users"][fromm]
+	except KeyError:
+		items[item]["users"][fromm] = "0"
+	try:
+		items[item]["users"][to]
+	except KeyError:
+		items[item]["users"][to] = "0"
+	
+	if quan > float(items[item]["users"][fromm]):
+		return False
+	return True
+
+@tree.command(name="poll", description="Make a new poll using this command")
+@app_commands.describe(question="What is the poll about?")
+@app_commands.describe(choices="Seperate poll choices by comma. You can only have ten choices maximum.")
+async def poll(interaction:discord.Interaction, question:str, choices:str=None):
+	emjs = ("1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟")
+	if choices == None:
+		choices = "Yes,No"
+		emjs = ("👍","👎")
+	choices = choices.split(',')
+	if len(choices) > 10:
+		interaction.response.send_message(f"You have no more than 10 choices.", ephemeral=True)
+		return
+	i = 0
+	res = f"Poll:\n{question}\n"
+
+	for choice in choices:
+		res += emjs[i]
+		res += f" - {choice}\n"
+		i += 1
+
+	await interaction.response.send_message(res)
+
+	i = 0
+	while i < len(choices):
+		mesg = await interaction.original_response()
+		await mesg.add_reaction(emjs[i])
+		i += 1
+
+@tree.command(name="give", description="Give away items!")
+@app_commands.describe(item=f"What item?")
+@app_commands.describe(quantity=f"How many would you like to give")
+@app_commands.describe(message="Optional message attached to your gift.")
+@app_commands.describe(to="Who are you going to give it to?")
+@app_commands.choices(item=itemslist)
+async def sell(interaction:discord.Interaction, to:discord.User, item:app_commands.Choice[str], quantity:int, message:str=None):
+	embe = discord.Embed(color=embec)
+	
+	embe.set_author(name=str(interaction.user.display_name), icon_url=interaction.user.avatar)
+	embe.set_footer(text=f"{datetime.datetime.now()}")
+
+	if quantity <= 0:
+		embe.add_field(name="Error", value="Quantity is 0 or negative.", inline=False)
+		await interaction.response.send_message(embed=embe)
+		return
+	if not check_sell_items(str(interaction.user.id), str(to.id), str(item.value), quantity):
+		embe.add_field(name="Error", value=f"You don't have enough {item.name}.", inline=False)
+		await interaction.response.send_message(embed=embe)
+		return
+	if str(interaction.user.id) == str(to.id):
+		embe.add_field(name="Error", value="You can't give stuff to yourself.")
+		await interaction.response.send_message(embed=embe)
+		return
+
+	items[item.value]["users"][str(interaction.user.id)] = str(float(items[item.value]["users"][str(interaction.user.id)]) - float(quantity))
+	items[item.value]["users"][str(to.id)] = str(float(items[item.value]["users"][str(to.id)]) + float(quantity))
+
+	save_items()
+	load_items()
+
+	if message == None:
+		embe.add_field(name="Gift", value=f"Hello <@{to.id}>,\n<@{interaction.user.id}> gave you {quantity} {item.name}.\nEnjoy!")
+		await interaction.response.send_message(embed=embe)
+		return
+	embe.add_field(name="Gift", value=f"Dear <@{to.id}>,\n    Please enjoy the {quantity} {item.name} I give you.\n    {message}\nBest Wishes,<@{interaction.user.id}>")
+	await interaction.response.send_message(embed=embe)
+
 
 @tree.command(name="buy", description="Buy stuff using turrcoins!")
 @app_commands.describe(item=f"What would you like to buy?")
@@ -798,6 +983,7 @@ async def item_check(interaction:discord.Interaction,item:app_commands.Choice[st
 	embe.set_footer(text=f"{datetime.datetime.now()}")
 	
 	itemname = item.name
+	itemprice = str(float(items[item.value]["price"]))
 	count = 0
 	try:
 		count = items[item.value]["users"][str(userid)]
@@ -807,6 +993,7 @@ async def item_check(interaction:discord.Interaction,item:app_commands.Choice[st
 	
 	embe.add_field(name=f"Item name",value=f"{itemname}",inline=False)
 	embe.add_field(name=f"Quantity",value=f"{count}",inline=False)
+	embe.add_field(name=f"Unit price",value=f"{itemprice} turrcoins",inline=False)
 	embe.add_field(name=f"Item Description",value=f"{descr}",inline=False)
 	await interaction.response.send_message(embed=embe)
 
@@ -840,6 +1027,7 @@ async def chat(interaction:discord.Interaction, prompt: str, version:app_command
 	disclaimer = "Disclaimer: Turrnut Chatbot may display inaccurate or offensive contents that does not represents Turrnut's views."
 	default = 1.1
 	if version.value == 1.1:
+		
 		
 		seqs = tokenizer.texts_to_sequences(prompt)
 		padded = pad_sequences(seqs, maxlen=int(howmanywords),padding=padtype,truncating=trunctype)
@@ -1135,7 +1323,7 @@ async def rank(interaction: discord.Interaction):
 	global embec
 	load_money()
 	money.sort(key=mykey, reverse=True)
-	until = 20
+	until = 15
 	if len(money) < until:
 		until = len(money)
 	resp = ""
@@ -1161,7 +1349,7 @@ async def rank(interaction: discord.Interaction):
 			elif int(you) in (3,13) : resp += f"\nYou(<@{str(interaction.user.id)}>) are in **{you}rd** place."
 			else: resp += f"\nYou(<@{str(interaction.user.id)}>) are in **{you}th** place."
 	resp += f"\n{len(money)} Bank accounts in total."
-	embe = discord.Embed(title="Turrcoins Leaderboard", description="Top 20 turrcoin holders", color=embec)
+	embe = discord.Embed(title="Turrcoins Leaderboard", description="Top 10 turrcoin holders", color=embec)
 	embe.add_field(name="Ranking", value=resp, inline=False)
 	await interaction.response.send_message(embed=embe)
 
@@ -1190,8 +1378,9 @@ async def balance(interaction: discord.Interaction, person: discord.Member=None)
 			break
 		index += 1
 	embe = discord.Embed(title=f"Turrnut bank", description=f"Account balance for user: <@{str(theid)}>", color=embec)
-	
-	embe.set_author(name=str(interaction.user.display_name), icon_url=interaction.user.avatar)
+	if person != None:
+		embe.set_author(name=str(person.display_name), icon_url=person.avatar)
+	else: embe.set_author(name=str(interaction.user.display_name), icon_url=interaction.user.avatar)
 	embe.add_field(name=f"{money[index].balance}", value=f"Turrcoins", inline=False)
 	embe.set_footer(text=f"{datetime.datetime.now()}")
 	await interaction.response.send_message(embed=embe)
@@ -1296,7 +1485,7 @@ async def inv(interaction: discord.Interaction, command: app_commands.Choice[str
 		await interaction.response.send_message(embed=embe)
 	
 	elif command.value == "rank":
-		embe = discord.Embed(title="Command /leaderboard", description=f"See the top 20 turrcoin holders!", color=embec)
+		embe = discord.Embed(title="Command /leaderboard", description=f"See the top 15 turrcoin holders!", color=embec)
 		await interaction.response.send_message(embed=embe)
 
 	elif command.value == "help":
@@ -1429,8 +1618,8 @@ async def on_member_join(member):
 	global MYSERVER
 	if True:
 		print('new member!')
-		await member.send('!!!!!!!!!!!!!!!!!\nHello! Welcome to the Offical Turrnut Republic Discord Server! In this server you can chat, socialize and play games with other people.\nTo customize your experience at our server, please pick your pronoun roles and ping roles in the #roles channel\nAlso, it\'s good to read the #server-rules channel because it contains useful information about what to do and not to do in our server\n\nGoodbye, have fun!')
-		await member.send('https://tenor.com/view/morgan-freeman-gif-24496452')
+	#	await member.send('!!!!!!!!!!!!!!!!!\nHello! Welcome to the Offical Turrnut Republic Discord Server! In this server you can chat, socialize and play games with other people.\nTo customize your experience at our server, please pick your pronoun roles and ping roles in the #roles channel\nAlso, it\'s good to read the #server-rules channel because it contains useful information about what to do and not to do in our server\n\nGoodbye, have fun!')
+	#	await member.send('https://tenor.com/view/morgan-freeman-gif-24496452')
 
 @client.event
 async def on_member_remove(member):
@@ -1442,6 +1631,7 @@ async def on_message(message):
 	global ignore_bad_words
 	global curse_words
 	global react_all
+	global susflag
 	mensaje = message
 
 	for react in react_all:
@@ -1476,9 +1666,10 @@ async def on_message(message):
 		json.dump(authorinfo, fobj, indent=6)
 	if message.content.lower() == 'what is my userid':
 		await message.channel.send(str(message.author.id))
-	if 'sus' in message.content.lower() or 'amogus' in message.content.lower() or 'among us' in message.content.lower() or 'sussy baka' in message.content.lower():
-		log(str(message.author) + " is sus. Ewww. ")
-		await message.reply(random.Random().choice(seq=('sus', 'when the message is sus', 'AMOGUS', '**EMERGENCY MEETING**\n\n*dun dun dun dun*', 'yo sussy baka', 'https://tenor.com/view/19dollar-fortnite-card-among-us-amogus-sus-red-among-sus-gif-20549014')))
+	if susflag:
+		if 'sus' in message.content.lower() or 'amogus' in message.content.lower() or 'among us' in message.content.lower() or 'sussy baka' in message.content.lower():
+			log(str(message.author) + " is sus. Ewww. ")
+			await message.reply(random.Random().choice(seq=('sus', 'when the message is sus', 'AMOGUS', '**EMERGENCY MEETING**\n\n*dun dun dun dun*', 'yo sussy baka', 'https://tenor.com/view/19dollar-fortnite-card-among-us-amogus-sus-red-among-sus-gif-20549014')))
 
 	instructions = message.content.split(' ')
 	i = 0
