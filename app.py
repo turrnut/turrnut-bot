@@ -109,7 +109,8 @@ itemslist = [
 	app_commands.Choice(name="Turrnut Car", value="car"),
 	app_commands.Choice(name="Turrnut Home", value="home"),
 	app_commands.Choice(name="Turrnut Ring", value="ring"),
-	app_commands.Choice(name="TurrTank", value="tank")
+	app_commands.Choice(name="TurrTank", value="tank"),
+	app_commands.Choice(name="Ferret pet", value="ferret")
 ]
 
 with open(f"chat.pickle", "rb") as f:
@@ -149,18 +150,18 @@ class TODButton(discord.ui.View):
 	def __init__ (self):
 		super().__init__()
 	@discord.ui.button(label="Truth", style=ButtonStyle.green)
-	async def truth(self, interaction:discord.Interaction, button: discord.ui.Button, emoji="✅"):
+	async def truth(self, interaction:discord.Interaction, button: discord.ui.Button, emoji="🟢"):
 		self.disabled=True
 		global truth
 		await interaction.response.send_message(f"Requested by: <@{interaction.user.id}>\nType: **Truth**\n{random.Random().choice(seq=truth)}", view=TODButton())
 
-	@discord.ui.button(label="Dare", style=ButtonStyle.red, emoji="🚫")
+	@discord.ui.button(label="Dare", style=ButtonStyle.red, emoji="🔴")
 	async def dare(self, interaction:discord.Interaction, button: discord.ui.Button):
 		self.disabled=True
 		global dare
 		await interaction.response.send_message(f"Requested by: <@{interaction.user.id}>\nType: **Dare**\n{random.Random().choice(seq=dare)}", view=TODButton())
 
-	@discord.ui.button(label="Random", style=ButtonStyle.blurple, emoji="❔")
+	@discord.ui.button(label="Random", style=ButtonStyle.blurple, emoji="🔵")
 	async def btn(self, interaction:discord.Interaction, button: discord.ui.Button):
 		self.disabled=True
 		global truth
@@ -874,6 +875,16 @@ def check_sell_items(fromm:str, to:str, item:str, quan:int):
 		return False
 	return True
 
+@tree.command(name="summon", description="🔮(Magically) Summons a person online")
+@app_commands.describe(person="Who do you want to summon?")
+async def summon(interaction:discord.Interaction, person:discord.User):
+	if int(person.id) == int(interaction.user.id): await interaction.response.send_message(f"You can't summon yourself.")
+	if client.get_user(int(person.id)).bot: await interaction.response.send_message(f"No matter how hard I try, bots cannot be summoned.")
+	await interaction.response.send_message(f"Summoned.",ephemeral=True)
+	await interaction.channel.send(f"<@{person.id}>,\n||<@{interaction.user.id}>|| is summoning you!")
+	lol = ("They didn't give you up, don't let them down!", "Be online now please, or I can't promise that they will still be sane when you went online again.")
+	await client.get_user(int(person.id)).send(f"<@{interaction.user.id}> was trying to summon you in **{interaction.guild.name}**, in the channel of **#{interaction.channel.name}**\n{random.Random().choice(seq=lol)}")
+
 @tree.command(name="poll", description="Make a new poll using this command")
 @app_commands.describe(question="What is the poll about?")
 @app_commands.describe(choices="Seperate poll choices by comma. You can only have ten choices maximum.")
@@ -884,7 +895,7 @@ async def poll(interaction:discord.Interaction, question:str, choices:str=None):
 		emjs = ("👍","👎")
 	choices = choices.split(',')
 	if len(choices) > 10:
-		interaction.response.send_message(f"You have no more than 10 choices.", ephemeral=True)
+		interaction.response.send_message(f"You can have no more than 10 choices.", ephemeral=True)
 		return
 	i = 0
 	res = f"Poll:\n{question}\n"
@@ -1074,8 +1085,8 @@ async def daily(interaction:discord.Interaction):
 	if not str(interaction.user.id) in awards:
 		new = True
 	else:
-		if float(awards[str(interaction.user.id)]) > float(float(time.time())) - 7200:
-			await interaction.response.send_message(f"Try again in ||{ str(round(float(float(7200 - (float(float(time.time())) - float(awards[str(interaction.user.id)]))) / 60.0), 3 )) } minutes||")
+		if float(awards[str(interaction.user.id)]) > float(float(time.time())) - 600:
+			await interaction.response.send_message(f"Try again in ||{ str(round(float(float(600 - (float(float(time.time())) - float(awards[str(interaction.user.id)]))) /60  ), 1 )) } minutes||")
 			return
 	awards[str(interaction.user.id)] = str(float(time.time()))
 	with open(pathify("awards|awards.json"), "w") as fobj2:
@@ -1099,97 +1110,6 @@ async def fact(interaction:discord.Interaction, expression: str):
 		except:
 			await interaction.response.send_message("Invalid Input", ephemeral=True) 
 			return
-
-isplaying = False
-ispaused = False
-queue = []
-ytdl_opts = {"format" : "bestaudio", "noplaylist" : "True"}
-ffmpeg_opts = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
-vc = None
-
-async def search_music(song):
-	with YoutubeDL(ytdl_opts) as ytdl:
-		try:
-			info = ytdl.extract_info(f"ytsearch:{song}",download=False)["entries"][0]
-			return {"source" : info["formats"][0]["url"], "title" : info["title"] }
-		except: return None
-def music_next():
-	if len(queue) > 0:
-		isplaying = True
-		url = queue[0][0]["source"]
-		queue.pop(0)
-		vc.play(discord.FFmpegPCMAudio(url, **ffmpeg_opts), after=lambda arg:music_next())
-		return
-	isplaying=False
-
-@tree.command(name="pause", description="Pause the current song.")
-async def pause(interaction:discord.Interaction):
-	if isplaying:
-		isplaying = False
-		ispaused = True
-		vc.pause()
-		await interaction.response.send_message("Song **paused**")
-		return
-	await interaction.response.send_message("No song is playing.")
-
-@tree.command(name="resume", description="Resume the paused song.")
-async def resume(interaction:discord.Interaction):
-	if ispaused:
-		isplaying = True
-		ispaused = False
-		vc.resume()
-		await interaction.response.send_message("Song **resumed**")
-		return
-	await interaction.response.send_message("No song is paused.")
-
-@tree.command(name="play", description="Play music")
-@app_commands.describe(song="What song you want to play?")
-@app_commands.choices(song=[
-	app_commands.Choice(name="Never gonna give you up",value="https://www.youtube.com/watch?v=dQw4w9WgXcQ")
-])
-async def music(interaction:discord.Interaction, song: app_commands.Choice[str]):
-	global isplaying
-	global ispaused
-	global queue
-	global vc
-	isplaying = False
-	ispaused = False
-	queue = []
-	vc = None
-
-	url = song.value
-	voicech = interaction.user.voice
-	if voicech is None:
-		await interaction.response.send_message("You are not in a voice channel!")
-		return
-	voicech = interaction.user.voice.channel
-	if voicech is None:
-		await interaction.response.send_message("You are not in a voice channel!")
-		return
-	if ispaused:
-		vc.resume()
-		return
-	thesong = await search_music(url)
-	if type(thesong) == None:
-		await interaction.response.send_message("An unknown error occured, please try a different song.", ephemeral=True)
-		return
-	queue.append([thesong, voicech])
-	if not isplaying:
-		url = ""
-	if len(queue) > 0:
-		isplaying = True
-		theurl = queue[0][0]["source"]
-
-		if vc == None or not vc.is_connected():
-			vc = await queue[0][1].connect()
-			if vc == None:
-				await interaction.response.send_message("Error: Cannot connect to the voice channel.")
-			return
-		await vc.move_to(queue[0][1])
-		queue.pop(0)
-		vc.play(discord.FFmpegPCMAudio(theurl, **ffmpeg_opts), after=lambda arg:music_next())
-
-		await interaction.response.send_message(f"Now playing {song.name}!")
 
 @tree.command(name="never-have-i-ever", description="Never have I ever...?")
 async def nh(interaction: discord.Interaction):
@@ -1349,7 +1269,7 @@ async def rank(interaction: discord.Interaction):
 			elif int(you) in (3,13) : resp += f"\nYou(<@{str(interaction.user.id)}>) are in **{you}rd** place."
 			else: resp += f"\nYou(<@{str(interaction.user.id)}>) are in **{you}th** place."
 	resp += f"\n{len(money)} Bank accounts in total."
-	embe = discord.Embed(title="Turrcoins Leaderboard", description="Top 10 turrcoin holders", color=embec)
+	embe = discord.Embed(title="Turrcoins Leaderboard", description="Top 15 turrcoin holders", color=embec)
 	embe.add_field(name="Ranking", value=resp, inline=False)
 	await interaction.response.send_message(embed=embe)
 
@@ -1445,7 +1365,7 @@ async def inv(interaction: discord.Interaction, command: app_commands.Choice[str
 		for server in client.guilds:
 			num_of_servers += 1
 
-		await interaction.response.send_message(f"# <:turrnut:1124769501087543358><:turrnut:1124769501087543358><:turrnut:1124769501087543358><:turrnut:1124769501087543358><:turrnut:1124769501087543358><:turrnut:1124769501087543358><:turrnut:1124769501087543358><:turrnut:1124769501087543358><:turrnut:1124769501087543358><:turrnut:1124769501087543358>\nHello, I am <@{str(client.user.id)}>\n# I am currently in {num_of_servers} servers!\n## My pronouns are it/its.\n### Click this link to invite me to your server: https://discord.com/oauth2/authorize?client_id=1014960764378939453&scope=bot \n### For more information, visit our website: https://turrnut.github.io/discordbot\n### For technical support, join our server: https://discord.gg/JBB8C33pKS")
+		await interaction.response.send_message(f"# hi.\nI am <@{str(client.user.id)}>\n# I am currently in {num_of_servers} servers!\n## My pronouns are it/its.\n### Click this link to invite me to your server: https://discord.com/oauth2/authorize?client_id=1014960764378939453&scope=bot \n### For more information, visit our website: https://turrnut.github.io/discordbot\n### For technical support, join our server: https://discord.gg/JBB8C33pKS")
 		return
 
 	elif command.value == "ask":
