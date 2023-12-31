@@ -19,7 +19,6 @@ import pickle
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import tensorflow_text as text
 from tensorflow import keras
 from time import sleep
 from keras import Sequential
@@ -89,20 +88,6 @@ guilds = []
 AWARD = 10
 ignore_bad_words = (1112529128273477724,)
 embec = 0x22B14C
-len_tags = 0
-questions = []
-answers = []
-xs = []
-ys = []
-total_words = 0
-word_index = {}
-tokenizer = None
-padtype = "post"
-corpus = []
-trunctype = "post"
-chatmodel = keras.models.load_model(f"models{os.sep}chat", compile=False)
-chatmodel.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-
 orders = []
 
 itemslist = [
@@ -153,13 +138,23 @@ class TODButton(discord.ui.View):
 	async def truth(self, interaction:discord.Interaction, button: discord.ui.Button, emoji="🟢"):
 		self.disabled=True
 		global truth
-		await interaction.response.send_message(f"Requested by: <@{interaction.user.id}>\nType: **Truth**\n{random.Random().choice(seq=truth)}", view=TODButton())
+		embe = discord.Embed(title=f"Truth Or Dare", description=f"Type: Truth, Requested by <@{interaction.user.id}>", color=embec)
+	
+		embe.add_field(name=f"{random.Random().choice(seq=truth)}", value=" ", inline=False)
+		embe.set_footer(text=f"{datetime.datetime.now()}")
+
+		await interaction.response.send_message(embed=embe, view=TODButton())
 
 	@discord.ui.button(label="Dare", style=ButtonStyle.red, emoji="🔴")
 	async def dare(self, interaction:discord.Interaction, button: discord.ui.Button):
 		self.disabled=True
 		global dare
-		await interaction.response.send_message(f"Requested by: <@{interaction.user.id}>\nType: **Dare**\n{random.Random().choice(seq=dare)}", view=TODButton())
+		embe = discord.Embed(title=f"Truth Or Dare", description=f"Type: Dare, Requested by <@{interaction.user.id}>", color=embec)
+	
+		embe.add_field(name=f"{random.Random().choice(seq=dare)}", value=" ", inline=False)
+		embe.set_footer(text=f"{datetime.datetime.now()}")
+
+		await interaction.response.send_message(embed=embe, view=TODButton())
 
 	@discord.ui.button(label="Random", style=ButtonStyle.blurple, emoji="🔵")
 	async def btn(self, interaction:discord.Interaction, button: discord.ui.Button):
@@ -172,8 +167,12 @@ class TODButton(discord.ui.View):
 		if listt == 2:
 			listtt = truth
 			qtype = "Truth"
-		await interaction.response.send_message(f"Requested by: <@{interaction.user.id}>\nType: **{qtype}**\n{random.Random().choice(seq=listtt)}", view=TODButton())
+		embe = discord.Embed(title=f"Truth Or Dare", description=f"Type: {qtype}, Requested by <@{interaction.user.id}>", color=embec)
+	
+		embe.add_field(name=f"{random.Random().choice(seq=listtt)}", value=" ", inline=False)
+		embe.set_footer(text=f"{datetime.datetime.now()}")
 
+		await interaction.response.send_message(embed=embe, view=TODButton())
 class SellButton(discord.ui.View):
 	def __init__ (self):
 		super().__init__()
@@ -201,7 +200,12 @@ class NHIEButton(discord.ui.View):
 	@discord.ui.button(label="Never Have I Ever", style=ButtonStyle.grey)
 	async def btn(self, interaction:discord.Interaction, button: discord.ui.Button):
 		global nhie
-		await interaction.response.send_message(f"Requested by: <@{interaction.user.id}>\nType: **NHIE**\nNever have I ever {random.Random().choice(seq=nhie)}", view=NHIEButton())
+		embe = discord.Embed(title=f"Never Have I Ever", description=f"Type: NHIE, Requested by <@{interaction.user.id}>", color=embec)
+	
+		embe.add_field(name=f"Never have I ever {random.Random().choice(seq=nhie)}", value=" ", inline=False)
+		embe.set_footer(text=f"{datetime.datetime.now()}")
+
+		await interaction.response.send_message(embed=embe, view=NHIEButton())
 
 class WYRButton(discord.ui.View):
 	def __init__ (self):
@@ -209,8 +213,12 @@ class WYRButton(discord.ui.View):
 	@discord.ui.button(label="Would you rather", style=ButtonStyle.blurple)
 	async def btn(self, interaction:discord.Interaction, button: discord.ui.Button):
 		global wyr
-		await interaction.response.send_message(f"Requested by: <@{interaction.user.id}>\nType: **WYR**\n{random.Random().choice(seq=wyr)}", view=WYRButton())
+		embe = discord.Embed(title=f"Would You Rather", description=f"Type: WYR, Requested by <@{interaction.user.id}>", color=embec)
+	
+		embe.add_field(name=f"{random.Random().choice(seq=wyr)}", value=" ", inline=False)
+		embe.set_footer(text=f"{datetime.datetime.now()}")
 
+		await interaction.response.send_message(embed=embe, view=WYRButton())
 
 class Meme:
 	def __init__(self, name, suggested):
@@ -1019,45 +1027,6 @@ async def calc(interaction:discord.Interaction, expression: str):
 	else:
 		await interaction.response.send_message(str(expression) + "=" + str(result.value))
 
-@tree.command(name="chat", description="Interact with the turrnut chatbot!")
-@app_commands.describe(prompt=f"Prompt for the chatbot")
-@app_commands.describe(version=f"What version of the Chatbot you want to use?")
-@app_commands.choices(version=[
-	app_commands.Choice(name="Version 1.1", value=1.1)
-])
-async def chat(interaction:discord.Interaction, prompt: str, version:app_commands.Choice[float]):
-	await interaction.response.defer()
-	global chatmodel
-	global howmanywords
-	global tokenizer
-	global padtype
-	global trunctype
-	global corpus
-	res = ""
-	prompt = [prompt]
-	disclaimer = "Disclaimer: Turrnut Chatbot may display inaccurate or offensive contents that does not represents Turrnut's views."
-	default = 1.1
-	if version.value == 1.1:
-		
-		
-		seqs = tokenizer.texts_to_sequences(prompt)
-		padded = pad_sequences(seqs, maxlen=int(howmanywords),padding=padtype,truncating=trunctype)
-		print("Padded:", padded)
-		pred = chatmodel.predict(padded)[0]
-		argmx = np.argmax(pred)
-		if pred[argmx] > .7:
-			rdc = corpus[argmx]["response"]
-			res = f"{random.Random().choice(seq=rdc)}"
-		else:
-			res = f"Sorry, I didn't understand that. Try ask a different question"
-	embe = discord.Embed(title=f"Chat", description=f"{version.name}", color=embec)
-	
-	embe.set_author(name=str(interaction.user.display_name), icon_url=interaction.user.avatar)
-	embe.add_field(name="You:", value=prompt[0], inline=False)
-	embe.add_field(name="Bot:", value=res, inline=False)
-	embe.set_footer(text=disclaimer)
-	await interaction.followup.send(embed=embe)
-
 
 	
 @tree.command(name="collect", description="Get your turrcoin award using this command.")
@@ -1114,7 +1083,12 @@ async def fact(interaction:discord.Interaction, expression: str):
 @tree.command(name="never-have-i-ever", description="Never have I ever...?")
 async def nh(interaction: discord.Interaction):
 	global nhie
-	await interaction.response.send_message(f"Requested by: <@{interaction.user.id}>\nType: **NHIE**\nNever have I ever {random.Random().choice(seq=nhie)}", view=NHIEButton())
+	embe = discord.Embed(title=f"Never Have I Ever", description=f"Type: NHIE, Requested by <@{interaction.user.id}>", color=embec)
+	
+	embe.add_field(name=f"{random.Random().choice(seq=nhie)}", value=" ", inline=False)
+	embe.set_footer(text=f"{datetime.datetime.now()}")
+
+	await interaction.response.send_message(embed=embe, view=NHIEButton())
 
 @tree.command(name="suggest", description="Suggestion a new feature!")
 @app_commands.describe(suggestion="What feature would you like to suggest?")
@@ -1135,7 +1109,12 @@ async def sugg(interaction: discord.Interaction, suggestion:str):
 @tree.command(name="would-you-rather", description="Play the would you rather game!")
 async def wy(interaction: discord.Interaction):
 	global wyr
-	await interaction.response.send_message(f"Requested by: <@{interaction.user.id}>\nType: **WYR**\n{random.Random().choice(seq=wyr)}", view=WYRButton())
+	embe = discord.Embed(title=f"Would You Rather", description=f"Type: WYR, Requested by <@{interaction.user.id}>", color=embec)
+	
+	embe.add_field(name=f"{random.Random().choice(seq=wyr)}", value=" ", inline=False)
+	embe.set_footer(text=f"{datetime.datetime.now()}")
+
+	await interaction.response.send_message(embed=embe, view=WYRButton())
 
 @tree.command(name="truth-or-dare", description="TRUTH or DARE??!! Use this command to play!")
 @app_commands.describe(type="Leave blank for a random question")
@@ -1159,19 +1138,29 @@ async def tod(interaction: discord.Interaction, type: app_commands.Choice[int]=N
 		qtype = random.Random().choice(seq=("t","d"))
 
 	if qtype == "t":
-		await interaction.response.send_message(f"Requested by: <@{interaction.user.id}>\nType: **Truth**\n{random.Random().choice(seq=truth)}", view=TODButton())
-		return
-	await interaction.response.send_message(f"Requested by: <@{interaction.user.id}>\nType: **Dare**\n{random.Random().choice(seq=dare)}", view=TODButton())
+		embe = discord.Embed(title=f"Truth or Dare", description=f"Type: Truth, Requested by <@{interaction.user.id}>", color=embec)
+	
+		embe.add_field(name=f"{random.Random().choice(seq=truth)}", value=" ", inline=False)
+		embe.set_footer(text=f"{datetime.datetime.now()}")
 
+		await interaction.response.send_message(embed=embe, view=TODButton())
+		return
+	embe = discord.Embed(title=f"Truth or Dare", description=f"Type: Dare, Requested by <@{interaction.user.id}>", color=embec)
+	
+	embe.add_field(name=f"{random.Random().choice(seq=dare)}", value=" ", inline=False)
+	embe.set_footer(text=f"{datetime.datetime.now()}")
+
+	await interaction.response.send_message(embed=embe, view=TODButton())
 @tree.command(name="pay", description="Give someone an amount of turrcoins")
 @app_commands.describe(receiver="The person who receive this money")
 @app_commands.describe(amount="How much money to transfer")
-async def give(interaction: discord.Interaction, receiver: discord.Member, amount: float):
+async def pay(interaction: discord.Interaction, receiver: discord.Member, amount: float):
 	global money
 	load_money()
 	send = ""
 	fail = True
 	hasacc = False
+	checking = True
 	for mon in money:
 		if str(mon.id) == str(interaction.user.id):
 			hasacc = True
@@ -1190,12 +1179,23 @@ async def give(interaction: discord.Interaction, receiver: discord.Member, amoun
 	account = money.pop(index)
 	if amount > float(account.balance):
 		send = f"Can't complete transcation. You only have {str(account.balance)} coins but you attempt to transfer {amount}"
-	if amount < 0:
-		send = f"Can't complete transcation. the amount is negative"
-	if amount > float(account.balance):
-		send = f"Can't complete transcation. {amount} is a negative number"
-	if str(receiver.id) == str(interaction.user.id):
+		checking= False
+	elif float(amount) <= 0:
+		send = f"Can't complete transcation. the amount is 0 or negative"
+		checking= False
+	elif str(receiver.id) == str(interaction.user.id):
 		send = f"Can't complete transcation. You can't give yourself money"
+		checking= False
+	else: pass
+	
+	if not checking:
+		embe = discord.Embed(title=f"Error", description=f"<@{interaction.user.id}> to <@{receiver.id}>", color=embec)
+	
+		embe.add_field(name=f"{send}", value="Transaction failed", inline=False)
+		embe.set_footer(text=f"{datetime.datetime.now()}")
+		await interaction.response.send_message(embed=embe)
+		return
+
 	hasacc = False
 	for mon in money:
 		if str(mon.id) == str(receiver.id):
@@ -1342,18 +1342,22 @@ async def ask(interaction: discord.Interaction, question:str):
 @app_commands.choices(command=[
 	app_commands.Choice(name="/ask",value="ask"),
 	app_commands.Choice(name="/balance", value="bal"),
+	app_commands.Choice(name="/buy", value="buy"),
 	app_commands.Choice(name="/calculate",value="calc"),
-	app_commands.Choice(name="/chat",value="chat"),
 	app_commands.Choice(name="/collect",value="day"),
 	app_commands.Choice(name="/factorial",value="fact"),
-	app_commands.Choice(name="/pay",value="pay"),
+	app_commands.Choice(name="/give",value="give"),
 	app_commands.Choice(name="/help",value="help"),
+	app_commands.Choice(name="/item",value="item"),
 	app_commands.Choice(name="/leaderboard",value="rank"),
 	app_commands.Choice(name="/meme",value="meme"),
 	app_commands.Choice(name="/never-have-i-ever",value="nhie"),
+	app_commands.Choice(name="/pay",value="pay"),
+	app_commands.Choice(name="/poll",value="poll"),
 	app_commands.Choice(name="/predict-grade",value="grade"),
 	app_commands.Choice(name="/speak",value="speak"),
 	app_commands.Choice(name="/suggest",value="sug"),
+	app_commands.Choice(name="/summon",value="summon"),
 	app_commands.Choice(name="/truth-or-dare",value="tod"),
 	app_commands.Choice(name="/would-you-rather",value="wyr"),
 ])
@@ -1365,7 +1369,7 @@ async def inv(interaction: discord.Interaction, command: app_commands.Choice[str
 		for server in client.guilds:
 			num_of_servers += 1
 
-		await interaction.response.send_message(f"# hi.\nI am <@{str(client.user.id)}>\n# I am currently in {num_of_servers} servers!\n## My pronouns are it/its.\n### Click this link to invite me to your server: https://discord.com/oauth2/authorize?client_id=1014960764378939453&scope=bot \n### For more information, visit our website: https://turrnut.github.io/discordbot\n### For technical support, join our server: https://discord.gg/JBB8C33pKS")
+		await interaction.response.send_message(f"# hi.\nI am <@{str(client.user.id)}>\n# I am currently in {num_of_servers} servers!\n## My pronouns are it/its.\n### Click this link to invite me to your server: https://discord.com/oauth2/authorize?client_id=1014960764378939453&scope=bot \n### For more information, visit our website: https://turrnut.github.io/discordbot\n### For technical support, join our server: https://discord.gg/Xbt2mCjaz6")
 		return
 
 	elif command.value == "ask":
@@ -1378,30 +1382,50 @@ async def inv(interaction: discord.Interaction, command: app_commands.Choice[str
 		embe.add_field(name="**Required**: expression", value="Use + for addition, - for subtraction, * for multiplication, / for division and ^ for power. There is no need to put an \"=\" sign at the end. Create variables using 'val'.", inline=True)
 		await interaction.response.send_message(embed=embe)
 
-	elif command.value == "chat":
-		embe = discord.Embed(title="Command /chat", description=f"Interact with the turrnut chatbot!", color=embec)
-		embe.add_field(name="**Required**: prompt", value=f"Prompt for the chatbot.", inline=True)
-		embe.add_field(name="**Required**: version", value=f"Specifiy the version of the chatbot you want to use.", inline=True)
-		await interaction.response.send_message(embed=embe)
-	
 	elif command.value == "bal":
 		embe = discord.Embed(title="Command /balance", description=f"Check to see how many turrcoins you have. Turrcoins are a type of currency created by me.", color=embec)
 		embe.add_field(name="**Optional**: person", value="Leave blank if you want to check your own balance.", inline=True)
 		await interaction.response.send_message(embed=embe)
 
+	elif command.value == "buy":
+		embe = discord.Embed(title="Command /buy", description=f"Buy an item from the store.", color=embec)
+		embe.add_field(name="**Required**: item", value="Specify which item do you want to buy.", inline=True)
+		embe.add_field(name="**Required**: quantity", value="Specify how many items you want to buy.", inline=True)
+		await interaction.response.send_message(embed=embe)
+
+	elif command.value == "item":
+		embe = discord.Embed(title="Command /item", description=f"Check how many items does a person own. You can also check the unit price of an item with this command before you use /buy", color=embec)
+		embe.add_field(name="**Required**: item", value="Specify which item do you want to check.", inline=True)
+		embe.add_field(name="**Required**: user", value="This is where you tell the bot whose item you want to check. In other words, in here you will be selecting a user whose information about the ownership of an item will be displayed, it can be yourself but doesn\'t have to be", inline=True)
+		await interaction.response.send_message(embed=embe)
+
 	elif command.value == "day":
-		embe = discord.Embed(title="Command /collect", description=f"Get turrcoins that refreshes every 2 hours! If you don't have an account, use /balance to create one first.", color=embec)
+		embe = discord.Embed(title="Command /collect", description=f"Get turrcoins that refreshes every 10 minutes! If you don't have an account, use /balance to create one first.", color=embec)
 		await interaction.response.send_message(embed=embe)
 
 	elif command.value == "fact":
-		embe = discord.Embed(title="Command /calculate", description=f"Use the turrnut expression evaluator via this command", color=embec)
+		embe = discord.Embed(title="Command /factorial", description=f"Use the turrnut expression evaluator via this command", color=embec)
 		embe.add_field(name="**Required**: expression", value="Use the same syntax as you would use for /calculate, the final result will be the factorial of the original result", inline=True)
 		await interaction.response.send_message(embed=embe)
 
 	elif command.value == "pay":
-		embe = discord.Embed(title="Command /give", description=f"Transfer a certain amount of turrcoinss to another user.", color=embec)
+		embe = discord.Embed(title="Command /pay", description=f"Transfer a certain amount of turrcoinss to another user.", color=embec)
 		embe.add_field(name="**Required**: receiver", value="Specify to whom you wish to transfer the turrcoins", inline=True)
 		embe.add_field(name="**Required**: amount", value="Specify the amount of turrcoins you intend to transfer", inline=True)
+		await interaction.response.send_message(embed=embe)
+
+	elif command.value == "give":
+		embe = discord.Embed(title="Command /give", description=f"Give items you own to a person", color=embec)
+		embe.add_field(name="**Required**: to", value="This is where you tell the bot who do you want to give your items to.", inline=True)
+		embe.add_field(name="**Required**: item", value="You can select the item you want to give in here.", inline=True)
+		embe.add_field(name="**Required**: quantity", value="You can specify how many of that item you want to give away.", inline=True)
+		embe.add_field(name="**Optional**: message", value="Since this is a \"gift\", you can optionally attach a message to it that will be displayed to that person.", inline=True)
+		await interaction.response.send_message(embed=embe)
+
+	elif command.value == "poll":
+		embe = discord.Embed(title="Command /poll", description=f"Want to ask for an opinion in the chat? Use this command to create a poll where people can express their opinions via reactions.", color=embec)
+		embe.add_field(name="**Required**: question", value="What is a question you are wondering what people think? Put the question here.", inline=True)
+		embe.add_field(name="**Optional**: choices", value="If left blank, the poll will be a yes/no question, but you can create your custom poll options by separating separate choices by comma(10 choices maximum)", inline=True)
 		await interaction.response.send_message(embed=embe)
 	
 	elif command.value == "rank":
@@ -1433,8 +1457,13 @@ async def inv(interaction: discord.Interaction, command: app_commands.Choice[str
 		embe.add_field(name="**Required**: message", value="What do you want the bot to say?", inline=True)
 		await interaction.response.send_message(embed=embe)
 
-	elif command.value == "suggest":
-		embe = discord.Embed(title="Command /suggest", description=f"Suggest a new feature to the bot", color=embec)
+	elif command.value == "summon":
+		embe = discord.Embed(title="Command /summon", description=f"Have a AFK friend you would like to be online? Use this command to (magically) \"summon\" your friend online. We can\'t promise it will be successful, though.", color=embec)
+		embe.add_field(name="**Required**: person", value="Who do you want to summon?", inline=True)
+		await interaction.response.send_message(embed=embe)
+
+	elif command.value == "sug":
+		embe = discord.Embed(title="Command /suggest", description=f"Suggest a new feature to the bot or report a bug.", color=embec)
 		embe.add_field(name="**Required**: suggestion", value="What is your suggestion?", inline=True)
 		await interaction.response.send_message(embed=embe)
 
@@ -1485,6 +1514,7 @@ async def speakkc(interaction: discord.Interaction, message:str, replyto:str=Non
 				server = client.get_guild(server_id)
 				channel = server.get_channel(channel_id)
 				mesg = await channel.fetch_message(msg_id)
+				await interaction.response.send_message("Reply sent.", ephemeral=True)
 				await mesg.reply(message)
 				return
 		await interaction.response.send_message("You can't use this command, you don't have `Manage Messages` permission",ephemeral=True)
@@ -1504,6 +1534,7 @@ async def speakkc(interaction: discord.Interaction, message:str, replyto:str=Non
 
 			server = client.get_guild(server_id)
 			channel = server.get_channel(channel_id)
+			await interaction.response.send_message("Reply sent.", ephemeral=True)
 			mesg = await channel.fetch_message(msg_id)
 			await mesg.reply(message)
 			return	

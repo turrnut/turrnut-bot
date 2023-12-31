@@ -9,7 +9,8 @@
                   "820541682415960064": "1.0",
                   "1133931783122079754": "1.0",
                   "711282706293456967": "0",
-                  "980121390306983997": "0"
+                  "980121390306983997": "0",
+                  "1183126173304234027": "2.0"
             }
       },
       "car": {
@@ -17,12 +18,13 @@
             "desc": "The Turrnut Car is a marvel of automotive engineering, redefining the driving experience with its groundbreaking design and cutting-edge technology. Its sleek and aerodynamic silhouette ensures a smooth ride, while the eco-friendly electric motor delivers impressive acceleration and a whisper-quiet journey. The spacious interior boasts luxurious comfort and innovative features, seamlessly integrated for a futuristic feel. Safety remains a top priority, with advanced driver-assistance systems and robust structural integrity. The Turrnut Car's range is exceptional, making long journeys a breeze. Embracing sustainability, this car takes strides towards a greener future, making it an ideal choice for the modern driver seeking excellence.",
             "users": {
                   "23": "0",
-                  "977377574789472278": "916.0",
+                  "977377574789472278": "915.0",
                   "820541682415960064": "6.0",
                   "1133931783122079754": "0.0",
                   "1014960764378939453": "84.0",
                   "1047642306326564945": "5.0",
-                  "811101581272547359": "1.0"
+                  "811101581272547359": "1.0",
+                  "1014572988089237554": "1.0"
             }
       },
       "home": {
@@ -40,20 +42,23 @@
             "price": "777",
             "desc": "The TurrTank is highly regarded for its exceptional mobility, robust armor, and formidable firepower. Its innovative design allows it to maneuver effortlessly in varied terrains while offering superior protection to its crew. With its cutting-edge weaponry, it stands as a formidable force on the battlefield, ensuring a strong offensive and defensive capability. This tank's performance and versatility make it a highly sought-after asset for modern military operations.",
             "users": {
-                  "977377574789472278": "497.0",
-                  "820541682415960064": "220001004631292.0",
+                  "977377574789472278": "8274.0",
+                  "820541682415960064": "220781003626660.0",
                   "984242137879162920": "1.0",
                   "1025854689142657055": "5135.0",
                   "1047642306326564945": "3.0",
                   "811101581272547359": "125.0",
-                  "1133931783122079754": "8.0"
+                  "1133931783122079754": "8.0",
+                  "764828032140836865": "666.0"
             }
       },
       "ferret": {
             "price": "4.5",
             "desc": "Ferrets are a type of pet",
             "users": {
-                  "977377574789472278": "1007.0"
+                  "977377574789472278": "1005.0",
+                  "1014960764378939453": "2.0",
+                  "820541682415960064": "3.0"
             }
       }
 }
