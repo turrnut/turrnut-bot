@@ -1,6 +1,11 @@
 {
       "ring": {
-            "price": "9.0",
+            "price": "9",
+            "use": [
+                  "You asked a random person to marry you, unfortunately they refused.",
+                  "You showed off your ring to your friends, they applauded with sarcasm in response."
+            ],
+            "usable": "0",
             "desc": "In brilliance and gold, the Turrnut Ring gleams,\nA lavish gem, adorning dreams,\nDiamonds dance 'round its lustrous core,\nA symbol of power forevermore.\n\nWith elegance and grace, it graces the hand,\nA treasure of beauty, rare and grand.\nA testament to love's eternal fling,\nIn every heart, it reigns as king.",
             "users": {
                   "23": "0",
@@ -15,6 +20,11 @@
       },
       "car": {
             "price": "100",
+            "use": [
+                  "You drove the car for 7 miles before realizing you ran out of gasoline.",
+                  "You showed off your car to your friends, they sneered because they have better cars. How rude"
+            ],
+            "usable": "0",
             "desc": "The Turrnut Car is a marvel of automotive engineering, redefining the driving experience with its groundbreaking design and cutting-edge technology. Its sleek and aerodynamic silhouette ensures a smooth ride, while the eco-friendly electric motor delivers impressive acceleration and a whisper-quiet journey. The spacious interior boasts luxurious comfort and innovative features, seamlessly integrated for a futuristic feel. Safety remains a top priority, with advanced driver-assistance systems and robust structural integrity. The Turrnut Car's range is exceptional, making long journeys a breeze. Embracing sustainability, this car takes strides towards a greener future, making it an ideal choice for the modern driver seeking excellence.",
             "users": {
                   "23": "0",
@@ -24,22 +34,31 @@
                   "1014960764378939453": "84.0",
                   "1047642306326564945": "5.0",
                   "811101581272547359": "1.0",
-                  "1014572988089237554": "1.0"
+                  "1014572988089237554": "1.0",
+                  "1183126173304234027": "1.0"
             }
       },
       "home": {
             "price": "500",
+            "use": [
+                  "You tried to invite your friends to a party in your house, unfortunately no one came."
+            ],
             "desc": "Turrnut Home embodies the epitome of luxurious living, captivating all who step through its grand entrance. This architectural masterpiece blends modern aesthetics with timeless elegance, featuring state-of-the-art smart home technology for ultimate convenience and comfort. Every detail, from the handcrafted finishes to the expansive windows that bathe the rooms in natural light, exudes sophistication and charm. Nestled in a serene location, it offers a private oasis away from the bustling world. The lush landscapes, bespoke amenities, and a harmonious fusion of indoor and outdoor spaces make Turrnut Home an exquisite haven, enchanting its residents with a life of unparalleled opulence.",
             "users": {
                   "123": "0",
                   "977377574789472278": "100071.0",
                   "820541682415960064": "1003.0",
                   "984242137879162920": "1.0",
-                  "1133931783122079754": "0.0"
+                  "1133931783122079754": "0.0",
+                  "1183126173304234027": "0"
             }
       },
       "tank": {
             "price": "777",
+            "use": [
+                  "You drove the tank to your best friend's birthday party, they freaked out"
+            ],
+            "usable": "0",
             "desc": "The TurrTank is highly regarded for its exceptional mobility, robust armor, and formidable firepower. Its innovative design allows it to maneuver effortlessly in varied terrains while offering superior protection to its crew. With its cutting-edge weaponry, it stands as a formidable force on the battlefield, ensuring a strong offensive and defensive capability. This tank's performance and versatility make it a highly sought-after asset for modern military operations.",
             "users": {
                   "977377574789472278": "8274.0",
@@ -49,16 +68,48 @@
                   "1047642306326564945": "3.0",
                   "811101581272547359": "125.0",
                   "1133931783122079754": "8.0",
-                  "764828032140836865": "666.0"
+                  "764828032140836865": "666.0",
+                  "1183126173304234027": "0",
+                  "964894108164423800": "0"
             }
       },
       "ferret": {
             "price": "4.5",
+            "use": [
+                  "You played with the ferrets for a whole day without doing anything else"
+            ],
             "desc": "Ferrets are a type of pet",
             "users": {
-                  "977377574789472278": "1005.0",
+                  "977377574789472278": "1030.0",
                   "1014960764378939453": "2.0",
-                  "820541682415960064": "3.0"
+                  "820541682415960064": "3.0",
+                  "1183126173304234027": "3.0",
+                  "964894108164423800": "200.0"
+            }
+      },
+      "ftoy": {
+            "price": "3.141592653589793238462643383279502884197",
+            "use": [
+                  "You tried to play with the toys, but the ferrets robbed them away"
+            ],
+            "desc": "The perfect toy for you pet ferret!",
+            "users": {
+                  "977377574789472278": "1006.0",
+                  "964894108164423800": "200.0",
+                  "1183126173304234027": "0"
+            }
+      },
+      "bstok": {
+            "price": "24.1212402312638",
+            "desc": "...",
+            "usable": "1",
+            "use": [
+                  "Hearing British pop music makes you very sleepy..."
+            ],
+            "users": {
+                  "977377574789472278": "790.0",
+                  "811101581272547359": "385.0",
+                  "964894108164423800": "0.0"
             }
       }
 }
