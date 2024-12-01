@@ -2,4 +2,4 @@ discord==2.3.2
 numpy
 pynacl
 youtube_dl
-tensorflow==2.14.0
+tensorflow==2.13.0

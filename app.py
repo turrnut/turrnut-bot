@@ -76,7 +76,7 @@ howmanywords = "20"
 MYSERVER = "Turrnut Republic(拖鞋社)"
 ADMIN = "977377574789472278" # turrnut
 TREASURER = "964894108164423800" # mrgeaso
-TREASURER = "811101581272547359" # netcro
+TREASURER = "720292051849314436" # tigerztacos
 LIST = (ADMIN,
 	TREASURER,
 	"917059800154652732", # nickels(main)
@@ -1586,7 +1586,7 @@ async def mem(interaction: discord.Interaction):
 	# await interaction.response.send_message("https://cdn.discordapp.com/attachments/1126943272271622205/1137119843934552085/image.png")
 	await interaction.response.send_message(str(meme.name))
 	# await interaction.channel.send("\nAs suggested by: " + str(meme.suggested))
-
+"""
 @tree.command(name="compliment", description="Get a compliment!")
 async def compliment(interaction: discord.Interaction):
 	global compliments
@@ -1596,7 +1596,7 @@ async def compliment(interaction: discord.Interaction):
 	# await interaction.response.send_message("https://cdn.discordapp.com/attachments/1126943272271622205/1137119843934552085/image.png")
 	await interaction.response.send_message(f"Hi, <@{interaction.user.id}>. " + str(comp))
 	# await interaction.channel.send("\nAs suggested by: " + str(meme.suggested))
-
+"""
 @tree.command(name="speak", description="Make me say something!")
 @app_commands.describe(message="What to do you want me to say?")
 @app_commands.describe(replyto="Reply to a message(link). Leave blank if none.")
@@ -1691,7 +1691,9 @@ async def on_message(message):
 	mensaje = message
 
 	for react in react_all:
-		await message.add_reaction(react)
+		try:
+			await message.add_reaction(react)
+		except: print("failed reaction all")
 
 	if message.author == client.user:
 		return

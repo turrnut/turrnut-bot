@@ -17,8 +17,10 @@
                   "980121390306983997": "0",
                   "1183126173304234027": "5.0",
                   "964894108164423800": "110000000000.0",
-                  "1047642306326564945": "7.0",
-                  "969924134899425280": "1.0"
+                  "1047642306326564945": "6.0",
+                  "969924134899425280": "1.0",
+                  "1194752390008680579": "2.0",
+                  "811101581272547359": "1.0"
             }
       },
       "car": {
@@ -49,11 +51,12 @@
             "desc": "Turrnut Home embodies the epitome of luxurious living, captivating all who step through its grand entrance. This architectural masterpiece blends modern aesthetics with timeless elegance, featuring state-of-the-art smart home technology for ultimate convenience and comfort. Every detail, from the handcrafted finishes to the expansive windows that bathe the rooms in natural light, exudes sophistication and charm. Nestled in a serene location, it offers a private oasis away from the bustling world. The lush landscapes, bespoke amenities, and a harmonious fusion of indoor and outdoor spaces make Turrnut Home an exquisite haven, enchanting its residents with a life of unparalleled opulence.",
             "users": {
                   "123": "0",
-                  "977377574789472278": "100071.0",
+                  "977377574789472278": "100069.0",
                   "820541682415960064": "1003.0",
                   "984242137879162920": "1.0",
                   "1133931783122079754": "0.0",
-                  "1183126173304234027": "1.0"
+                  "1183126173304234027": "1.0",
+                  "898703175459156008": "2.0"
             }
       },
       "tank": {
@@ -72,8 +75,8 @@
                   "811101581272547359": "125.0",
                   "1133931783122079754": "8.0",
                   "764828032140836865": "666.0",
-                  "1183126173304234027": "0",
-                  "964894108164423800": "1000000000.0"
+                  "1183126173304234027": "1.0",
+                  "964894108164423800": "1000001000.0"
             }
       },
       "ferret": {
@@ -99,7 +102,7 @@
             "desc": "The perfect toy for you pet ferret!",
             "users": {
                   "977377574789472278": "1004.0",
-                  "964894108164423800": "1000090000.0",
+                  "964894108164423800": "1000100000.0",
                   "1183126173304234027": "90.0",
                   "1194752390008680579": "2.0"
             }
@@ -112,9 +115,12 @@
                   "Hearing British pop music makes you very sleepy..."
             ],
             "users": {
-                  "977377574789472278": "1689.0",
+                  "977377574789472278": "88.0",
                   "811101581272547359": "385.0",
-                  "964894108164423800": "0.0"
+                  "964894108164423800": "0.0",
+                  "898703175459156008": "98.0",
+                  "1183126173304234027": "99.0",
+                  "744997698196733962": "500.0"
             }
       },
       "ppslice": {
