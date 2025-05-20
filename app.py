@@ -77,6 +77,7 @@ MYSERVER = "Turrnut Republic(拖鞋社)"
 ADMIN = "977377574789472278" # turrnut
 TREASURER = "964894108164423800" # mrgeaso
 TREASURER = "720292051849314436" # tigerztacos
+TREASURER = "778745923793584158" # juffyball
 LIST = (ADMIN,
 	TREASURER,
 	"917059800154652732", # nickels(main)
@@ -100,7 +101,8 @@ itemslist = [
 	app_commands.Choice(name="Ferret toy weapons", value="ftoy"),
 	app_commands.Choice(name="British sleep tokens", value="bstok"),
 	app_commands.Choice(name="Turrnut Jr. Pumpkin Pie", value="ppslice"),
-	app_commands.Choice(name="TurrTaco", value="taco")
+	app_commands.Choice(name="TurrTaco", value="taco"),
+	app_commands.Choice(name="Tuvaluan War Bonds", value="tvwarbonds")
 ]
 
 with open(f"chat.pickle", "rb") as f:
