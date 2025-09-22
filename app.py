@@ -78,7 +78,7 @@ mensaje = None
 logflag = True
 curse_words = ("fags", "nigger", "chink", "nigga",
 			   "faggot", "faggots", "retard", "fag",
-			   "penis", "stfu", "shutup", "kys", "meth", "cock", "dik")
+			   "penis", "stfu", "shutup", "kys", "meth", "cock", "dick")
 spamhalt = False
 SERVER_NAME = ""
 howmanywords = "20"
@@ -1192,6 +1192,16 @@ async def use(interaction:discord.Interaction, item:app_commands.Choice[str], qu
 	try:
 		if str(items[item.value]["usable"]) == "1":
 			items[item.value]["users"][str(interaction.user.id)] = str(float(items[item.value]["users"][str(interaction.user.id)]) - float(quantity))
+
+		if item.value == "coal":
+			theval = ""
+			if random.randint(0, 2500) == 67:
+				theval += "\nWith enough pressure... \nYOU TURNED COAL INTO DIAMOND, BABYYYY\n-# (only 0.04% chance!)"
+				buy_items(str(interaction.user.id), "diamond", 1)
+			else:
+				theval += "\nWith enough pressure... \nthe coal crumbles in your hands."
+			save_items()
+			load_items()
 	except: pass
 
 	save_items()

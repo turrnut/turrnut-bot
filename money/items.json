@@ -196,17 +196,9 @@
       "coal": {
             "price": "5",
             "desc": "Coal. can be obtained via mining.",
-            "usable": "0",
+            "usable": "1",
             "use": [
-                  "You took out your coal and looked at it in admiration... nothing happened.",
-                  "You rubbed the coal hoping for a genie... only got dirty hands.",
-                  "You balanced the coal on your nose. Impressive, but pointless.",
-                  "You whispered your dreams to the coal. It whispered back... in silence.",
-                  "You juggled the coal. Now everything smells like barbecue.",
-                  "You drew a smiley face on the coal. It's still emotionless.",
-                  "You tried to trade coal for cookies. Bad deal.",
-                  "You put the coal in your pocket. Congratulations, you have lint and coal.",
-                  "You asked coal to warm your heart. It stayed cold."
+                  "You tried to compress the coal into diamonds."
             ],
             "users": {
                   "977377574789472278": "55.0",
@@ -330,7 +322,8 @@
                   "You gave Turrnutium a nickname. It ignored you.",
                   "You licked Turrnutium. Why would you do that?",
                   "You asked Turrnutium to shine. It stayed dull.",
-                  "You dropped Turrnutium. The floor is fine. You aren't."
+                  "You dropped Turrnutium. The floor is fine. You aren't.",
+                  "You stared deep into the Turrnutium. It gleamed back a soft greenish-white hue."
             ],
             "users": {
                   "977377574789472278": "22.0"
