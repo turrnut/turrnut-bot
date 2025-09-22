@@ -183,10 +183,12 @@
             "desc": "Pickaxe used for mining. has a 40% chance of breaking upon use.",
             "usable": "0",
             "use": [
-                  "You went mining with your pickaxe..."
+                  "You looked at your pickaxe. Nothing happened. Maybe use /mine?",
+                  "You put the pickaxe on the ground politely then picked it back up. Nothing happened. Maybe try /mine?",
+                  "You stared at the pickaxe. It smells like a pickaxe. Nothing happened. Maybe try using /mine?"
             ],
             "users": {
-                  "977377574789472278": "62.0",
+                  "977377574789472278": "48.0",
                   "820541682415960064": "0.0",
                   "1405608029134782545": "0.0"
             }
@@ -207,8 +209,8 @@
                   "You asked coal to warm your heart. It stayed cold."
             ],
             "users": {
-                  "977377574789472278": "52.0",
-                  "820541682415960064": "14.0",
+                  "977377574789472278": "55.0",
+                  "820541682415960064": "80.0",
                   "1405608029134782545": "7.0"
             }
       },
@@ -228,13 +230,13 @@
                   "You named the quartz. It doesn't care."
             ],
             "users": {
-                  "977377574789472278": "29.0",
-                  "820541682415960064": "16.0",
+                  "977377574789472278": "33.0",
+                  "820541682415960064": "45.0",
                   "1405608029134782545": "1.0"
             }
       },
       "gold": {
-            "price": "50",
+            "price": "35",
             "desc": "Gold. can be obtained via mining.",
             "usable": "0",
             "use": [
@@ -249,14 +251,14 @@
                   "You asked gold to make you rich. It just stared."
             ],
             "users": {
-                  "977377574789472278": "27.0",
-                  "820541682415960064": "2.0",
+                  "977377574789472278": "28.0",
+                  "820541682415960064": "11.0",
                   "1405608029134782545": "0.0",
                   "1286156256033116202": "4.0"
             }
       },
       "emerald": {
-            "price": "75",
+            "price": "80",
             "desc": "Emerald. can be obtained via mining.",
             "usable": "0",
             "use": [
@@ -272,7 +274,7 @@
             ],
             "users": {
                   "977377574789472278": "23.0",
-                  "820541682415960064": "1.0"
+                  "820541682415960064": "6.0"
             }
       },
       "diamond": {
@@ -291,12 +293,12 @@
                   "You kissed the diamond. It was cold and unimpressed."
             ],
             "users": {
-                  "977377574789472278": "35.0",
-                  "820541682415960064": "1.0"
+                  "977377574789472278": "40.0",
+                  "820541682415960064": "5.0"
             }
       },
       "tuvalunium": {
-            "price": "500",
+            "price": "650",
             "desc": "Tuvalunium. can be obtained via mining. This mineral is EXTREMELY RARE.",
             "usable": "0",
             "use": [
@@ -311,12 +313,12 @@
                   "You used Tuvalunium as a doorstop. Fancy, but dumb."
             ],
             "users": {
-                  "977377574789472278": "21.0",
-                  "820541682415960064": "1"
+                  "977377574789472278": "23.0",
+                  "820541682415960064": "0.0"
             }
       },
       "turrnutium": {
-            "price": "1000",
+            "price": "3000",
             "desc": "Turrnutium. can be obtained via mining. This mineral is EXTREMELY RARE.",
             "usable": "0",
             "use": [
@@ -331,7 +333,7 @@
                   "You dropped Turrnutium. The floor is fine. You aren't."
             ],
             "users": {
-                  "977377574789472278": "21.0"
+                  "977377574789472278": "22.0"
             }
       }
 }
