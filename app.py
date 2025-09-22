@@ -10,6 +10,7 @@ import nacl
 import youtube_dl
 import time
 import asyncio
+import traceback
 import exint.interpreter as lang
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
@@ -25,6 +26,9 @@ from keras import Sequential
 from keras.layers import *
 from keras.preprocessing.text import Tokenizer
 from keras_preprocessing.sequence import pad_sequences
+
+import chessdotcom
+from chessdotcom import *
 
 from discord import app_commands, ButtonStyle
 from discord.ext import commands
@@ -63,7 +67,12 @@ from youtube_dl import YoutubeDL
 intents = discord.Intents.all()
 client = Bot(command_prefix='?', intents=intents)
 
+chessdotcom.Client.request_config['headers']['User-Agent'] = 'My Python Application. Contact me at victorconqueror@gmail.com'
+
 react_all = []
+chess = sorted(["TurrnutChess", "Jplay21", "Juffyball"], reverse=True)
+elo = list(map(lambda person: get_player_stats(person).json["stats"]["chess_rapid"]["last"]["rating"], chess))
+print(elo)
 tree = client.tree
 mensaje = None
 logflag = True
@@ -87,22 +96,31 @@ LIST = (ADMIN,
 	)
 susflag = False
 guilds = []
-AWARD = 10
+AWARD = 10 # now it's randomly 5-15 instead of a fixed number. Go to the daily function to change it
 ignore_bad_words = (1112529128273477724,)
 embec = 0x22B14C
 orders = []
 
 itemslist = [
-	app_commands.Choice(name="Turrnut Cars", value="car"),
-	app_commands.Choice(name="Turrnut Homes", value="home"),
-	app_commands.Choice(name="Turrnut Rings", value="ring"),
-	app_commands.Choice(name="TurrTanks", value="tank"),
+	app_commands.Choice(name="British sleep tokens", value="bstok"),
+	app_commands.Choice(name="Coal", value="coal"),
+	app_commands.Choice(name="Diamond", value="diamond"),
+	app_commands.Choice(name="Emerald", value="emerald"),
 	app_commands.Choice(name="Ferret pets", value="ferret"),
 	app_commands.Choice(name="Ferret toy weapons", value="ftoy"),
-	app_commands.Choice(name="British sleep tokens", value="bstok"),
+	app_commands.Choice(name="Gold", value="gold"),
+	app_commands.Choice(name="Pickaxe", value="pick"),
+	app_commands.Choice(name="Quartz", value="quartz"),
+	app_commands.Choice(name="Russian War bonds", value="ruswarbonds"),
+	app_commands.Choice(name="Turrnut Cars", value="car"),
+	app_commands.Choice(name="Turrnut Homes", value="home"),
 	app_commands.Choice(name="Turrnut Jr. Pumpkin Pie", value="ppslice"),
+	app_commands.Choice(name="Turrnut Rings", value="ring"),
+	app_commands.Choice(name="Turrnutium", value="turrnutium"),
 	app_commands.Choice(name="TurrTaco", value="taco"),
-	app_commands.Choice(name="Tuvaluan War Bonds", value="tvwarbonds")
+	app_commands.Choice(name="TurrTanks", value="tank"),
+	app_commands.Choice(name="Tuvaluan War Bonds", value="tvwarbonds"),
+	app_commands.Choice(name="Tuvalunium", value="tuvalunium"),
 ]
 
 with open(f"chat.pickle", "rb") as f:
@@ -312,7 +330,16 @@ def buy_items(userid:str, item:str, quantity:int):
 	except KeyError:
 		items[item]["users"][userid] = "0"
 	
-	if quantity * float(items[item]["price"]) > float(money[find_money(Money(userid, 0))].balance):
+	if item in ("coal", "quartz", "gold", "emerald", "diamond", "tuvalunium", "turrnutium"):
+		items[item]["users"][userid] = str(float(items[item]["users"][userid]) + quantity)
+		
+		save_money()
+		load_money()
+
+		save_items()
+		load_items()
+		return True
+	elif quantity * float(items[item]["price"]) > float(money[find_money(Money(userid, 0))].balance):
 		return False
 
 	items[item]["users"][userid] = str(float(items[item]["users"][userid]) + quantity)
@@ -437,6 +464,8 @@ async def dostuff(instructions, message):
 	global tree
 	global ignore_bad_words
 	global react_all
+	global elo
+	global chess
 	instruction = []
 	for i in instructions:
 		instruction.append(i)
@@ -447,6 +476,30 @@ async def dostuff(instructions, message):
 		await tree.sync()
 		await message.channel.send("Commands Synced")
 		return
+	if instruction[1] == "chess":
+		chessresponse = f"# Turrnut Republic Chess Leaderboard {datetime.datetime.now().strftime('%b')} {datetime.datetime.now().year}"
+		chessdict = {}
+		i = 0
+		for e in elo:
+			chessdict[chess[i]] = e
+			i += 1
+		sortedchessdict = sorted(chessdict.items(), key=lambda item: item[1], reverse=True)
+		i = 0
+		for person,el in sortedchessdict:
+			chessresponse += "\n"
+			if i >= 9: break
+			if i < 3:
+				if i == 0: chessresponse += "🥇"
+				if i == 1: chessresponse += "🥈"
+				if i == 2: chessresponse += "🥉"
+			else:
+				chessresponse += str((i + 1))
+			chessresponse += f": {person} -> **{el}**"
+			i += 1
+		chessresponse += f"\n-# Ranking based on Rapid elo fetched from [Chess.com](https://chess.com), to have you added to the list, DM <@{ADMIN}>."
+			
+		await message.channel.send(chessresponse)
+			
 	if instruction[1] == "calculate":
 		if len(instruction) == 2:
 			return
@@ -1024,6 +1077,85 @@ def get_item_msg(id):
 	if id == "": pass
 	else: return "Nothing happened."
 
+@tree.command(name="mine", description="Go mining!")
+async def mine(interaction:discord.Interaction):
+	item = app_commands.Choice(name="Pickaxe", value="pick")
+	quantity = 1
+	embe = discord.Embed(color=embec)
+	
+	embe.set_author(name=str(interaction.user.display_name), icon_url=interaction.user.avatar)
+	embe.set_footer(text=f"{datetime.datetime.now()}")
+
+	if not check_sell_items(str(interaction.user.id), str(interaction.user.id), str(item.value), quantity):
+		embe.add_field(name="Error", value=f"You don't have any {item.name}s. Use /buy to buy one!", inline=False)
+		await interaction.response.send_message(embed=embe)
+		return
+
+	save_items()
+	load_items()
+
+	try:
+		save_items()
+		load_items()
+		theval = random.Random().choice(seq=items[item.value]["use"])
+		thing = "ABSOLUTELY NOTHING!!"
+
+		if item.value == "pick":
+			theval = ""
+			pickaxe_rng = random.randint(0, 1000)
+			break_rng = random.randint(0, 1000)
+			if break_rng <= 400:
+				theval += "\nyour pickaxe broke."
+				items[item.value]["users"][str(interaction.user.id)] = str(float(items[item.value]["users"][str(interaction.user.id)]) - float(1))
+
+			if pickaxe_rng == 71:
+				thing = "TURRNUTIUM"
+				theval += "\n(You only have 0.1% chance of getting this item)"
+				buy_items(str(interaction.user.id), "turrnutium", 1)
+			elif pickaxe_rng <= 200:
+				theval += "\n(You have 20% chance of getting this)"
+			elif pickaxe_rng <= 500:
+				thing = "COAL"
+				theval += "\n(You have 30% chance of getting this item)"
+				buy_items(str(interaction.user.id), "coal", 1)
+			elif pickaxe_rng <= 750:
+				mystery = random.randint(5, 30)
+				thing = f"{mystery} TURRCOINS"
+				theval += "\n(You have 25% chance of getting this item)"
+				money[find_money(Money(str(interaction.user.id), 0))].balance = float(money[find_money(Money(str(interaction.user.id), 0))].balance) + float(mystery)
+				save_money()
+				load_money()
+				save_items()
+				load_items()
+			elif pickaxe_rng <= 900:
+				thing = "QUARTZ"
+				theval += "\n(You have 15% chance of getting this item)"
+				buy_items(str(interaction.user.id), "quartz", 1)
+			elif pickaxe_rng <= 950:
+				thing = "GOLD"
+				theval += "\n(You have 5% chance of getting this item)"
+				buy_items(str(interaction.user.id), "gold", 1)
+			elif pickaxe_rng <= 975:
+				thing = "EMERALD"
+				theval += "\n(You have 2.5% chance of getting this item)"
+				buy_items(str(interaction.user.id), "emerald", 1)
+			elif pickaxe_rng <= 995:
+				thing = "DIAMOND"
+				theval += "\n(You only have 2% chance of getting this item)"
+				buy_items(str(interaction.user.id), "diamond", 1)
+			else:
+				thing = "TUVALUNIUM"
+				theval += "\n(You only have 0.4% chance of getting this item)"
+				buy_items(str(interaction.user.id), "tuvalunium", 1)
+			save_items()
+			load_items()
+
+		embe.add_field(name=f"You found {thing}!!!", value=theval)
+	except KeyError as e:
+		print(traceback.format_exc())
+		print(items["emerald"]["users"])
+		embe.add_field(name=f"You used {str(quantity)} {item.name}...", value=e)
+	await interaction.response.send_message(embed=embe)
 @tree.command(name="use", description="Use items!")
 @app_commands.describe(item=f"What item?")
 @app_commands.describe(quantity=f"How many would you like to use?")
@@ -1051,9 +1183,57 @@ async def use(interaction:discord.Interaction, item:app_commands.Choice[str], qu
 	load_items()
 
 	try:
-		embe.add_field(name=f"You used {str(quantity)} {item.name}...", value=random.Random().choice(seq=items[item.value]["use"]))
-	except KeyError:
-		embe.add_field(name=f"You used {str(quantity)} {item.name}...", value="Nothing happened.")
+		save_items()
+		load_items()
+		theval = random.Random().choice(seq=items[item.value]["use"])
+
+		if item.value == "pick":
+			theval = ""
+			pickaxe_rng = random.randint(0, 1000)
+			break_rng = random.randint(0, 1000)
+			if break_rng <= 400:
+				theval += "\nyour pickaxe broke."
+				items[item.value]["users"][str(interaction.user.id)] = str(float(items[item.value]["users"][str(interaction.user.id)]) - float(1))
+
+			if pickaxe_rng == 71:
+				theval += "\nYou found TURRNUTIUM!!!\n(You only have 0.1% chance of getting this item)"
+				buy_items(str(interaction.user.id), "turrnutium", 1)
+			elif pickaxe_rng <= 200:
+				theval += "\nYou found ABSOLUTELY NOTHING!!!\n(You have 20% chance of getting this)"
+			elif pickaxe_rng <= 500:
+				theval += "\nYou found a COAL!!!\n(You have 30% chance of getting this item)"
+				buy_items(str(interaction.user.id), "coal", 1)
+			elif pickaxe_rng <= 750:
+				mystery = random.randint(5, 30)
+				theval += f"\nYou found {mystery} TURRCOINS!!!\n(You have 25% chance of getting this item)"
+				money[find_money(Money(str(interaction.user.id), 0))].balance = float(money[find_money(Money(str(interaction.user.id), 0))].balance) + float(mystery)
+				save_money()
+				load_money()
+				save_items()
+				load_items()
+			elif pickaxe_rng <= 900:
+				theval += "\nYou found a QUARTZ!!!\n(You have 15% chance of getting this item)"
+				buy_items(str(interaction.user.id), "quartz", 1)
+			elif pickaxe_rng <= 950:
+				theval += "\nYou found a GOLD!!!\n(You have 5% chance of getting this item)"
+				buy_items(str(interaction.user.id), "gold", 1)
+			elif pickaxe_rng <= 975:
+				theval += "\nYou found an EMERALD!!!\n(You have 2.5% chance of getting this item)"
+				buy_items(str(interaction.user.id), "emerald", 1)
+			elif pickaxe_rng <= 995:
+				theval += "\nYou found a DIAMOND!!!\n(You only have 2% chance of getting this item)"
+				buy_items(str(interaction.user.id), "diamond", 1)
+			else:
+				theval += "\nYou found TUVALUNIUM!!!\n(You only have 0.4% chance of getting this item)"
+				buy_items(str(interaction.user.id), "tuvalunium", 1)
+			save_items()
+			load_items()
+
+		embe.add_field(name=f"You used {str(quantity)} {item.name}...", value=theval)
+	except KeyError as e:
+		print(traceback.format_exc())
+		print(items["emerald"]["users"])
+		embe.add_field(name=f"You used {str(quantity)} {item.name}...", value=e)
 	await interaction.response.send_message(embed=embe)
 
 
@@ -1075,10 +1255,14 @@ async def buy(interaction:discord.Interaction,item:app_commands.Choice[str],quan
 		msg = f"{str(quantity)} {item.name} costs {cost} turrcoins, You only have {float(money[find_money(Money(interaction.user.id, 0))].balance)}."
 		embe.add_field(name="Error",value=msg,inline=False)
 	else :
-		cost = str(quantity * float(items[item.value]["price"]))
-		print("COST EVALUTED")
-		msg = f"You bought {str(quantity)} {item.name} for {cost} turrcoins.\nYour balance is {float(money[find_money(Money(interaction.user.id, 0))].balance)}."
-		embe.add_field(name="Success",value=msg,inline=False)
+		if item.value in ("coal", "quartz", "gold", "emerald", "diamond", "tuvalunium", "turrnutium"):
+			msg = f"Unfortunately, you can not buy this {item.name} because it is a mineral. The only way to obtain it is by mining. \nYou can buy a pickaxe using /buy and then use /use on the pickaxe."
+			embe.add_field(name="Error",value=msg,inline=False)
+		else:	
+			cost = str(quantity * float(items[item.value]["price"]))
+			print("COST EVALUTED")
+			msg = f"You bought {str(quantity)} {item.name} for {cost} turrcoins.\nYour balance is {float(money[find_money(Money(interaction.user.id, 0))].balance)}."
+			embe.add_field(name="Success",value=msg,inline=False)
 	await interaction.response.send_message(embed=embe)
 
 
@@ -1087,8 +1271,10 @@ async def buy(interaction:discord.Interaction,item:app_commands.Choice[str],quan
 @app_commands.describe(item=f"What item would you like to check")
 @app_commands.describe(user=f"What user do you want to check the item on? Leave blank to check your own.")
 @app_commands.choices(item=itemslist)
-async def item_check(interaction:discord.Interaction,item:app_commands.Choice[str],user:discord.User):
+async def item_check(interaction:discord.Interaction,item:app_commands.Choice[str],user:discord.User=None):
 	global items
+	if user == None:
+		user = interaction.user
 	userid = user.id
 	username = user.display_name
 	useravatar = user.avatar
@@ -1102,7 +1288,7 @@ async def item_check(interaction:discord.Interaction,item:app_commands.Choice[st
 	itemprice = str(float(items[item.value]["price"]))
 	count = 0
 	try:
-		count = items[item.value]["users"][str(userid)]
+		count = str(int(float(items[item.value]["users"][str(userid)])))
 	except KeyError:
 		print("BRUH")
 	descr = items[item.value]["desc"]
@@ -1112,6 +1298,51 @@ async def item_check(interaction:discord.Interaction,item:app_commands.Choice[st
 	embe.add_field(name=f"Unit price",value=f"{itemprice} turrcoins",inline=False)
 	embe.add_field(name=f"Item Description",value=f"{descr}",inline=False)
 	await interaction.response.send_message(embed=embe)
+
+@tree.command(name="minerals", description="Check a user's minerals")
+@app_commands.describe(user=f"Which user do you want to check? Leave blank for self.")
+async def minerals_check(interaction:discord.Interaction,user:discord.User=None):
+	global items
+	if user == None:
+		user = interaction.user
+	userid = user.id
+	username = user.display_name
+	useravatar = user.avatar
+
+	embe = discord.Embed(color=embec)
+	
+	embe.set_author(name=f"Minerals of {username}", icon_url=useravatar)
+	embe.set_footer(text=f"{datetime.datetime.now()}")
+	
+	minerals = [
+		app_commands.Choice(name="Coal", value="coal"),
+		app_commands.Choice(name="Quartz", value="quartz"),
+		app_commands.Choice(name="Gold", value="gold"),
+		app_commands.Choice(name="Emerald", value="emerald"),
+		app_commands.Choice(name="Diamond", value="diamond"),
+		app_commands.Choice(name="Tuvalunium", value="tuvalunium"),
+		app_commands.Choice(name="Turrnutium", value="turrnutium"),
+	]
+
+	nworth = 0
+	for item in minerals:
+		itemname = item.name
+		itemprice = str(float(items[item.value]["price"]))
+		count = 0
+		try:
+			count = str(int(float(items[item.value]["users"][str(userid)])))
+		except KeyError:
+			print("BRUH")
+		# descr = items[item.value]["desc"]
+		
+		embe.add_field(name=f"{itemname}",value=f"{count}",inline=True)
+		# embe.add_field(name=f"Quantity",value=f"{count}",inline=False)
+		# embe.add_field(name=f"Unit price",value=f"{itemprice} turrcoins",inline=False)
+		# embe.add_field(name=f"Item Description",value=f"{descr}",inline=False)
+		nworth += float((float(count) * float(itemprice)))
+	embe.add_field(name="TOTAL EVALUATION", value=f"{nworth} TRC", inline=False)
+	await interaction.response.send_message(embed=embe)
+
 
 @tree.command(name="calculate", description="Try the turrnut mathematic and logical calculator!")
 @app_commands.describe(expression="Arithmetic or boolean expression")
@@ -1130,6 +1361,10 @@ async def calc(interaction:discord.Interaction, expression: str):
 async def daily(interaction:discord.Interaction):
 	global money
 	global AWARD
+
+	AWARD = round(random.Random().uniform(5.0,15.0), 3)
+	if str(interaction.user.id) == "1405608029134782545": # Mergeaso
+		AWARD = math.pi
 
 	load_money()
 
@@ -1372,7 +1607,7 @@ async def rank(interaction: discord.Interaction):
 
 @tree.command(name="balance", description="Check how much turrcoins you have")
 @app_commands.describe(person="Leave blank to check your own balance")
-async def balance(interaction: discord.Interaction, person: discord.Member=None):
+async def balance(interaction: discord.Interaction, person: discord.User=None):
 	global money
 	load_money()
 	hasacc = False
@@ -1421,7 +1656,7 @@ async def predictgrade(interaction: discord.Interaction, first:float, second:flo
 		log(str(interaction.user) + " predict the grade as " +
 		str(first) + " " + str(second) + " " + str(third))
 		if first == second == third:
-			 await interaction.response.send_message(f"{first},{second},{third}\nThe turrnut Aritificial Intelligence predict that your final quarter grade will be: " + str(first) + "%\n100.0% Confidence")
+			await interaction.response.send_message(f"{first},{second},{third}\nThe turrnut Aritificial Intelligence predict that your final quarter grade will be: " + str(first) + "%\n100.0% Confidence")
 		else:
 			await interaction.response.send_message(f"{first},{second},{third}\nThe turrnut Aritificial Intelligence predict that your final quarter grade will be: " + str(round(possibilities[np.argmax(predictions[0])], 2)) + "%\n" + str(round(predictions[0][np.argmax(predictions[0])] * 100, 2)) + "% Confidence")
 			
@@ -1575,7 +1810,7 @@ async def inv(interaction: discord.Interaction, command: app_commands.Choice[str
 
 	else:
 		embe = discord.Embed(title=f"Command {command.name}", description=f"Coming soon...", color=embec)
-		await interaction.response.send_message(embed)
+		await interaction.response.send_message(embed=embe)
 	
 
 
@@ -1588,17 +1823,24 @@ async def mem(interaction: discord.Interaction):
 	# await interaction.response.send_message("https://cdn.discordapp.com/attachments/1126943272271622205/1137119843934552085/image.png")
 	await interaction.response.send_message(str(meme.name))
 	# await interaction.channel.send("\nAs suggested by: " + str(meme.suggested))
-"""
+
 @tree.command(name="compliment", description="Get a compliment!")
-async def compliment(interaction: discord.Interaction):
+@app_commands.describe(to="Who do you want to give the compliment to? Leave blank for yourself.")
+async def compliment(interaction: discord.Interaction, to: discord.User=None):
 	global compliments
+	comp = random.Random().choice(seq=compliments)
+	
+	recipient = to.id if to is not None else interaction.user.id
+	
+	embe = discord.Embed(description=f"<@{recipient}>, **{comp}**", color=embec)
+	embe.set_footer(text=f"{datetime.datetime.now()}")
+
 	log(str(interaction.user) + " prompted a random compliment")
 
-	comp = random.Random().choice(seq=compliments)
 	# await interaction.response.send_message("https://cdn.discordapp.com/attachments/1126943272271622205/1137119843934552085/image.png")
-	await interaction.response.send_message(f"Hi, <@{interaction.user.id}>. " + str(comp))
+	await interaction.response.send_message(embed=embe)
 	# await interaction.channel.send("\nAs suggested by: " + str(meme.suggested))
-"""
+
 @tree.command(name="speak", description="Make me say something!")
 @app_commands.describe(message="What to do you want me to say?")
 @app_commands.describe(replyto="Reply to a message(link). Leave blank if none.")
@@ -1620,6 +1862,8 @@ async def speakkc(interaction: discord.Interaction, message:str, replyto:str=Non
 
 				server = client.get_guild(server_id)
 				channel = server.get_channel(channel_id)
+				if channel is None:
+					channel = await client.fetch_channel(channel_id)
 				mesg = await channel.fetch_message(msg_id)
 				await interaction.response.send_message("Reply sent.", ephemeral=True)
 				await mesg.reply(message)

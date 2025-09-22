@@ -14,7 +14,7 @@
                   "820541682415960064": "1.0",
                   "1133931783122079754": "1.0",
                   "711282706293456967": "0",
-                  "980121390306983997": "0",
+                  "980121390306983997": "1.0",
                   "1183126173304234027": "5.0",
                   "964894108164423800": "110000000000.0",
                   "1047642306326564945": "6.0",
@@ -51,7 +51,7 @@
             "desc": "Turrnut Home embodies the epitome of luxurious living, captivating all who step through its grand entrance. This architectural masterpiece blends modern aesthetics with timeless elegance, featuring state-of-the-art smart home technology for ultimate convenience and comfort. Every detail, from the handcrafted finishes to the expansive windows that bathe the rooms in natural light, exudes sophistication and charm. Nestled in a serene location, it offers a private oasis away from the bustling world. The lush landscapes, bespoke amenities, and a harmonious fusion of indoor and outdoor spaces make Turrnut Home an exquisite haven, enchanting its residents with a life of unparalleled opulence.",
             "users": {
                   "123": "0",
-                  "977377574789472278": "100069.0",
+                  "977377574789472278": "100071.0",
                   "820541682415960064": "1003.0",
                   "984242137879162920": "1.0",
                   "1133931783122079754": "0.0",
@@ -67,8 +67,8 @@
             "usable": "0",
             "desc": "The TurrTank is highly regarded for its exceptional mobility, robust armor, and formidable firepower. Its innovative design allows it to maneuver effortlessly in varied terrains while offering superior protection to its crew. With its cutting-edge weaponry, it stands as a formidable force on the battlefield, ensuring a strong offensive and defensive capability. This tank's performance and versatility make it a highly sought-after asset for modern military operations.",
             "users": {
-                  "977377574789472278": "8274.0",
-                  "820541682415960064": "220781003626660.0",
+                  "977377574789472278": "8275.0",
+                  "820541682415960064": "220781003626659.0",
                   "984242137879162920": "1.0",
                   "1025854689142657055": "5135.0",
                   "1047642306326564945": "3.0",
@@ -91,7 +91,8 @@
                   "820541682415960064": "3.0",
                   "1183126173304234027": "93.0",
                   "964894108164423800": "1000090000.0",
-                  "1194752390008680579": "2.0"
+                  "1194752390008680579": "2.0",
+                  "1405608029134782545": "1000000000.0"
             }
       },
       "ftoy": {
@@ -104,7 +105,8 @@
                   "977377574789472278": "1004.0",
                   "964894108164423800": "1000100000.0",
                   "1183126173304234027": "90.0",
-                  "1194752390008680579": "2.0"
+                  "1194752390008680579": "2.0",
+                  "1211429000346476564": "1.0"
             }
       },
       "bstok": {
@@ -115,13 +117,15 @@
                   "Hearing British pop music makes you very sleepy..."
             ],
             "users": {
-                  "977377574789472278": "68.0",
+                  "977377574789472278": "77.0",
                   "811101581272547359": "385.0",
                   "964894108164423800": "0.0",
                   "898703175459156008": "98.0",
                   "1183126173304234027": "99.0",
                   "744997698196733962": "500.0",
-                  "1034310361236647997": "20.0"
+                  "1034310361236647997": "20.0",
+                  "1211429000346476564": "0.0",
+                  "820541682415960064": "0.0"
             }
       },
       "ppslice": {
@@ -159,7 +163,175 @@
             "users": {
                   "977377574789472278": "21.0",
                   "964894108164423800": "101.0",
-                  "778745923793584158": "1000000.0"
+                  "778745923793584158": "1000000.0",
+                  "1211429000346476564": "0"
+            }
+      },
+      "ruswarbonds": {
+            "price": "146.229",
+            "desc": "War bonds issued in the war against Russia. Price fluctuate like stocks.",
+            "usable": "0",
+            "use": [
+                  "You showed your patriotism by showing off your war bonds"
+            ],
+            "users": {
+                  "977377574789472278": "23.0"
+            }
+      },
+      "pick": {
+            "price": "30",
+            "desc": "Pickaxe used for mining. has a 40% chance of breaking upon use.",
+            "usable": "0",
+            "use": [
+                  "You went mining with your pickaxe..."
+            ],
+            "users": {
+                  "977377574789472278": "62.0",
+                  "820541682415960064": "0.0",
+                  "1405608029134782545": "0.0"
+            }
+      },
+      "coal": {
+            "price": "5",
+            "desc": "Coal. can be obtained via mining.",
+            "usable": "0",
+            "use": [
+                  "You took out your coal and looked at it in admiration... nothing happened.",
+                  "You rubbed the coal hoping for a genie... only got dirty hands.",
+                  "You balanced the coal on your nose. Impressive, but pointless.",
+                  "You whispered your dreams to the coal. It whispered back... in silence.",
+                  "You juggled the coal. Now everything smells like barbecue.",
+                  "You drew a smiley face on the coal. It's still emotionless.",
+                  "You tried to trade coal for cookies. Bad deal.",
+                  "You put the coal in your pocket. Congratulations, you have lint and coal.",
+                  "You asked coal to warm your heart. It stayed cold."
+            ],
+            "users": {
+                  "977377574789472278": "52.0",
+                  "820541682415960064": "14.0",
+                  "1405608029134782545": "7.0"
+            }
+      },
+      "quartz": {
+            "price": "25",
+            "desc": "Quartz. can be obtained via mining.",
+            "usable": "0",
+            "use": [
+                  "You took out your quartz and looked at it in admiration... nothing happened.",
+                  "You tried to eat the quartz... dentist says hi.",
+                  "You asked the quartz for good vibes. It ghosted you.",
+                  "You dropped the quartz and pretended it was on purpose.",
+                  "You polished the quartz. Still looks like quartz.",
+                  "You waved the quartz like a wand. No magic, only awkwardness.",
+                  "You pressed the quartz to your ear. It didn't call back.",
+                  "You used quartz as a paperweight. Papers still flew away.",
+                  "You named the quartz. It doesn't care."
+            ],
+            "users": {
+                  "977377574789472278": "29.0",
+                  "820541682415960064": "16.0",
+                  "1405608029134782545": "1.0"
+            }
+      },
+      "gold": {
+            "price": "50",
+            "desc": "Gold. can be obtained via mining.",
+            "usable": "0",
+            "use": [
+                  "You took out your gold and looked at it in admiration... nothing happened.",
+                  "You tried to bite the gold... now you need a dentist.",
+                  "You asked the gold to pay taxes. It declined.",
+                  "You tried to flex the gold, but nobody was watching.",
+                  "You polished the gold. Still shiny, still useless.",
+                  "You offered gold to a pigeon. It declined rudely.",
+                  "You stacked the gold dramatically. It fell over.",
+                  "You dropped the gold. Gravity works.",
+                  "You asked gold to make you rich. It just stared."
+            ],
+            "users": {
+                  "977377574789472278": "27.0",
+                  "820541682415960064": "2.0",
+                  "1405608029134782545": "0.0",
+                  "1286156256033116202": "4.0"
+            }
+      },
+      "emerald": {
+            "price": "75",
+            "desc": "Emerald. can be obtained via mining.",
+            "usable": "0",
+            "use": [
+                  "You took out your emerald and looked at it in admiration... nothing happened.",
+                  "You showed the emerald to the sun. The sun ignored it.",
+                  "You tried to hypnotize yourself with the emerald. It worked. Maybe.",
+                  "You told the emerald your secrets. It won't tell a soul.",
+                  "You dropped the emerald. Now you're nervous.",
+                  "You wore the emerald like jewelry. Still single.",
+                  "You stared at the emerald. The emerald won.",
+                  "You tried to feed the emerald to a goat. Bad idea.",
+                  "You told the emerald a joke. It didn't laugh."
+            ],
+            "users": {
+                  "977377574789472278": "23.0",
+                  "820541682415960064": "1.0"
+            }
+      },
+      "diamond": {
+            "price": "100",
+            "desc": "Diamond. can be obtained via mining.",
+            "usable": "0",
+            "use": [
+                  "You took out your diamond and looked at it in admiration... nothing happened.",
+                  "You held the diamond up dramatically. Nobody clapped.",
+                  "You tried to cut glass with the diamond. The glass won.",
+                  "You put the diamond under your pillow. Tooth Fairy is broke now.",
+                  "You tossed the diamond in the air. Almost lost it.",
+                  "You called the diamond your best friend. Awkward silence.",
+                  "You used the diamond to scratch your name. Ugly handwriting.",
+                  "You wore the diamond as a crown jewel. Still no kingdom.",
+                  "You kissed the diamond. It was cold and unimpressed."
+            ],
+            "users": {
+                  "977377574789472278": "35.0",
+                  "820541682415960064": "1.0"
+            }
+      },
+      "tuvalunium": {
+            "price": "500",
+            "desc": "Tuvalunium. can be obtained via mining. This mineral is EXTREMELY RARE.",
+            "usable": "0",
+            "use": [
+                  "You took out your Tuvalunium and looked at it in admiration... nothing happened.",
+                  "You tried to sell the Tuvalunium on eBay. No bids.",
+                  "You sniffed the Tuvalunium. Smells like disappointment.",
+                  "You challenged the Tuvalunium to a staring contest. You lost.",
+                  "You gave the Tuvalunium a pep talk. It stayed quiet.",
+                  "You juggled Tuvalunium. Now your back hurts.",
+                  "You asked Tuvalunium for life advice. Bad move.",
+                  "You tucked Tuvalunium in bed. It didn't thank you.",
+                  "You used Tuvalunium as a doorstop. Fancy, but dumb."
+            ],
+            "users": {
+                  "977377574789472278": "21.0",
+                  "820541682415960064": "1"
+            }
+      },
+      "turrnutium": {
+            "price": "1000",
+            "desc": "Turrnutium. can be obtained via mining. This mineral is EXTREMELY RARE.",
+            "usable": "0",
+            "use": [
+                  "You took out your Turrnutium and looked at it in admiration... nothing happened.",
+                  "You tapped the Turrnutium three times. Still nothing.",
+                  "You tried to eat the Turrnutium. Please don't do that again.",
+                  "You asked the Turrnutium for WiFi. It refused.",
+                  "You balanced Turrnutium on your head. Felt silly.",
+                  "You gave Turrnutium a nickname. It ignored you.",
+                  "You licked Turrnutium. Why would you do that?",
+                  "You asked Turrnutium to shine. It stayed dull.",
+                  "You dropped Turrnutium. The floor is fine. You aren't."
+            ],
+            "users": {
+                  "977377574789472278": "21.0"
             }
       }
 }

@@ -3,3 +3,4 @@ numpy
 pynacl
 youtube_dl
 tensorflow==2.13.0
+chess.com
