@@ -857,7 +857,7 @@ async def dostuff(instructions, message):
 		if instruction[1].lower() == "help":
 			# LOG
 			# log(str(message.author) + " Used the help command")
-			await message.channel.send("Hello, I am Turrnut Bot, a bot created by turrnut. I am currently serving ** " + str(len(client.guilds)) + " servers!** My pronouns are *it/its*")
+			await message.channel.send("Hello, I am Turrnut Bot, a bot created by turrnut. I am currently serving ** " + str(len(client.guilds)) + " servers!** My pronouns are *she/her*")
 			await message.channel.send("Visit our website for details of the bot: https://turrnut.github.io/discordbot")
 			print("servers the bot is in: ", end="")
 			for server in client.guilds:
@@ -1679,7 +1679,7 @@ async def inv(interaction: discord.Interaction, command: app_commands.Choice[str
 		for server in client.guilds:
 			num_of_servers += 1
 
-		await interaction.response.send_message(f"# hi.\nI am <@{str(client.user.id)}>\n# I am currently in {num_of_servers} servers!\n## My pronouns are it/its.\n### Click this link to invite me to your server: https://discord.com/oauth2/authorize?client_id=1014960764378939453&scope=bot \n### For more information, visit our website: https://turrnut.github.io/discordbot\n### For technical support, join our server: https://discord.gg/Xbt2mCjaz6")
+		await interaction.response.send_message(f"# hi.\nI am <@{str(client.user.id)}>\n# I am currently in {num_of_servers} servers!\n## My pronouns are she/her.\n### Click this link to invite me to your server: https://discord.com/oauth2/authorize?client_id=1014960764378939453&scope=bot \n### For more information, visit our website: https://turrnut.github.io/discordbot\n### For technical support, join our server: https://discord.gg/Xbt2mCjaz6")
 		return
 
 	elif command.value == "ask":
