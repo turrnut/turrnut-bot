@@ -4,6 +4,7 @@ import os
 import math
 import datetime
 import json
+from blackjack import bj, bjhit, bjstand
 import bruh
 import random
 import nacl
@@ -179,6 +180,10 @@ truth = ("If you could be invisible for a day, what’s the first thing you woul
 
 dare = ("Pick someone in this room and ask them for a date.","Let another person post an Instagram caption on your behalf.","Hand over your phone to another player who can send a single text saying anything they want to anyone they want","Let the other players go through your phone for one minute.","Smell another player's armpit.","Smell another player's barefoot.","Eat a bite of a banana peel.","Do an impression of another player until someone can figure out who it is.","Say pickles at the end of every sentence you say until it's your turn again.","Imitate a TikTok star until another player guesses who you're portraying.","Act like a chicken until your next turn.","Talk in a British accent until your next turn.","Send a heart-eye emoji to your crush’s Instagram story.","Call a friend, pretend it's their birthday, and sing them Happy Birthday to You.","Name a famous person that looks like each player in the room.","Show us your best dance moves.","Eat a packet of hot sauce straight.","Let another person draw a tattoo on your back with a permanent marker.","Put on a blindfold and touch the other players' faces until you can figure out who's who.","Bite into a raw onion without slicing it.","Go outside and try to “summon” the rain as loud as possible.","Serenade the person to your right for a full minute.","Do 20 squats.","Let the other players redo your hairstyle.","Eat a condiment of your choice straight from the bottle.","Dump out your purse, backpack, or pockets and do a show and tell of what's inside.","Let the player to your right redo your makeup with their eyes closed.","Prank call one of your family members.","Let another player create a hat out of toilet paper — and you have to wear it for the rest of the game.		","Do a plank for a full minute.","Do your sassiest runway walk.","Put five ice cubes in your mouth (you can't chew them, you just have to let them melt—brrr).","Bark like a dog until it’s your next turn.","Draw your favorite movie and have the other person guess it (Pictionary-style).","Repeat everything the person to your right says until your next turn.","Demonstrate how you style your hair in the mirror (without actually using the mirror).","Play air guitar for one minute.","Empty a glass of cold water onto your head outside.","Go on Instagram Live and do a dramatic reading of one of your textbooks.","In the next 10 minutes, find a way to scare another player and make it a surprise.","Lick a bar of soap.","Talk to a pillow as if it’s your crush.","Post the oldest selfie on your phone to Snapchat or Instagram stories (and leave it up!).","Attempt the first TikTok dance on your FYP.","Imitate a celebrity of the group’s choosing every time you talk for the next 10 minutes.","Go to your crush’s Instagram page and like something from several weeks ago.","Do karaoke to a song of the group’s choosing.","Post a photo (any photo) to social with a heartfelt dedication to a celebrity of the group’s choosing.","Find your very first crush on social and DM them.","Peel a banana using just your toes.","Let the group mix together five of whatever liquids they find in the fridge, then drink it.","Wear another player’s socks like gloves for the next five minutes.","Put on makeup without looking in the mirror, then leave it like that for the rest of the game.","Describe the most attractive quality of every person in the room.","Sing like an opera singer instead of speaking for the next five minutes.","Let everyone pose you in an embarrassing position and post a picture to Instagram.","Allow the person to your right to draw on your face with a Sharpie.","Jump in the pool (or shower) with all your clothes on!","Stand outside your house and wave to everyone who passes in the next minute.","Pretend to be underwater for the next 10 minutes.","Make out with a pillow.","Let everyone go through your Snapchat history.","Post a flirty comment on the first Instagram picture that you see.","Give the person to your right a foot massage (with their consent).","Pretend to be a ballerina until your next turn.","Serenade the person next to you.","Try to fit your whole fist in your mouth.","Read aloud the most personal text you’ve sent in recent days.","Reveal your screen time report to your friends.","Go outside and howl at the moon like a wolf.","Read the last text message you sent out loud.","Show the weirdest item you have in your purse/pockets.","Call the first person in your contacts list and sing them “Happy Birthday.”","Do your best impression of a fish out of water.","Give another player your phone and let them send a social media DM to anyone they want.","Do as many push-ups as you can in one minute.","Give a one-word “roast” to each other player.","Speak in an Australian accent until your next turn.","Let another player tickle you but don’t laugh!","Spin in a swivel chair for 30 seconds and then try to walk a straight line.","Go outside and sing “Never gonna give you up” by Rick Astley at full volume.","Let another player draw a tattoo on your arm in permanent marker.","Hold the plank position until it’s your turn again.","Tell each player who you think their celebrity look alike is.","Show off your best dance moves for the full duration of a song.","Narrate the game in a newscaster voice for three turns.","Walk next door with a measuring cup and ask for a cup of sugar.","Switch clothes with another player for the rest of the game.","Put on a blindfold and touch each players’ face until you can guess who each player is.","Let another player pour a glass of water on your head.","Give a shoulder rub to the player to your right (if they are comfortable).","Attempt to juggle two or three items of the asker’s choosing.","Perform a dramatic version of a monologue from a favorite TV show or movie.","Show the most embarrassing photo on your phone.","Comment a fire emoji on the first five pictures on your Instagram feed.","Do an impression of another player until your next turn.","Try to drink a glass of water without using your hands.","Allow the other players to blindfold you and try to guess three food items from the pantry just by smell.","Do your best interpretive dance/gymnastics floor routine.","Go outside and do your best wolf howl at the moon.","Post an unflattering selfie to your favorite social media account.","Talk and act like a celebrity until the group can guess who you are (this could go multiple turns!)","If you have to get up for the rest of the game, no walking allowed. You can crawl on all fours, roll, somersault, hop on one foot etc., but no walking!","Remove your socks with your teeth.","Go outside and pretend to mow grass with an invisible mower — sounds and all.","Act out a commercial for a product chosen by the other players.","Sing instead of speaking any time you talk for three turns.","Make a silly face and keep it that way until someone in the group laughs.","Do a freestyle rap about the other players for one minute.","Show the group your internet search history.","Let another player style your hair and leave it that way for the rest of the game.","Video chat the person of your choice but pick your nose through the entire conversation.","Put your shoes on the wrong feet and keep them there for the rest of the game.","Call a random acquaintance and tell them you want to break up.","Let the other players pose you and remain in that position until your next turn.","Allow someone else in the group to blindfold you and feed you one item out of the fridge.","Lead the group in a mini yoga class for one minute.","How old are you? Whatever your age is, do that many squats.","Perform a dance routine to a boy band song of the group’s choice.","Let another player draw a washable marker mustache on you.",)
 
+def mtms(value: float):
+    minutes = int(value)  # whole minutes
+    seconds = round((value - minutes) * 60)  # convert fractional part to seconds
+    return minutes, seconds
 
 def order_id_unique(order):
 	for order in orders:
@@ -1181,6 +1186,9 @@ async def use(interaction:discord.Interaction, item:app_commands.Choice[str], qu
 	embe.set_author(name=str(interaction.user.display_name), icon_url=interaction.user.avatar)
 	embe.set_footer(text=f"{datetime.datetime.now()}")
 
+	coalstuff = ""
+	coalflag = False
+
 	if quantity <= 0:
 		embe.add_field(name="Error", value="Quantity is 0 or negative.", inline=False)
 		await interaction.response.send_message(embed=embe)
@@ -1191,17 +1199,19 @@ async def use(interaction:discord.Interaction, item:app_commands.Choice[str], qu
 		return
 	try:
 		if str(items[item.value]["usable"]) == "1":
-			items[item.value]["users"][str(interaction.user.id)] = str(float(items[item.value]["users"][str(interaction.user.id)]) - float(quantity))
-
-		if item.value == "coal":
-			theval = ""
-			if random.randint(0, 2500) == 67:
-				theval += "\nWith enough pressure... \nYOU TURNED COAL INTO DIAMOND, BABYYYY\n-# (only 0.04% chance!)"
-				buy_items(str(interaction.user.id), "diamond", 1)
+			if item.value == "coal":
+				items[item.value]["users"][str(interaction.user.id)] = str(float(items[item.value]["users"][str(interaction.user.id)]) - float(1))
+				coalflag = True
+				if random.randint(0, 2500) == 71:
+					coalstuff += "\nWith enough pressure... \nYOU TURNED COAL INTO DIAMOND, BABYYYY\n-# (only 0.04% chance!)"
+					buy_items(str(interaction.user.id), "diamond", 1)
+				else:
+					coalstuff += "\nWith enough pressure... \nthe coal crumbles in your hands."
+				save_items()
+				load_items()
 			else:
-				theval += "\nWith enough pressure... \nthe coal crumbles in your hands."
-			save_items()
-			load_items()
+				items[item.value]["users"][str(interaction.user.id)] = str(float(items[item.value]["users"][str(interaction.user.id)]) - float(quantity))
+			
 	except: pass
 
 	save_items()
@@ -1211,8 +1221,8 @@ async def use(interaction:discord.Interaction, item:app_commands.Choice[str], qu
 		save_items()
 		load_items()
 		theval = random.Random().choice(seq=items[item.value]["use"])
-
-		embe.add_field(name=f"You used {str(quantity)} {item.name}...", value=theval)
+		
+		embe.add_field(name=f"You used {str(quantity)} {item.name}...", value=theval if not coalflag else theval + coalstuff)
 	except KeyError as e:
 		print(traceback.format_exc())
 		embe.add_field(name=f"You used {str(quantity)} {item.name}...", value="But something went wrong in the code.")
@@ -1239,7 +1249,7 @@ async def buy(interaction:discord.Interaction,item:app_commands.Choice[str],quan
 		embe.add_field(name="Error",value=msg,inline=False)
 	else :
 		if item.value in ("coal", "quartz", "gold", "emerald", "diamond", "tuvalunium", "turrnutium"):
-			msg = f"Unfortunately, you can not buy this {item.name} because it is a mineral. The only way to obtain it is by mining. \nYou can buy a pickaxe using /buy and then use /use on the pickaxe."
+			msg = f"Unfortunately, you can not buy this {item.name} because it is a mineral. The only way to obtain it is by mining. \nYou can buy a pickaxe using /buy and then use /mine."
 			embe.add_field(name="Error",value=msg,inline=False)
 		else:	
 			cost = str(quantity * float(items[item.value]["price"]))
@@ -1249,6 +1259,125 @@ async def buy(interaction:discord.Interaction,item:app_commands.Choice[str],quan
 	await interaction.response.send_message(embed=embe)
 	log(str(interaction.user.id) + "wants to buy something")
 
+@tree.command(name="blackjack", description="Start a new game of blackjack and play against the computer for a chance to win Turrcoins!")
+@app_commands.describe(wager=f"How many Turrcoins do you bet?")
+async def blackjack(interaction:discord.Interaction,wager:float):
+	global money
+	global items
+	
+	msg = ""
+
+	embe = discord.Embed(color=embec)
+	
+	embe.set_author(name=str(interaction.user.display_name), icon_url=interaction.user.avatar)
+	embe.set_footer(text=f"{datetime.datetime.now()}")
+
+	userbalance = float(money[find_money(Money(str(interaction.user.id), 0))].balance)
+
+	if wager <= 0:
+		embe.add_field(name="Error", value=f"Nice try, but wager amount cannot be 0 or negative like the number {str(wager)}", inline=False)
+		await interaction.response.send_message(embed=embe)
+		return
+	if userbalance < wager:
+		embe.add_field(name="Error", value=f"Wagered amount {str(wager)} is bigger than your balance {str(userbalance)}", inline=False)
+		await interaction.response.send_message(embed=embe)
+		return
+	
+	game = bj(str(interaction.user.id), wager)
+
+	if game["status"] == "ok":
+		money[find_money(Money(str(interaction.user.id), 0))].balance = float(money[find_money(Money(str(interaction.user.id), 0))].balance) - wager
+	
+	save_money()
+	load_money()
+
+	userbalance = float(money[find_money(Money(str(interaction.user.id), 0))].balance)
+
+	msg = game["message"] + f"\n\nYou have {userbalance} turrcoins." + "\nYou: **" + str(game["player"]) + "**\nComputer: **" + str(game["computer"]) + "**\nBet: **" + str(game["wager"]) + "**\n-# (Use /blackjack-hit or /blackjack-stand to play!)"
+
+	embe.add_field(name="Blackjack", value=msg, inline=False)
+	await interaction.response.send_message(embed=embe)
+
+@tree.command(name="blackjack-hit", description="Hit (in blackjack).")
+async def blackjackhit(interaction:discord.Interaction):
+	global money
+	global items
+	
+	msg = ""
+
+	embe = discord.Embed(color=embec)
+	
+	embe.set_author(name=str(interaction.user.display_name), icon_url=interaction.user.avatar)
+	embe.set_footer(text=f"{datetime.datetime.now()}")
+	
+	game = bjhit(str(interaction.user.id))
+	userbalance = float(money[find_money(Money(str(interaction.user.id), 0))].balance)
+	if game["status"] == "error":
+		msg = "You don't have an active blackjack game. Use **/blackjack** to start one!"
+	elif game["status"] == "bust":
+		msg = f"**YOU BUSTED!!**\n\nYour balance is now {userbalance} turrcoins.\n**" + str(game["player"]) + "-" + str(game["computer"]) + "**\nBet: **" + str(game["wager"]) + "**"
+		w = game["wager"]
+		log(f"{interaction.user.display_name}(" + str(interaction.user.id) + f")lost {w} TRC gambling.")
+	else:
+		msg = f"\n\nYou have {userbalance} turrcoins." + "\nYou: **" + str(game["player"]) + "**\nComputer: **" + str(game["computer"]) + "**\nBet: **" + str(game["wager"]) + "**"
+
+	embe.add_field(name="Blackjack - Hit", value=msg, inline=False)
+	await interaction.response.send_message(embed=embe)
+
+@tree.command(name="blackjack-stand", description="Stand (in blackjack).")
+async def blackjackstand(interaction:discord.Interaction):
+	global money
+	global items
+	
+	msg = ""
+
+	embe = discord.Embed(color=embec)
+	
+	embe.set_author(name=str(interaction.user.display_name), icon_url=interaction.user.avatar)
+	embe.set_footer(text=f"{datetime.datetime.now()}")
+	
+	game = bjstand(str(interaction.user.id))
+	userbalance = float(money[find_money(Money(str(interaction.user.id), 0))].balance)
+	if game["status"] == "error":
+		msg = "You don't have an active blackjack game. Use **/blackjack** to start one!"
+	elif game["status"] == "lose":
+		msg = f"**YOU LOST!!**\n\nYour balance is now {userbalance} turrcoins.\n**" + str(game["player"]) + "-" + str(game["computer"]) + "**\nBet: **" + str(game["wager"]) + "**" 
+		w = game["wager"]
+		log(f"{interaction.user.display_name}(" + str(interaction.user.id) + f")lost {w} TRC gambling.")
+
+	elif game["status"] == "win":
+		money[find_money(Money(str(interaction.user.id), 0))].balance = float(float(money[find_money(Money(str(interaction.user.id), 0))].balance) + float(game["wager"]) + float(game["wager"]))
+		
+		save_money()
+		load_money()
+
+		userbalance = float(money[find_money(Money(str(interaction.user.id), 0))].balance)
+		
+		msg = f"**YOU WON!!**\n\nYour balance is now {userbalance} turrcoins.\n**" + str(game["player"]) + "-" + str(game["computer"]) + "**\nBet: **" + str(game["wager"]) + "**" 
+		w = game["wager"]
+		log(f"{interaction.user.display_name}(" + str(interaction.user.id) + f")won {w} TRC gambling.")
+
+	else:
+		msg = f"**YOU TIED!!**\n-# (New round started with the same wager)"
+		msg += f"\n\nYou have {userbalance} turrcoins." + "\nYou: **" + str(game["player"]) + "**\nComputer: **" + str(game["computer"]) + "**\nBet: **" + str(game["wager"]) + "**"
+		w = game["wager"]
+		log(f"{interaction.user.display_name}(" + str(interaction.user.id) + f")tied {w} TRC gambling.")
+
+
+	embe.add_field(name="Blackjack - Stand", value=msg, inline=False)
+	await interaction.response.send_message(embed=embe)
+
+@tree.command(name="coin", description="Flip a coin!")
+async def coin(interaction:discord.Interaction):
+	embe = discord.Embed(color=embec)
+	
+	embe.set_author(name=str(interaction.user.display_name), icon_url=interaction.user.avatar)
+	embe.set_footer(text=f"{datetime.datetime.now()}")
+
+	face = random.Random().choice(seq=("HEADS!!!", "TAILS!!!"))
+	embe.add_field(name=face, value=face, inline=False)
+
+	await interaction.response.send_message(embed=embe)
 
 
 @tree.command(name="item", description="Check Item")
@@ -1277,9 +1406,9 @@ async def item_check(interaction:discord.Interaction,item:app_commands.Choice[st
 		print("BRUH")
 	descr = items[item.value]["desc"]
 	
-	embe.add_field(name=f"Item name",value=f"{itemname}",inline=False)
-	embe.add_field(name=f"Quantity",value=f"{count}",inline=False)
-	embe.add_field(name=f"Unit price",value=f"{itemprice} turrcoins",inline=False)
+	embe.add_field(name=f"Item name",value=f"{itemname}",inline=True)
+	embe.add_field(name=f"Quantity",value=f"{count}",inline=True)
+	embe.add_field(name=f"Unit price",value=f"{itemprice} turrcoins",inline=True)
 	embe.add_field(name=f"Item Description",value=f"{descr}",inline=False)
 	await interaction.response.send_message(embed=embe)
 	log(str(interaction.user.id) + "checks on items")
@@ -1373,7 +1502,8 @@ async def daily(interaction:discord.Interaction):
 		new = True
 	else:
 		if float(awards[str(interaction.user.id)]) > float(float(time.time())) - 600:
-			await interaction.response.send_message(f"Try again in ||{ str(round(float(float(600 - (float(float(time.time())) - float(awards[str(interaction.user.id)]))) /60  ), 1 )) } minutes||")
+			minutes , seconds = mtms(round(float(float(600 - (float(float(time.time())) - float(awards[str(interaction.user.id)]))) /60  ), 1 ))
+			await interaction.response.send_message(f"Try again in ||{ minutes } minutes {seconds} seconds||")
 			return
 	awards[str(interaction.user.id)] = str(float(time.time()))
 	with open(pathify("awards|awards.json"), "w") as fobj2:
