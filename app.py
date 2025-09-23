@@ -651,7 +651,7 @@ async def dostuff(instructions, message):
 	if len(instruction) == 2:
 		if instruction[1].lower() == "restart":
 			if str(message.author) != ADMIN:
-				message.channel.send("Nice try.")
+				await message.channel.send("Nice try.")
 				return
 			message.channel.send("Restart **Successful**.")
 
