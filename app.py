@@ -1191,7 +1191,7 @@ async def mine(interaction:discord.Interaction):
 				theval += "\n(You have **30% chance** of getting this item)"
 
 				diamond_rng = random.randint(0, 1000)
-				if diamond_rng == 71:
+				if diamond_rng == 71 and False:
 					theval += "\nBut wait! With enough pressure... **YOU TURNED COAL INTO DIAMOND💎, BABYYYY!!!!** *(This only happens only 0.1% of the time when you get coal!)*"
 					buy_items(str(interaction.user.id), "diamond", 1)
 				else:
@@ -1266,7 +1266,7 @@ async def use(interaction:discord.Interaction, item:app_commands.Choice[str], qu
 				coalflag = True
 				if quantity == 1:
 					if random.randint(0, 2500) == 420:
-						coalstuff += "\nWith enough pressure... \nYOU TURNED COAL INTO DIAMOND, BABYYYY\n-# (only 0.04% chance!)"
+						coalstuff += "\nWith enough pressure... \nYOU TURNED COAL INTO DIAMOND💎, BABYYYY\n-# (only 0.04% chance!)"
 						buy_items(str(interaction.user.id), "diamond", 1)
 					else:
 						coalstuff += "\nWith enough pressure... \nthe coal crumbles in your hands."
@@ -1283,7 +1283,7 @@ async def use(interaction:discord.Interaction, item:app_commands.Choice[str], qu
 					if coal_hits == 0:
 						coalstuff += "\nYou just wasted " + str(coal_busts) + " pieces of coal. Congrats."
 					else:
-						coalstuff += "\nYou broke " + str(coal_busts) + " pieces of coal...\nBUT MADE " + str(coal_hits) + " DIAMONDS!!!!!"
+						coalstuff += "\nYou broke " + str(coal_busts) + " pieces of coal...\nBUT MADE " + str(coal_hits) + " DIAMONDS!!!!!💎"
 						buy_items(str(interaction.user.id), "diamond", coal_hits)
 
 				save_items()
@@ -1359,7 +1359,7 @@ async def blackjack(interaction:discord.Interaction,wager:float):
 		embe.add_field(name="Nice try, champ.", value=f"You're in too much debt. Come back when you're not broke.", inline=False)
 		await interaction.response.send_message(embed=embe)
 		return
-	if userbalance - wager <= -1000:
+	if userbalance - wager <= -100:
 		embe.add_field(name="Nice try, champ.", value=f"You can't just produce infinite turrcoins out of thin air.\nTry making a reasonable bet.", inline=False)
 		await interaction.response.send_message(embed=embe)
 		return
@@ -1498,35 +1498,6 @@ async def minerals_check(interaction:discord.Interaction,user:discord.User=None)
 	embe.add_field(name="TOTAL EVALUATION", value=f"{nworth} TRC", inline=False)
 	await interaction.response.send_message(embed=embe)
 	log(str(interaction.user.id) + "minerals check")
-
-@tree.command(name="earnings", description="Check a user's lifetime blackjack earnings")
-@app_commands.describe(user=f"Which user do you want to check? Leave blank for self.")
-async def earnings(interaction:discord.Interaction,user:discord.User=None):
-	global items
-	if user == None:
-		user = interaction.user
-	userid = user.id
-	username = user.display_name
-	useravatar = user.avatar
-
-	embe = discord.Embed(color=embec)
-	
-	embe.set_author(name=f"Lifetime casino earnings of {username}", icon_url=useravatar)
-	embe.set_footer(text=f"{datetime.datetime.now()}")
-	
-	earnings = {}
-	if os.path.exists(pathify("blackjack|earnings.json")):
-		with open(pathify("blackjack|earnings.json"), "r") as f:
-			try:
-				earnings = json.load(f)
-			except json.JSONDecodeError:
-				earnings = {}
-	earning = earnings[str(user.id)]
-	earningtext = "LOST" if earning < 0 else "WON"
-
-	embe.add_field(name=earningtext, value=f"{str(abs(earning))} TRC", inline=False)
-	await interaction.response.send_message(embed=embe)
-	log(str(interaction.user.id) + "earnings check")
 
 
 @tree.command(name="calculate", description="Try the turrnut mathematic and logical calculator!")

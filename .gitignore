@@ -131,4 +131,3 @@ dmypy.json
 *.token
 exint/interpreter.py
 interpreter.py
-exint/
