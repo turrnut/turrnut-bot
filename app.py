@@ -350,7 +350,7 @@ class BlackjackButton(discord.ui.View):
 
 
 		embe.add_field(name="Blackjack - Stand", value=msg, inline=False)
-		await interaction.response.edit_message(embed=embe, view=None)
+		await interaction.response.edit_message(embed=embe, view=None if game["status"] != "tie" else BlackjackButton())
 
 
 class Meme:
@@ -1341,7 +1341,7 @@ async def buy(interaction:discord.Interaction,item:app_commands.Choice[str],quan
 async def blackjack(interaction:discord.Interaction,wager:float):
 	global money
 	global items
-	
+		
 	msg = ""
 
 	embe = discord.Embed(color=embec)
@@ -1352,15 +1352,15 @@ async def blackjack(interaction:discord.Interaction,wager:float):
 	userbalance = float(money[find_money(Money(str(interaction.user.id), 0))].balance)
 
 	if wager <= 0:
-		embe.add_field(name="Error", value=f"Nice try, but wager amount cannot be 0 or negative like the number {str(wager)}", inline=False)
+		embe.add_field(name="Error", value=f"Nice try, but wager amount cannot be 0 or negative like the number **{str(wager)}**", inline=False)
 		await interaction.response.send_message(embed=embe)
 		return
 	if userbalance <= -100:
-		embe.add_field(name="Nice try, champ.", value=f"You're in too much debt. Come back when you're not broke.", inline=False)
+		embe.add_field(name="Nice try, champ.", value=f"You're in too much debt. I mean, **{str(userbalance)}**? Come back when you're not broke.", inline=False)
 		await interaction.response.send_message(embed=embe)
 		return
 	if userbalance - wager <= -100:
-		embe.add_field(name="Nice try, champ.", value=f"You can't just produce infinite turrcoins out of thin air.\nTry making a reasonable bet.", inline=False)
+		embe.add_field(name="Nice try, champ.", value=f"You can't just produce infinite turrcoins out of thin air. **{str(wager)}** when you only have **{str(userbalance)}**? Nah, that's way too much.\nTry making a reasonable bet.", inline=False)
 		await interaction.response.send_message(embed=embe)
 		return
 	
@@ -2072,6 +2072,12 @@ async def on_ready():
 	await client.change_presence(status=discord.Status.idle, activity=discord.Activity(name="Insomnia Competition",type=5))
 	print("\n\n\n")
 
+@client.event
+async def on_typing(ch, user, when):
+	if not user.bot:
+		print(f"{user} IS TYPING... {when}", end="\r", flush=True)
+		async with ch.typing():
+			await asyncio.sleep(1)
 
 @client.event
 async def on_member_join(member):
