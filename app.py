@@ -8,25 +8,15 @@ from blackjack import bj, bjhit, bjstand
 import bruh
 import random
 import nacl
-import youtube_dl
 import time
 import asyncio
 import traceback
-import exint.interpreter as lang
+import interpreter as lang
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
-import tensorflow as tf
-import pickle
 import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-from tensorflow import keras
 from time import sleep
-from keras import Sequential
-from keras.layers import *
-from keras.preprocessing.text import Tokenizer
-from keras_preprocessing.sequence import pad_sequences
 
 import chessdotcom
 from chessdotcom import *
@@ -35,8 +25,6 @@ from discord import app_commands, ButtonStyle
 from discord.ext import commands
 
 from discord.ext.commands import Bot
-
-from youtube_dl import YoutubeDL
 
 # Features list:
 #   1. randomly send greeting messages
@@ -85,6 +73,7 @@ SERVER_NAME = ""
 howmanywords = "20"
 MYSERVER = "Turrnut Republic(拖鞋社)"
 ADMIN = "977377574789472278" # turrnut
+#ADMIN = "820541682415960064" # tuvalu (testing)
 TREASURER = "964894108164423800" # mrgeaso
 TREASURER = "720292051849314436" # tigerztacos
 TREASURER = "778745923793584158" # juffyball
@@ -123,9 +112,6 @@ itemslist = [
 	app_commands.Choice(name="Tuvaluan War Bonds", value="tvwarbonds"),
 	app_commands.Choice(name="Tuvalunium", value="tuvalunium"),
 ]
-
-with open(f"chat.pickle", "rb") as f:
-        	len_tags, questions, answers, xs, ys, total_words, word_index, tokenizer, corpus = pickle.load(f)
 
 # Generating a list of 200 G-rated, non-personal compliments/words of affirmation in a single line.
 compliments = [
@@ -291,6 +277,81 @@ class WYRButton(discord.ui.View):
 		embe.set_footer(text=f"{datetime.datetime.now()}")
 
 		await interaction.response.send_message(embed=embe, view=WYRButton())
+
+class BlackjackButton(discord.ui.View):
+	def __init__ (self):
+		super().__init__()
+
+	@discord.ui.button(label="Hit", style=ButtonStyle.green)
+	async def blackjackhit(self, interaction:discord.Interaction, button: discord.ui.Button):
+		global money
+		global items
+		
+		msg = ""
+
+		embe = discord.Embed(color=embec)
+		
+		embe.set_author(name=str(interaction.user.display_name), icon_url=interaction.user.avatar)
+		embe.set_footer(text=f"{datetime.datetime.now()}")
+		
+		game = bjhit(str(interaction.user.id))
+		userbalance = float(money[find_money(Money(str(interaction.user.id), 0))].balance)
+		if game["status"] == "error":
+			msg = "You don't have an active blackjack game. Use **/blackjack** to start one!"
+		elif game["status"] == "bust":
+			msg = f"**YOU BUSTED!!**\n\nYour balance is now {userbalance} turrcoins.\n**" + str(game["player"]) + "-" + str(game["computer"]) + "**\nBet: **" + str(game["wager"]) + "**"
+			w = game["wager"]
+			log(f"{interaction.user.display_name}(" + str(interaction.user.id) + f")lost {w} TRC gambling.")
+		else:
+			msg = f"\n\nYou have {userbalance} turrcoins." + "\nYou: **" + str(game["player"]) + "**\nComputer: **" + str(game["computer"]) + "**\nBet: **" + str(game["wager"]) + "**"
+
+		embe.add_field(name="Blackjack - Hit", value=msg, inline=False)
+		await interaction.response.send_message(embed=embe, view=BlackjackButton())
+
+
+	@discord.ui.button(label="Stand", style=ButtonStyle.blurple)
+	async def blackjackstand(self, interaction:discord.Interaction, button: discord.ui.Button):
+		global money
+		global items
+		
+		msg = ""
+
+		embe = discord.Embed(color=embec)
+		
+		embe.set_author(name=str(interaction.user.display_name), icon_url=interaction.user.avatar)
+		embe.set_footer(text=f"{datetime.datetime.now()}")
+		
+		game = bjstand(str(interaction.user.id))
+		userbalance = float(money[find_money(Money(str(interaction.user.id), 0))].balance)
+		if game["status"] == "error":
+			msg = "You don't have an active blackjack game. Use **/blackjack** to start one!"
+		elif game["status"] == "lose":
+			msg = f"**YOU LOST!!**\n\nYour balance is now {userbalance} turrcoins.\n**" + str(game["player"]) + "-" + str(game["computer"]) + "**\nBet: **" + str(game["wager"]) + "**" 
+			w = game["wager"]
+			log(f"{interaction.user.display_name}(" + str(interaction.user.id) + f")lost {w} TRC gambling.")
+
+		elif game["status"] == "win":
+			money[find_money(Money(str(interaction.user.id), 0))].balance = float(float(money[find_money(Money(str(interaction.user.id), 0))].balance) + float(game["wager"]) + float(game["wager"]))
+			
+			save_money()
+			load_money()
+
+			userbalance = float(money[find_money(Money(str(interaction.user.id), 0))].balance)
+			
+			msg = f"**YOU WON!!**\n\nYour balance is now {userbalance} turrcoins.\n**" + str(game["player"]) + "-" + str(game["computer"]) + "**\nBet: **" + str(game["wager"]) + "**" 
+			w = game["wager"]
+			log(f"{interaction.user.display_name}(" + str(interaction.user.id) + f")won {w} TRC gambling.")
+
+		else:
+			msg = f"**YOU TIED!!**\n-# (New round started with the same wager)"
+			msg += f"\n\nYou have {userbalance} turrcoins." + "\nYou: **" + str(game["player"]) + "**\nComputer: **" + str(game["computer"]) + "**\nBet: **" + str(game["wager"]) + "**"
+			w = game["wager"]
+			log(f"{interaction.user.display_name}(" + str(interaction.user.id) + f")tied {w} TRC gambling.")
+
+
+		embe.add_field(name="Blackjack - Stand", value=msg, inline=False)
+		await interaction.response.send_message(embed=embe, view=BlackjackButton())
+
 
 class Meme:
 	def __init__(self, name, suggested):
@@ -651,7 +712,7 @@ async def dostuff(instructions, message):
 	if len(instruction) == 2:
 		if instruction[1].lower() == "restart":
 			if str(message.author) != ADMIN:
-				await message.channel.send("Nice try.")
+				message.channel.send("Nice try.")
 				return
 			message.channel.send("Restart **Successful**.")
 
@@ -1199,18 +1260,34 @@ async def use(interaction:discord.Interaction, item:app_commands.Choice[str], qu
 		return
 	try:
 		if str(items[item.value]["usable"]) == "1":
+			items[item.value]["users"][str(interaction.user.id)] = str(float(items[item.value]["users"][str(interaction.user.id)]) - float(quantity))
+
 			if item.value == "coal":
-				items[item.value]["users"][str(interaction.user.id)] = str(float(items[item.value]["users"][str(interaction.user.id)]) - float(1))
 				coalflag = True
-				if random.randint(0, 2500) == 71:
-					coalstuff += "\nWith enough pressure... \nYOU TURNED COAL INTO DIAMOND, BABYYYY\n-# (only 0.04% chance!)"
-					buy_items(str(interaction.user.id), "diamond", 1)
-				else:
-					coalstuff += "\nWith enough pressure... \nthe coal crumbles in your hands."
+				if quantity == 1:
+					if random.randint(0, 2500) == 420:
+						coalstuff += "\nWith enough pressure... \nYOU TURNED COAL INTO DIAMOND, BABYYYY\n-# (only 0.04% chance!)"
+						buy_items(str(interaction.user.id), "diamond", 1)
+					else:
+						coalstuff += "\nWith enough pressure... \nthe coal crumbles in your hands."
+				
+				elif quantity > 1:
+					coal_busts = 0
+					coal_hits = 0
+					for i in range(quantity):
+						if random.randint(0, 2500) == 420:
+							coal_hits += 1
+						else:
+							coal_busts += 1
+
+					if coal_hits == 0:
+						coalstuff += "\nYou just wasted " + str(coal_busts) + " pieces of coal. Congrats."
+					else:
+						coalstuff += "\nYou broke " + str(coal_busts) + " pieces of coal...\nBUT MADE " + str(coal_hits) + " DIAMONDS!!!!!"
+						buy_items(str(interaction.user.id), "diamond", coal_hits)
+
 				save_items()
 				load_items()
-			else:
-				items[item.value]["users"][str(interaction.user.id)] = str(float(items[item.value]["users"][str(interaction.user.id)]) - float(quantity))
 			
 	except: pass
 
@@ -1278,8 +1355,12 @@ async def blackjack(interaction:discord.Interaction,wager:float):
 		embe.add_field(name="Error", value=f"Nice try, but wager amount cannot be 0 or negative like the number {str(wager)}", inline=False)
 		await interaction.response.send_message(embed=embe)
 		return
-	if userbalance < wager:
-		embe.add_field(name="Error", value=f"Wagered amount {str(wager)} is bigger than your balance {str(userbalance)}", inline=False)
+	if userbalance <= -100:
+		embe.add_field(name="Nice try, champ.", value=f"You're in too much debt. Come back when you're not broke.", inline=False)
+		await interaction.response.send_message(embed=embe)
+		return
+	if userbalance - wager <= -1000:
+		embe.add_field(name="Nice try, champ.", value=f"You can't just produce infinite turrcoins out of thin air.\nTry making a reasonable bet.", inline=False)
 		await interaction.response.send_message(embed=embe)
 		return
 	
@@ -1293,79 +1374,39 @@ async def blackjack(interaction:discord.Interaction,wager:float):
 
 	userbalance = float(money[find_money(Money(str(interaction.user.id), 0))].balance)
 
-	msg = game["message"] + f"\n\nYou have {userbalance} turrcoins." + "\nYou: **" + str(game["player"]) + "**\nComputer: **" + str(game["computer"]) + "**\nBet: **" + str(game["wager"]) + "**\n-# (Use /blackjack-hit or /blackjack-stand to play!)"
+	msg = game["message"] + f"\n\nYou have {userbalance} turrcoins." + "\nYou: **" + str(game["player"]) + "**\nComputer: **" + str(game["computer"]) + "**\nBet: **" + str(game["wager"]) + "**"
 
 	embe.add_field(name="Blackjack", value=msg, inline=False)
-	await interaction.response.send_message(embed=embe)
+	await interaction.response.send_message(embed=embe, view=BlackjackButton())
 
-@tree.command(name="blackjack-hit", description="Hit (in blackjack).")
-async def blackjackhit(interaction:discord.Interaction):
-	global money
-	global items
-	
-	msg = ""
+@tree.command(name="earnings", description="Check a user's lifetime blackjack earnings")
+@app_commands.describe(user=f"Which user do you want to check? Leave blank for self.")
+async def earnings(interaction:discord.Interaction,user:discord.User=None):
+    global items
+    if user == None:
+        user = interaction.user
+    userid = user.id
+    username = user.display_name
+    useravatar = user.avatar
 
-	embe = discord.Embed(color=embec)
-	
-	embe.set_author(name=str(interaction.user.display_name), icon_url=interaction.user.avatar)
-	embe.set_footer(text=f"{datetime.datetime.now()}")
-	
-	game = bjhit(str(interaction.user.id))
-	userbalance = float(money[find_money(Money(str(interaction.user.id), 0))].balance)
-	if game["status"] == "error":
-		msg = "You don't have an active blackjack game. Use **/blackjack** to start one!"
-	elif game["status"] == "bust":
-		msg = f"**YOU BUSTED!!**\n\nYour balance is now {userbalance} turrcoins.\n**" + str(game["player"]) + "-" + str(game["computer"]) + "**\nBet: **" + str(game["wager"]) + "**"
-		w = game["wager"]
-		log(f"{interaction.user.display_name}(" + str(interaction.user.id) + f")lost {w} TRC gambling.")
-	else:
-		msg = f"\n\nYou have {userbalance} turrcoins." + "\nYou: **" + str(game["player"]) + "**\nComputer: **" + str(game["computer"]) + "**\nBet: **" + str(game["wager"]) + "**"
+    embe = discord.Embed(color=embec)
+    
+    embe.set_author(name=f"Lifetime casino earnings of {username}", icon_url=useravatar)
+    embe.set_footer(text=f"{datetime.datetime.now()}")
+    
+    earnings = {}
+    if os.path.exists(pathify("blackjack|earnings.json")):
+        with open(pathify("blackjack|earnings.json"), "r") as f:
+            try:
+                earnings = json.load(f)
+            except json.JSONDecodeError:
+                earnings = {}
+    earning = earnings[str(user.id)]
+    earningtext = "LOST" if earning < 0 else "WON"
 
-	embe.add_field(name="Blackjack - Hit", value=msg, inline=False)
-	await interaction.response.send_message(embed=embe)
-
-@tree.command(name="blackjack-stand", description="Stand (in blackjack).")
-async def blackjackstand(interaction:discord.Interaction):
-	global money
-	global items
-	
-	msg = ""
-
-	embe = discord.Embed(color=embec)
-	
-	embe.set_author(name=str(interaction.user.display_name), icon_url=interaction.user.avatar)
-	embe.set_footer(text=f"{datetime.datetime.now()}")
-	
-	game = bjstand(str(interaction.user.id))
-	userbalance = float(money[find_money(Money(str(interaction.user.id), 0))].balance)
-	if game["status"] == "error":
-		msg = "You don't have an active blackjack game. Use **/blackjack** to start one!"
-	elif game["status"] == "lose":
-		msg = f"**YOU LOST!!**\n\nYour balance is now {userbalance} turrcoins.\n**" + str(game["player"]) + "-" + str(game["computer"]) + "**\nBet: **" + str(game["wager"]) + "**" 
-		w = game["wager"]
-		log(f"{interaction.user.display_name}(" + str(interaction.user.id) + f")lost {w} TRC gambling.")
-
-	elif game["status"] == "win":
-		money[find_money(Money(str(interaction.user.id), 0))].balance = float(float(money[find_money(Money(str(interaction.user.id), 0))].balance) + float(game["wager"]) + float(game["wager"]))
-		
-		save_money()
-		load_money()
-
-		userbalance = float(money[find_money(Money(str(interaction.user.id), 0))].balance)
-		
-		msg = f"**YOU WON!!**\n\nYour balance is now {userbalance} turrcoins.\n**" + str(game["player"]) + "-" + str(game["computer"]) + "**\nBet: **" + str(game["wager"]) + "**" 
-		w = game["wager"]
-		log(f"{interaction.user.display_name}(" + str(interaction.user.id) + f")won {w} TRC gambling.")
-
-	else:
-		msg = f"**YOU TIED!!**\n-# (New round started with the same wager)"
-		msg += f"\n\nYou have {userbalance} turrcoins." + "\nYou: **" + str(game["player"]) + "**\nComputer: **" + str(game["computer"]) + "**\nBet: **" + str(game["wager"]) + "**"
-		w = game["wager"]
-		log(f"{interaction.user.display_name}(" + str(interaction.user.id) + f")tied {w} TRC gambling.")
-
-
-	embe.add_field(name="Blackjack - Stand", value=msg, inline=False)
-	await interaction.response.send_message(embed=embe)
+    embe.add_field(name=earningtext, value=f"{str(abs(earning))} TRC", inline=False)
+    await interaction.response.send_message(embed=embe)
+    log(str(interaction.user.id) + "earnings check")
 
 @tree.command(name="coin", description="Flip a coin!")
 async def coin(interaction:discord.Interaction):
@@ -1455,35 +1496,6 @@ async def minerals_check(interaction:discord.Interaction,user:discord.User=None)
 		# embe.add_field(name=f"Item Description",value=f"{descr}",inline=False)
 		nworth += float((float(count) * float(itemprice)))
 	embe.add_field(name="TOTAL EVALUATION", value=f"{nworth} TRC", inline=False)
-	await interaction.response.send_message(embed=embe)
-	log(str(interaction.user.id) + "minerals check")
-
-@tree.command(name="earnings", description="Check a user's lifetime blackjack earnings")
-@app_commands.describe(user=f"Which user do you want to check? Leave blank for self.")
-async def earnings(interaction:discord.Interaction,user:discord.User=None):
-	global items
-	if user == None:
-		user = interaction.user
-	userid = user.id
-	username = user.display_name
-	useravatar = user.avatar
-
-	embe = discord.Embed(color=embec)
-	
-	embe.set_author(name=f"Lifetime casino earnings of {username}", icon_url=useravatar)
-	embe.set_footer(text=f"{datetime.datetime.now()}")
-	
-	earnings = {}
-	if os.path.exists(pathify("blackjack|earnings.json")):
-		with open(pathify("blackjack|earnings.json"), "r") as f:
-			try:
-				earnings = json.load(f)
-			except json.JSONDecodeError:
-				earnings = {}
-	earning = earnings[str(user.id)]
-	earningtext = "LOST" if earning < 0 else "WON"
-
-	embe.add_field(name=earningtext, value=f"{str(abs(earning))} TRC", inline=False)
 	await interaction.response.send_message(embed=embe)
 	log(str(interaction.user.id) + "minerals check")
 
