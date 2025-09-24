@@ -306,7 +306,7 @@ class BlackjackButton(discord.ui.View):
 			msg = f"\n\nYou have {userbalance} turrcoins." + "\nYou: **" + str(game["player"]) + "**\nComputer: **" + str(game["computer"]) + "**\nBet: **" + str(game["wager"]) + "**"
 
 		embe.add_field(name="Blackjack - Hit", value=msg, inline=False)
-		await interaction.response.send_message(embed=embe, view=BlackjackButton())
+		await interaction.response.edit_message(embed=embe, view=None if game["status"] == "bust" else BlackjackButton())
 
 
 	@discord.ui.button(label="Stand", style=ButtonStyle.blurple)
@@ -350,7 +350,7 @@ class BlackjackButton(discord.ui.View):
 
 
 		embe.add_field(name="Blackjack - Stand", value=msg, inline=False)
-		await interaction.response.send_message(embed=embe, view=BlackjackButton())
+		await interaction.response.edit_message(embed=embe, view=None)
 
 
 class Meme:
