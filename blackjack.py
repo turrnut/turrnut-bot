@@ -1,6 +1,9 @@
 import json
 import random
 import os
+import discord
+import asyncio
+import datetime
 
 def pathify(path):
 	return path.replace('|', os.sep)
@@ -59,26 +62,68 @@ def bj(userid: str, wager: int):
                 games = {}
 
     if str(userid) in games:
-        player, computer, wagered = games[str(userid)]
+        player, computer_actual, computer_showing, wagered = games[str(userid)]
         return {
             "status": "exists",
             "message": "*Game already in progress*",
             "player": player,
-            "computer": computer,
+            "computer_actual": computer_actual,
+            "computer_showing": computer_showing,
             "wager": wagered,
         }
 
-    player = random.randint(2, 21)
-    computer = random.randint(2, 21)
+    # there are 4 cards in a deck worth 10, hence 13
+    player_card1 = random.randint(1, 13)
+    player_card2 = random.randint(1, 13)
 
-    games[userid] = [player, computer, wager]
+    if player_card1 == 1:
+        player_card1 = 11
+    elif player_card1 > 9:
+        player_card1 = 10
+
+    if player_card2 == 1:
+        if player_card1 < 11:
+            player_card2 = 11
+        else:
+            player_card2 = 1
+    elif player_card2 > 9:
+        player_card2 = 10
+
+    computer_card1 = random.randint(1, 13)
+    computer_card2 = random.randint(1, 13)
+
+    if computer_card1 == 1:
+        computer_card1 = 11
+    elif computer_card1 > 9:
+        computer_card1 = 10
+
+    if computer_card2 == 1:
+        if computer_card1 < 11:
+            computer_card2 = 11
+        else:
+            computer_card2 = 1
+    elif computer_card2 > 9:
+        computer_card2 = 10
+
+    player = player_card1 + player_card2
+    computer_actual = computer_card1 + computer_card2
+    
+    if computer_card1 <= computer_card2:
+        computer_showing = computer_card1
+    else:
+        computer_showing = computer_card2
+
+    print("computer drew a " + str(computer_card1) + " and a " + str(computer_card2))
+
+    games[userid] = [player, computer_actual, computer_showing, wager]
     save_games()
 
     return {
         "status": "ok",
         "message": "*New Game!*",
         "player": player,
-        "computer": computer,
+        "computer_actual": computer_actual,
+        "computer_showing": computer_showing,
         "wager": wager,
     }
 
@@ -91,8 +136,9 @@ def bjhit(userid: str):
 
     games[str(userid)][0] += random.randint(1, 11)
     player_score = games[str(userid)][0]
-    computer_score = games[str(userid)][1]
-    wager = games[str(userid)][2]
+    computer_actual = games[str(userid)][1]
+    computer_showing = games[str(userid)][2]
+    wager = games[str(userid)][3]
 
     if player_score > 21:
         del games[str(userid)]
@@ -101,7 +147,8 @@ def bjhit(userid: str):
         return {
             "status": "bust",
             "player": player_score,
-            "computer": computer_score,
+            "computer_actual": computer_actual,
+            "computer_showing": computer_showing,
             "wager": wager,
         }
 
@@ -109,7 +156,8 @@ def bjhit(userid: str):
     #     return {
     #         "status": "blackjack",
     #         "player": player_score,
-    #         "computer": computer_score,
+    #         "computer_actual": computer_actual,
+    #         "computer_showing": computer_showing,
     #         "wager": wager,
     #     }
 
@@ -118,39 +166,56 @@ def bjhit(userid: str):
         return {
             "status": "continue",
             "player": player_score,
-            "computer": computer_score,
+            "computer_actual": computer_actual,
+            "computer_showing": computer_showing,
             "wager": wager,
         }
 
 
 
-def bjstand(userid: str):
+async def bjstand(userid: str):
     global games
+
+    msg = ""
+
+    embe = discord.Embed(color=0x22B14C)
+    
+    embe.set_footer(text=f"{datetime.datetime.now()}")
 
     if userid not in games:
         return {"status": "error"}
 
-    player_score, computer_score, wager = games[userid]
+    player_score, computer_actual, computer_showing, wager = games[userid]
 
     # Computer draws until >= 17
-    while computer_score < 17:
-        computer_score += random.randint(1, 11)
+    while computer_actual < 17:
+        computer_draw = random.randint(1, 14)
+        if computer_actual < 11 and computer_draw == 1:
+            computer_draw = 11
+        elif computer_draw == 1:
+            computer_draw = 1
+        elif computer_draw > 9:
+            computer_draw = 10
+        
+        computer_actual += computer_draw
+        computer_showing += computer_draw
 
     outcome = None
-    if computer_score > 21 or player_score > computer_score:
+    if computer_actual > 21 or player_score > computer_actual:
         update_earnings(str(userid), float(wager))
         outcome = "win"
-    elif player_score < computer_score:
+    elif player_score < computer_actual:
         update_earnings(str(userid), float(-wager))
         outcome = "lose"
-    elif player_score == computer_score:
+    elif player_score == computer_actual:
         games[userid] = [random.randint(2, 21), random.randint(2, 21), wager]
         save_games()
         return {
             "status": "tie",
             "message": "New round started with same wager",
             "player": games[userid][0],
-            "computer": games[userid][1],
+            "computer_actual": games[userid][1],
+            "computer_showing": games[userid][2],
             "wager": wager,
         }
 
@@ -160,6 +225,7 @@ def bjstand(userid: str):
     return {
         "status": outcome,
         "player": player_score,
-        "computer": computer_score,
+        "computer_actual": computer_actual,
+        "computer_showing": computer_showing,
         "wager": wager,
     }
