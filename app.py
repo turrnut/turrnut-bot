@@ -1485,7 +1485,7 @@ async def earnings(interaction:discord.Interaction,user:discord.User=None):
 
 	embe.add_field(name=earningtext, value=f"{str(abs(earning))} TRC", inline=False)
 	await interaction.response.send_message(embed=embe)
-	log(str(interaction.user.id) + "minerals check")
+	log(str(interaction.user.id) + "earnings check")
 
 
 @tree.command(name="calculate", description="Try the turrnut mathematic and logical calculator!")
