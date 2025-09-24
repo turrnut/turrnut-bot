@@ -1458,6 +1458,35 @@ async def minerals_check(interaction:discord.Interaction,user:discord.User=None)
 	await interaction.response.send_message(embed=embe)
 	log(str(interaction.user.id) + "minerals check")
 
+@tree.command(name="earnings", description="Check a user's lifetime blackjack earnings")
+@app_commands.describe(user=f"Which user do you want to check? Leave blank for self.")
+async def earnings(interaction:discord.Interaction,user:discord.User=None):
+	global items
+	if user == None:
+		user = interaction.user
+	userid = user.id
+	username = user.display_name
+	useravatar = user.avatar
+
+	embe = discord.Embed(color=embec)
+	
+	embe.set_author(name=f"Lifetime casino earnings of {username}", icon_url=useravatar)
+	embe.set_footer(text=f"{datetime.datetime.now()}")
+	
+	earnings = {}
+	if os.path.exists(pathify("blackjack|earnings.json")):
+		with open(pathify("blackjack|earnings.json"), "r") as f:
+			try:
+				earnings = json.load(f)
+			except json.JSONDecodeError:
+				earnings = {}
+	earning = earnings[str(user.id)]
+	earningtext = "LOST" if earning < 0 else "WON"
+
+	embe.add_field(name=earningtext, value=f"{str(abs(earning))} TRC", inline=False)
+	await interaction.response.send_message(embed=embe)
+	log(str(interaction.user.id) + "minerals check")
+
 
 @tree.command(name="calculate", description="Try the turrnut mathematic and logical calculator!")
 @app_commands.describe(expression="Arithmetic or boolean expression")
