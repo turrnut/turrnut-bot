@@ -278,6 +278,16 @@ class WYRButton(discord.ui.View):
 
 		await interaction.response.send_message(embed=embe, view=WYRButton())
 
+class BlackjackNewButton(discord.ui.View):
+	def __init__ (self):
+		super().__init__()
+
+	@discord.ui.button(label="New game?", style=ButtonStyle.green)
+	async def blackjacknew(self, interaction:discord.Interaction, button: discord.ui.Button):
+		embe = await blackjack_start(interaction, 0.1, True)
+		await interaction.response.edit_message(embed=embe, view=BlackjackButton())
+		
+
 class BlackjackButton(discord.ui.View):
 	def __init__ (self):
 		super().__init__()
@@ -289,6 +299,8 @@ class BlackjackButton(discord.ui.View):
 		
 		msg = ""
 
+		game_ended = 0
+
 		embe = discord.Embed(color=embec)
 		
 		embe.set_author(name=str(interaction.user.display_name), icon_url=interaction.user.avatar)
@@ -298,22 +310,27 @@ class BlackjackButton(discord.ui.View):
 		userbalance = float(money[find_money(Money(str(interaction.user.id), 0))].balance)
 		if game["status"] == "error":
 			msg = "You don't have an active blackjack game. Use **/blackjack** to start one!"
+			game_ended = 1
 		elif game["status"] == "bust":
-			msg = f"**YOU BUSTED!!**\n\nYour balance is now {userbalance} turrcoins.\n**" + str(game["player"]) + "-" + str(game["computer"]) + "**\nBet: **" + str(game["wager"]) + "**"
+			msg = f"**YOU BUSTED!!**\n\nYour balance is now {userbalance} turrcoins.\n**" + str(game["player"]) + "-" + str(game["computer_actual"]) + "**\nBet: **" + str(game["wager"]) + "**"
 			w = game["wager"]
 			log(f"{interaction.user.display_name}(" + str(interaction.user.id) + f")lost {w} TRC gambling.")
+			game_ended = 1
 		else:
-			msg = f"\n\nYou have {userbalance} turrcoins." + "\nYou: **" + str(game["player"]) + "**\nComputer: **" + str(game["computer"]) + "**\nBet: **" + str(game["wager"]) + "**"
+			msg = f"\n\nYou have {userbalance} turrcoins." + "\nYou: **" + str(game["player"]) + "**\nComputer is showing **" + str(game["computer_showing"]) + "**\nBet: **" + str(game["wager"]) + "**"
 
 		embe.add_field(name="Blackjack - Hit", value=msg, inline=False)
-		await interaction.response.edit_message(embed=embe, view=None if game["status"] == "bust" else BlackjackButton())
+		if game_ended == 0:
+			await interaction.response.edit_message(embed=embe, view=BlackjackButton())
+		else:
+			await interaction.response.edit_message(embed=embe, view=BlackjackNewButton())
 
 
 	@discord.ui.button(label="Stand", style=ButtonStyle.blurple)
 	async def blackjackstand(self, interaction:discord.Interaction, button: discord.ui.Button):
 		global money
 		global items
-		
+
 		msg = ""
 
 		embe = discord.Embed(color=embec)
@@ -323,11 +340,11 @@ class BlackjackButton(discord.ui.View):
 		
 		game = bjstand(str(interaction.user.id))
 		userbalance = float(money[find_money(Money(str(interaction.user.id), 0))].balance)
+		w = game["wager"]
 		if game["status"] == "error":
 			msg = "You don't have an active blackjack game. Use **/blackjack** to start one!"
 		elif game["status"] == "lose":
-			msg = f"**YOU LOST!!**\n\nYour balance is now {userbalance} turrcoins.\n**" + str(game["player"]) + "-" + str(game["computer"]) + "**\nBet: **" + str(game["wager"]) + "**" 
-			w = game["wager"]
+			msg = f"**YOU LOST!!**" 
 			log(f"{interaction.user.display_name}(" + str(interaction.user.id) + f")lost {w} TRC gambling.")
 
 		elif game["status"] == "win":
@@ -338,20 +355,25 @@ class BlackjackButton(discord.ui.View):
 
 			userbalance = float(money[find_money(Money(str(interaction.user.id), 0))].balance)
 			
-			msg = f"**YOU WON!!**\n\nYour balance is now {userbalance} turrcoins.\n**" + str(game["player"]) + "-" + str(game["computer"]) + "**\nBet: **" + str(game["wager"]) + "**" 
-			w = game["wager"]
+			msg = f"**YOU WON!!**"
 			log(f"{interaction.user.display_name}(" + str(interaction.user.id) + f")won {w} TRC gambling.")
 
 		else:
-			msg = f"**YOU TIED!!**\n-# (New round started with the same wager)"
-			msg += f"\n\nYou have {userbalance} turrcoins." + "\nYou: **" + str(game["player"]) + "**\nComputer: **" + str(game["computer"]) + "**\nBet: **" + str(game["wager"]) + "**"
-			w = game["wager"]
-			log(f"{interaction.user.display_name}(" + str(interaction.user.id) + f")tied {w} TRC gambling.")
 
+			money[find_money(Money(str(interaction.user.id), 0))].balance = float(float(money[find_money(Money(str(interaction.user.id), 0))].balance) + float(game["wager"]))
+
+			save_money()
+			load_money()
+
+			userbalance = float(money[find_money(Money(str(interaction.user.id), 0))].balance)
+
+			msg = f"**YOU TIED!!**\n-# (All money wagered has been refunded.)"
+		
+		msg += f"\n\nYour balance is now {userbalance} turrcoins.\n**" + str(game["player"]) + "-" + str(game["computer_actual"]) + "**\nBet: **" + str(game["wager"]) + "**"
 
 		embe.add_field(name="Blackjack - Stand", value=msg, inline=False)
-		await interaction.response.edit_message(embed=embe, view=None if game["status"] != "tie" else BlackjackButton())
 
+		await interaction.response.edit_message(embed=embe, view=BlackjackNewButton())
 
 class Meme:
 	def __init__(self, name, suggested):
@@ -519,6 +541,52 @@ def validInteraction(mes):
 async def cant(mes):
 	await mes.channel.send("You don't have proper permissions!")
 
+async def blackjack_start(interaction:discord.Interaction,wager:float,gamecontinue:bool):
+	global money
+	global items
+	
+	msg = ""
+
+	embe = discord.Embed(color=embec)
+	
+	embe.set_author(name=str(interaction.user.display_name), icon_url=interaction.user.avatar)
+	embe.set_footer(text=f"{datetime.datetime.now()}")
+
+	userbalance = float(money[find_money(Money(str(interaction.user.id), 0))].balance)
+
+	if wager < 0:
+		embe.add_field(name="Error", value=f"Nice try, but wager amount cannot negative like the number **{str(wager)}**", inline=False)
+		await interaction.response.send_message(embed=embe)
+		return
+	if userbalance <= -100:
+		embe.add_field(name="Nice try, champ.", value=f"You're in too much debt. I mean, **{str(userbalance)}**? Come back when you're not broke.", inline=False)
+		await interaction.response.send_message(embed=embe)
+		return
+	if userbalance - wager <= -100:
+		embe.add_field(name="Nice try, champ.", value=f"You can't just spend money you don't have.\nTry making a reasonable bet.", inline=False)
+		await interaction.response.send_message(embed=embe)
+		return
+	
+	game = bj(str(interaction.user.id), wager, gamecontinue)
+
+	if game["wager"] != wager:
+		wager = game["wager"]
+
+	if game["status"] == "ok" or game["status"] == "freebie":
+		money[find_money(Money(str(interaction.user.id), 0))].balance = float(money[find_money(Money(str(interaction.user.id), 0))].balance) - wager
+	
+	save_money()
+	load_money()
+
+	userbalance = float(money[find_money(Money(str(interaction.user.id), 0))].balance)
+
+	if game["status"] == "freebie":
+		msg = game["message"] + f"\n\nYou: **" + str(game["player"]) + "**\nComputer is showing: **" + str(game["computer_showing"]) + "**"
+	else:
+		msg = game["message"] + f"\n\nYou have {userbalance} turrcoins." + "\nYou: **" + str(game["player"]) + "**\nComputer is showing: **" + str(game["computer_showing"]) + "**\nBet: **" + str(game["wager"]) + "**"
+
+	embe.add_field(name="Blackjack", value=msg, inline=False)
+	return embe
 
 async def dostuff(instructions, message):
 	global myid
@@ -1182,27 +1250,22 @@ async def mine(interaction:discord.Interaction):
 
 			if pickaxe_rng == 71:
 				thing = "TURRNUTIUM"
-				theval += "\n(You only have **0.1% chance** of getting this item)"
+				theval += "\n(You only have a **0.1% chance** of getting this item!!! Congratulations!)"
 				buy_items(str(interaction.user.id), "turrnutium", 1)
 			elif pickaxe_rng <= 200:
-				theval += "\n(You have **20% chance** of getting this)"
+				theval += "\n(You have a **20% chance** of getting nothing.)"
 			elif pickaxe_rng <= 500:
 				thing = "COAL"
-				theval += "\n(You have **30% chance** of getting this item)"
+				theval += "\n(You have a **30% chance** of getting this item.)"
 
-				diamond_rng = random.randint(0, 1000)
-				if diamond_rng == 71 and False:
-					theval += "\nBut wait! With enough pressure... **YOU TURNED COAL INTO DIAMOND💎, BABYYYY!!!!** *(This only happens only 0.1% of the time when you get coal!)*"
-					buy_items(str(interaction.user.id), "diamond", 1)
-				else:
-					buy_items(str(interaction.user.id), "coal", 1)
+				buy_items(str(interaction.user.id), "coal", 1)
 				save_items()
 				load_items()
 
 			elif pickaxe_rng <= 750:
 				mystery = random.randint(5, 25)
 				thing = f"{mystery} TURRCOINS"
-				theval += "\n(You have **25% chance** of getting this item)"
+				theval += "\n(You have a **25% chance** of hitting turrcoins.)"
 				money[find_money(Money(str(interaction.user.id), 0))].balance = float(money[find_money(Money(str(interaction.user.id), 0))].balance) + float(mystery)
 				save_money()
 				load_money()
@@ -1210,23 +1273,23 @@ async def mine(interaction:discord.Interaction):
 				load_items()
 			elif pickaxe_rng <= 900:
 				thing = "QUARTZ"
-				theval += "\n(You have **15% chance** of getting this item)"
+				theval += "\n(You have a **15% chance** of getting this item)"
 				buy_items(str(interaction.user.id), "quartz", 1)
 			elif pickaxe_rng <= 950:
 				thing = "GOLD"
-				theval += "\n(You have **5% chance** of getting this item)"
+				theval += "\n(You have a **5% chance** of getting this item.)"
 				buy_items(str(interaction.user.id), "gold", 1)
 			elif pickaxe_rng <= 975:
 				thing = "EMERALD"
-				theval += "\n(You have **2.5% chance** of getting this item)"
+				theval += "\n(You have a **2.5% chance** of getting this item.)"
 				buy_items(str(interaction.user.id), "emerald", 1)
 			elif pickaxe_rng <= 995:
 				thing = "DIAMOND"
-				theval += "\n(You only have **2% chance** of getting this item)"
+				theval += "\n(You only have a **2% chance** of getting this item.)"
 				buy_items(str(interaction.user.id), "diamond", 1)
 			else:
 				thing = "TUVALUNIUM"
-				theval += "\n(You only have **0.4% chance** of getting this item)"
+				theval += "\n(You only have a **0.5% chance** of getting this item!)"
 				buy_items(str(interaction.user.id), "tuvalunium", 1)
 			save_items()
 			load_items()
@@ -1339,44 +1402,7 @@ async def buy(interaction:discord.Interaction,item:app_commands.Choice[str],quan
 @tree.command(name="blackjack", description="Start a new game of blackjack and play against the computer for a chance to win Turrcoins!")
 @app_commands.describe(wager=f"How many Turrcoins do you bet?")
 async def blackjack(interaction:discord.Interaction,wager:float):
-	global money
-	global items
-		
-	msg = ""
-
-	embe = discord.Embed(color=embec)
-	
-	embe.set_author(name=str(interaction.user.display_name), icon_url=interaction.user.avatar)
-	embe.set_footer(text=f"{datetime.datetime.now()}")
-
-	userbalance = float(money[find_money(Money(str(interaction.user.id), 0))].balance)
-
-	if wager <= 0:
-		embe.add_field(name="Error", value=f"Nice try, but wager amount cannot be 0 or negative like the number **{str(wager)}**", inline=False)
-		await interaction.response.send_message(embed=embe)
-		return
-	if userbalance <= -100:
-		embe.add_field(name="Nice try, champ.", value=f"You're in too much debt. I mean, **{str(userbalance)}**? Come back when you're not broke.", inline=False)
-		await interaction.response.send_message(embed=embe)
-		return
-	if userbalance - wager <= -100:
-		embe.add_field(name="Nice try, champ.", value=f"You can't just produce infinite turrcoins out of thin air. **{str(wager)}** when you only have **{str(userbalance)}**? Nah, that's way too much.\nTry making a reasonable bet.", inline=False)
-		await interaction.response.send_message(embed=embe)
-		return
-	
-	game = bj(str(interaction.user.id), wager)
-
-	if game["status"] == "ok":
-		money[find_money(Money(str(interaction.user.id), 0))].balance = float(money[find_money(Money(str(interaction.user.id), 0))].balance) - wager
-	
-	save_money()
-	load_money()
-
-	userbalance = float(money[find_money(Money(str(interaction.user.id), 0))].balance)
-
-	msg = game["message"] + f"\n\nYou have {userbalance} turrcoins." + "\nYou: **" + str(game["player"]) + "**\nComputer: **" + str(game["computer"]) + "**\nBet: **" + str(game["wager"]) + "**"
-
-	embe.add_field(name="Blackjack", value=msg, inline=False)
+	embe = await blackjack_start(interaction, wager, False)
 	await interaction.response.send_message(embed=embe, view=BlackjackButton())
 
 @tree.command(name="earnings", description="Check a user's lifetime blackjack earnings")
@@ -2072,12 +2098,6 @@ async def on_ready():
 	await client.change_presence(status=discord.Status.idle, activity=discord.Activity(name="Insomnia Competition",type=5))
 	print("\n\n\n")
 
-@client.event
-async def on_typing(ch, user, when):
-	if not user.bot:
-		print(f"{user} IS TYPING... {when}", end="\r", flush=True)
-		async with ch.typing():
-			await asyncio.sleep(1)
 
 @client.event
 async def on_member_join(member):
