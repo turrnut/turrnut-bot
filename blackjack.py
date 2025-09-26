@@ -109,33 +109,31 @@ def bj(userid: str, wager: int, gamecontinue: bool):
     player = player_card1 + player_card2
     computer_actual = computer_card1 + computer_card2
 
-    if computer_card1 <= computer_card2:
-        computer_showing = computer_card1
-    else:
-        computer_showing = computer_card2
+    computer_showing = computer_card2
 
     print("computer drew a " + str(computer_card1) + " and a " + str(computer_card2))
+    print(str(userid) + " drew a " + str(player_card1) + " and a " + str(player_card2))
 
     games[userid] = [player, computer_actual, computer_showing, wager]
     save_games()
 
-    if wager == 0:
+    if player == 21:
         return {
-            "status": "freebie",
-            "message": "*New Game (free)!*",
+            "status": "blackjack",
             "player": player,
             "computer_actual": computer_actual,
             "computer_showing": computer_showing,
             "wager": wager,
         }
+    
     else:
         return {
-        "status": "ok",
-        "message": "*New Game!*",
-        "player": player,
-        "computer_actual": computer_actual,
-        "computer_showing": computer_showing,
-        "wager": wager,
+            "status": "ok",
+            "message": "*New Game!*",
+            "player": player,
+            "computer_actual": computer_actual,
+            "computer_showing": computer_showing,
+            "wager": wager,
         }
 
 
@@ -161,6 +159,8 @@ def bjhit(userid: str):
     computer_showing = games[str(userid)][2]
     wager = games[str(userid)][3]
 
+    print(str(userid) + " drew a " + str(player_card))
+
     if player_score > 21:
         games[userid] = [0, 0, 0, wager]
         save_games()
@@ -173,14 +173,14 @@ def bjhit(userid: str):
             "wager": wager,
         }
 
-    # elif player_score == 21:
-    #     return {
-    #         "status": "blackjack",
-    #         "player": player_score,
-    #         "computer_actual": computer_actual,
-    #         "computer_showing": computer_showing,
-    #         "wager": wager,
-    #     }
+    elif player_score == 21:
+        return {
+            "status": "blackjack",
+            "player": player_score,
+            "computer_actual": computer_actual,
+            "computer_showing": computer_showing,
+            "wager": wager,
+        }
 
     else:
         save_games()

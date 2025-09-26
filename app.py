@@ -47,7 +47,8 @@ from discord.ext.commands import Bot
 #   18. never have i ever (Slash only)
 #   19. would you rather (Slash only)
 #   20. add reactions
-#
+#	21. gamble (blackjack)
+#	22. go mining
 
 # Links that might be useful
 # FFMPEG: https://stackoverflow.com/questions/63036753/discord-py-bot-how-to-play-audio-from-local-files
@@ -67,7 +68,7 @@ mensaje = None
 logflag = True
 curse_words = ("fags", "nigger", "chink", "nigga",
 			   "faggot", "faggots", "retard", "fag",
-			   "penis", "stfu", "shutup", "kys", "meth", "cock", "dick")
+			   "penis", "stfu", "kys", "cock", "dick")
 spamhalt = False
 SERVER_NAME = ""
 howmanywords = "20"
@@ -111,6 +112,20 @@ itemslist = [
 	app_commands.Choice(name="TurrTanks", value="tank"),
 	app_commands.Choice(name="Tuvaluan War Bonds", value="tvwarbonds"),
 	app_commands.Choice(name="Tuvalunium", value="tuvalunium"),
+]
+
+shoplist = [
+	app_commands.Choice(name="British sleep tokens", value="bstok"),
+	app_commands.Choice(name="Ferret pets", value="ferret"),
+	app_commands.Choice(name="Pickaxe", value="pick"),
+	app_commands.Choice(name="Russian War bonds", value="ruswarbonds"),
+	app_commands.Choice(name="Turrnut Cars", value="car"),
+	app_commands.Choice(name="Turrnut Homes", value="home"),
+	app_commands.Choice(name="Turrnut Jr. Pumpkin Pie", value="ppslice"),
+	app_commands.Choice(name="Turrnut Rings", value="ring"),
+	app_commands.Choice(name="TurrTaco", value="taco"),
+	app_commands.Choice(name="TurrTanks", value="tank"),
+	app_commands.Choice(name="Tuvaluan War Bonds", value="tvwarbonds"),
 ]
 
 # Generating a list of 200 G-rated, non-personal compliments/words of affirmation in a single line.
@@ -165,6 +180,9 @@ nhie = (
 truth = ("If you could be invisible for a day, what’s the first thing you would do?","What’s the biggest secret you’ve kept from your parents?","What’s the most embarrassing music you listen to?","What’s one thing you love most about yourself?","Who is your secret crush?","Who is the last person you creeped on social media?","When was the last time you wet the bed?","If a genie granted you three wishes, what would you ask for and why?","What’s your biggest regret?","If you had to only ever watch rom-coms or only watch scary movies for the rest of your life, which would you choose and why?		","Where is the weirdest place you've ever gone to the bathroom?","Have you ever ghosted on someone?","Which player would survive a zombie apocalypse and which would be the first to go?","Reveal all the details of your first kiss.","What excuse have you used before to get out plans?","What's the longest you've ever slept?","What’s the shortest you’ve ever slept?","Read the last text you sent your best friend or significant other out loud.","What's your biggest pet peeve?","When was the last time you lied?","What five things would you bring to a deserted island?","Which is your favorite Hollywood Chris? Chris Evans, Chris Pratt, Chris Hemsworth or Chris Pine?"," What's the most embarrassing thing you ever did on a date?","What is the boldest pickup line you've ever used?","What celebrity do you think you most look like?","How many selfies do you take a day?","What is one thing you would stand in line an hour for?","When was the last time you cried?","What's the longest time you've ever gone without showering?","What's the most embarrassing top-played song on your phone?","What was your favorite childhood show?","If you had to change your name, what would your new first name be?","If you could be a fictional character for a day, who would you choose?","If you could date a fictional character, who would it be?","What's your biggest fear?","What's one silly thing you can't live without?","Where was your favorite childhood vacation spot?","What is the weirdest trend you've ever participated in?","If you could only listen to one song for the rest of your life, what would you choose?","Who do you text the most?","Have you ever been fired from a job?","If you had to wear only flip-flops or heels for the next 10 years, which would you choose?","What’s an instant deal breaker in a potential love interest?","If you could only eat one thing for the rest of your life, what would you choose?","What is the biggest lie you ever told your parents?","What's the worst physical pain you've ever experienced?","Which player knows you the best?","What's your favorite part of your body?","If you could only accomplish three things in life, what would they be?","What's the weirdest thing you've ever eaten?","Have you ever gone skinny dipping?","Tell us about the biggest romantic fail you’ve ever experienced.","Who was your first celebrity crush?","What's the strangest dream you've ever had?","What are the top three things you look for in a love interest?","What is your worst habit?","How many stuffed animals do you own?","Do you sleep with any stuffed animals?","What is your biggest insecurity?","Name one thing you’d do if you knew there’d be zero consequences.","When’s the last time you said you were sorry? For what?","Do you pee in the shower?","Do you still have feelings for any of your exes?","What’s the most embarrassing thing you’ve done to get a crush’s attention?","What’s the most random thing in your bag right now?","Have you ever sent a sext?","What’s the last movie that made you cry?","What’s the last song that made you cry?","What are the five most recent things in your search history?","When’s the last time you got caught in a lie?","What gross smell do you actually enjoy?","Who was the last person you said “I love you” to?","Have you ever had a paranormal experience?","If you could have lunch with a famous person, dead or alive, who would you pick and why?","If you were handed $1,000 right now, what would you spend it on?","Who’s your celebrity “hall pass” if you were to meet that person while in a relationship?","Have you ever cheated on an exam?","What unexpected part of the body do you find attractive?","What’s the most awkward thing you’ve ever been caught doing?","Have you ever flirted with a close friend’s sibling?","What was your first concert?","If you had the choice to never have to sleep again, would you take it?","If you had to get a tattoo today, what would it be?","Even if you’d be paid $1 million for it, what’s something you would never do?","If you could travel to the past and meet one person, who would it be?","What popular TV show or movie do you secretly hate?","Where do you see yourself in 10 years?","Name your go-to karaoke song.","What’s the most adventurous thing you’ve ever done?","When have you been in the most trouble in school?","If you had to always be overdressed or underdressed, which would you choose?","Who would you cast as you and your friends in the movie version of your life?","What’s the luckiest thing that’s ever happened to you?","Do you have any phobias?","Do you believe in an afterlife?","If you had to move to a different country tomorrow, where would you go?","What do you want to be remembered for most in life?","Do you believe in soul mates?","Have you ever re-gifted a present? What was it?","What’s the weirdest thing you do when you’re alone?","What movie (or franchise) are you most embarrassed to love?","Have you ever had an imaginary friend? Describe them.","What gross food combo do you secretly love?","If you could become besties with a celebrity, who would it be?","What’s the most embarrassing nickname you’ve ever been given?","If you could trade lives with any person you know for a day, who would it be?","What’s the worst thing you’ve ever said to anyone?","What’s the scariest dream you’ve ever had?","What’s the weirdest place you’ve kissed/hooked up with someone?","Have you ever slid into a celebrity’s DMs?","What superstitions do you believe in?","Minecraft or Roblox?","What app do you check first in the morning?","What’s the most embarrassing thing you’ve ever purchased?","What’s the longest you’ve ever gone without brushing your teeth?","What’s the weirdest thing you have in your bedroom?","What’s the weirdest thing you have in your locker?","How often do you wash your sheets?","Do you sing in the shower? What was the last song you belted out?","What’s the weirdest thing you do while driving?","Have you ever started a rumor about someone? What was it?","If you could talk to a fortune teller, what would you ask them?","Do you believe in aliens? What do you think they look like?","Have you ever given a fake number?","What’s more important to you: love or money?","What is a weird food that you love?","What terrible movie or show is your guilty pleasure?","What was your biggest childhood fear?","What is the first letter of your crush’s name?","What is the worst grade you received for a class in school/college?","What is the biggest lie you’ve ever told?","Have you ever accidentally hit something (or someone!) with your car?","Have you ever broken an expensive item?","What is one thing you’d change about your appearance if you could?","If you suddenly had a million dollars, how would you spend it?","Who is the best teacher you’ve ever had and why?","What is the worst food you’ve ever tasted?","What is the weirdest way you’ve met someone you now consider a close friend?","What is the most embarrassing thing you’ve posted on social media?","Who was your first celebrity crush?","Have you ever revealed a friend’s secret to someone else?","How many kids do you want to have one day (or how many did you want to have growing up)?","If you could only eat one meal for the rest of your life, what would it be?","What is a secret you had as a child that you never told your parents?","What is your favorite book of all time?","What is the last text message you sent your best friend?","What is something you would do if you knew there were no consequences?","What is the worst physical pain you’ve ever been in?","Personality-wise, are you more like your mom or your dad?","When is the last time you apologized (and what did you do)?","Have you ever reported someone for doing something wrong (either to the police or at work/school)?","If your house caught on fire and you could only save three things (besides people), what would they be?","If you could pick one other player to take with you to a deserted island, who would it be?","What sport or hobby do you wish you would’ve picked up as a child?","Have you ever stolen anything?","Have you ever been kicked out of a store, restaurant, bar, event, etc.?","What is the worst date you’ve ever had?","What is the weirdest thing you’ve ever done in public?","What is the last excuse you used to cancel plans?","What is the biggest mistake you’ve ever made at school or work?","Which player would survive the longest in a horror/apocalypse movie, and who would be the first one to die?","What is the dirtiest room/area of your house?","Which of your family members annoys you the most?","When is the last time you cried?","When is the last time you made someone else cry?","What is the longest you’ve ever gone without showering?","What is the worst date you’ve ever been on?","When is the last time you did something technically illegal?","If you could pick anyone in the world to be president, who would you choose?","How many times do you wear your jeans before you wash them?","Do you pee in pools?","If someone went through your closet, what is the weirdest thing they’d find?","Have you ever lied about your age?","Besides your phone, what’s the one item in your house you couldn’t live without?","What is the biggest fight you’ve ever been in with a friend?", )
 
 dare = ("Pick someone in this room and ask them for a date.","Let another person post an Instagram caption on your behalf.","Hand over your phone to another player who can send a single text saying anything they want to anyone they want","Let the other players go through your phone for one minute.","Smell another player's armpit.","Smell another player's barefoot.","Eat a bite of a banana peel.","Do an impression of another player until someone can figure out who it is.","Say pickles at the end of every sentence you say until it's your turn again.","Imitate a TikTok star until another player guesses who you're portraying.","Act like a chicken until your next turn.","Talk in a British accent until your next turn.","Send a heart-eye emoji to your crush’s Instagram story.","Call a friend, pretend it's their birthday, and sing them Happy Birthday to You.","Name a famous person that looks like each player in the room.","Show us your best dance moves.","Eat a packet of hot sauce straight.","Let another person draw a tattoo on your back with a permanent marker.","Put on a blindfold and touch the other players' faces until you can figure out who's who.","Bite into a raw onion without slicing it.","Go outside and try to “summon” the rain as loud as possible.","Serenade the person to your right for a full minute.","Do 20 squats.","Let the other players redo your hairstyle.","Eat a condiment of your choice straight from the bottle.","Dump out your purse, backpack, or pockets and do a show and tell of what's inside.","Let the player to your right redo your makeup with their eyes closed.","Prank call one of your family members.","Let another player create a hat out of toilet paper — and you have to wear it for the rest of the game.		","Do a plank for a full minute.","Do your sassiest runway walk.","Put five ice cubes in your mouth (you can't chew them, you just have to let them melt—brrr).","Bark like a dog until it’s your next turn.","Draw your favorite movie and have the other person guess it (Pictionary-style).","Repeat everything the person to your right says until your next turn.","Demonstrate how you style your hair in the mirror (without actually using the mirror).","Play air guitar for one minute.","Empty a glass of cold water onto your head outside.","Go on Instagram Live and do a dramatic reading of one of your textbooks.","In the next 10 minutes, find a way to scare another player and make it a surprise.","Lick a bar of soap.","Talk to a pillow as if it’s your crush.","Post the oldest selfie on your phone to Snapchat or Instagram stories (and leave it up!).","Attempt the first TikTok dance on your FYP.","Imitate a celebrity of the group’s choosing every time you talk for the next 10 minutes.","Go to your crush’s Instagram page and like something from several weeks ago.","Do karaoke to a song of the group’s choosing.","Post a photo (any photo) to social with a heartfelt dedication to a celebrity of the group’s choosing.","Find your very first crush on social and DM them.","Peel a banana using just your toes.","Let the group mix together five of whatever liquids they find in the fridge, then drink it.","Wear another player’s socks like gloves for the next five minutes.","Put on makeup without looking in the mirror, then leave it like that for the rest of the game.","Describe the most attractive quality of every person in the room.","Sing like an opera singer instead of speaking for the next five minutes.","Let everyone pose you in an embarrassing position and post a picture to Instagram.","Allow the person to your right to draw on your face with a Sharpie.","Jump in the pool (or shower) with all your clothes on!","Stand outside your house and wave to everyone who passes in the next minute.","Pretend to be underwater for the next 10 minutes.","Make out with a pillow.","Let everyone go through your Snapchat history.","Post a flirty comment on the first Instagram picture that you see.","Give the person to your right a foot massage (with their consent).","Pretend to be a ballerina until your next turn.","Serenade the person next to you.","Try to fit your whole fist in your mouth.","Read aloud the most personal text you’ve sent in recent days.","Reveal your screen time report to your friends.","Go outside and howl at the moon like a wolf.","Read the last text message you sent out loud.","Show the weirdest item you have in your purse/pockets.","Call the first person in your contacts list and sing them “Happy Birthday.”","Do your best impression of a fish out of water.","Give another player your phone and let them send a social media DM to anyone they want.","Do as many push-ups as you can in one minute.","Give a one-word “roast” to each other player.","Speak in an Australian accent until your next turn.","Let another player tickle you but don’t laugh!","Spin in a swivel chair for 30 seconds and then try to walk a straight line.","Go outside and sing “Never gonna give you up” by Rick Astley at full volume.","Let another player draw a tattoo on your arm in permanent marker.","Hold the plank position until it’s your turn again.","Tell each player who you think their celebrity look alike is.","Show off your best dance moves for the full duration of a song.","Narrate the game in a newscaster voice for three turns.","Walk next door with a measuring cup and ask for a cup of sugar.","Switch clothes with another player for the rest of the game.","Put on a blindfold and touch each players’ face until you can guess who each player is.","Let another player pour a glass of water on your head.","Give a shoulder rub to the player to your right (if they are comfortable).","Attempt to juggle two or three items of the asker’s choosing.","Perform a dramatic version of a monologue from a favorite TV show or movie.","Show the most embarrassing photo on your phone.","Comment a fire emoji on the first five pictures on your Instagram feed.","Do an impression of another player until your next turn.","Try to drink a glass of water without using your hands.","Allow the other players to blindfold you and try to guess three food items from the pantry just by smell.","Do your best interpretive dance/gymnastics floor routine.","Go outside and do your best wolf howl at the moon.","Post an unflattering selfie to your favorite social media account.","Talk and act like a celebrity until the group can guess who you are (this could go multiple turns!)","If you have to get up for the rest of the game, no walking allowed. You can crawl on all fours, roll, somersault, hop on one foot etc., but no walking!","Remove your socks with your teeth.","Go outside and pretend to mow grass with an invisible mower — sounds and all.","Act out a commercial for a product chosen by the other players.","Sing instead of speaking any time you talk for three turns.","Make a silly face and keep it that way until someone in the group laughs.","Do a freestyle rap about the other players for one minute.","Show the group your internet search history.","Let another player style your hair and leave it that way for the rest of the game.","Video chat the person of your choice but pick your nose through the entire conversation.","Put your shoes on the wrong feet and keep them there for the rest of the game.","Call a random acquaintance and tell them you want to break up.","Let the other players pose you and remain in that position until your next turn.","Allow someone else in the group to blindfold you and feed you one item out of the fridge.","Lead the group in a mini yoga class for one minute.","How old are you? Whatever your age is, do that many squats.","Perform a dance routine to a boy band song of the group’s choice.","Let another player draw a washable marker mustache on you.",)
+
+def pathify(path):
+	return path.replace('|', os.sep)
 
 def mtms(value: float):
     minutes = int(value)  # whole minutes
@@ -285,7 +303,8 @@ class BlackjackNewButton(discord.ui.View):
 	@discord.ui.button(label="New game?", style=ButtonStyle.green)
 	async def blackjacknew(self, interaction:discord.Interaction, button: discord.ui.Button):
 		embe = await blackjack_start(interaction, 0.1, True)
-		await interaction.response.edit_message(embed=embe, view=BlackjackButton())
+		if embe != "slime":
+			await interaction.response.edit_message(embed=embe, view=BlackjackButton())
 		
 
 class BlackjackButton(discord.ui.View):
@@ -293,92 +312,19 @@ class BlackjackButton(discord.ui.View):
 		super().__init__()
 
 	@discord.ui.button(label="Hit", style=ButtonStyle.green)
-	async def blackjackhit(self, interaction:discord.Interaction, button: discord.ui.Button):
-		global money
-		global items
-		
-		msg = ""
-
-		game_ended = 0
-
-		embe = discord.Embed(color=embec)
-		
-		embe.set_author(name=str(interaction.user.display_name), icon_url=interaction.user.avatar)
-		embe.set_footer(text=f"{datetime.datetime.now()}")
-		
-		game = bjhit(str(interaction.user.id))
-		userbalance = float(money[find_money(Money(str(interaction.user.id), 0))].balance)
-		if game["status"] == "error":
-			msg = "You don't have an active blackjack game. Use **/blackjack** to start one!"
-			game_ended = 1
-		elif game["status"] == "bust":
-			msg = f"**YOU BUSTED!!**\n\nYour balance is now {userbalance} turrcoins.\n**" + str(game["player"]) + "-" + str(game["computer_actual"]) + "**\nBet: **" + str(game["wager"]) + "**"
-			w = game["wager"]
-			log(f"{interaction.user.display_name}(" + str(interaction.user.id) + f")lost {w} TRC gambling.")
-			game_ended = 1
-		else:
-			msg = f"\n\nYou have {userbalance} turrcoins." + "\nYou: **" + str(game["player"]) + "**\nComputer is showing **" + str(game["computer_showing"]) + "**\nBet: **" + str(game["wager"]) + "**"
-
-		embe.add_field(name="Blackjack - Hit", value=msg, inline=False)
-		if game_ended == 0:
-			await interaction.response.edit_message(embed=embe, view=BlackjackButton())
-		else:
-			await interaction.response.edit_message(embed=embe, view=BlackjackNewButton())
-
+	async def bj_hit(self, interaction:discord.Interaction, button: discord.ui.Button):
+		await blackjackhit(interaction)
 
 	@discord.ui.button(label="Stand", style=ButtonStyle.blurple)
-	async def blackjackstand(self, interaction:discord.Interaction, button: discord.ui.Button):
-		global money
-		global items
-
-		msg = ""
-
-		embe = discord.Embed(color=embec)
-		
-		embe.set_author(name=str(interaction.user.display_name), icon_url=interaction.user.avatar)
-		embe.set_footer(text=f"{datetime.datetime.now()}")
-		
-		game = bjstand(str(interaction.user.id))
-		userbalance = float(money[find_money(Money(str(interaction.user.id), 0))].balance)
-		w = game["wager"]
-		if game["status"] == "error":
-			msg = "You don't have an active blackjack game. Use **/blackjack** to start one!"
-		elif game["status"] == "lose":
-			msg = f"**YOU LOST!!**" 
-			log(f"{interaction.user.display_name}(" + str(interaction.user.id) + f")lost {w} TRC gambling.")
-
-		elif game["status"] == "win":
-			money[find_money(Money(str(interaction.user.id), 0))].balance = float(float(money[find_money(Money(str(interaction.user.id), 0))].balance) + float(game["wager"]) + float(game["wager"]))
-			
-			save_money()
-			load_money()
-
-			userbalance = float(money[find_money(Money(str(interaction.user.id), 0))].balance)
-			
-			msg = f"**YOU WON!!**"
-			log(f"{interaction.user.display_name}(" + str(interaction.user.id) + f")won {w} TRC gambling.")
-
-		else:
-
-			money[find_money(Money(str(interaction.user.id), 0))].balance = float(float(money[find_money(Money(str(interaction.user.id), 0))].balance) + float(game["wager"]))
-
-			save_money()
-			load_money()
-
-			userbalance = float(money[find_money(Money(str(interaction.user.id), 0))].balance)
-
-			msg = f"**YOU TIED!!**\n-# (All money wagered has been refunded.)"
-		
-		msg += f"\n\nYour balance is now {userbalance} turrcoins.\n**" + str(game["player"]) + "-" + str(game["computer_actual"]) + "**\nBet: **" + str(game["wager"]) + "**"
-
-		embe.add_field(name="Blackjack - Stand", value=msg, inline=False)
-
-		await interaction.response.edit_message(embed=embe, view=BlackjackNewButton())
+	async def bj_stand(self, interaction:discord.Interaction, button: discord.ui.Button):
+		await blackjackstand(interaction)
+	
 
 class Meme:
 	def __init__(self, name, suggested):
 		self.name = name
 		self.suggested = suggested
+
 class Money:
 	def __init__(self, id, balance):
 		self.id = id
@@ -386,7 +332,6 @@ class Money:
 
 def pathify(path):
 	return path.replace('|', os.sep)
-
 
 with open(pathify("models|grades|possibilites.json"), "r") as fobj:
 	possibilities = json.load(fobj)
@@ -572,7 +517,7 @@ async def blackjack_start(interaction:discord.Interaction,wager:float,gamecontin
 	if game["wager"] != wager:
 		wager = game["wager"]
 
-	if game["status"] == "ok" or game["status"] == "freebie":
+	if game["status"] == "ok" or game["status"] == "blackjack":
 		money[find_money(Money(str(interaction.user.id), 0))].balance = float(money[find_money(Money(str(interaction.user.id), 0))].balance) - wager
 	
 	save_money()
@@ -580,13 +525,118 @@ async def blackjack_start(interaction:discord.Interaction,wager:float,gamecontin
 
 	userbalance = float(money[find_money(Money(str(interaction.user.id), 0))].balance)
 
-	if game["status"] == "freebie":
+	if game["status"] == "blackjack":
+		await blackjackstand(interaction)
+		embe = "slime" #impossible value to check :3
+		return embe 
+
+	if wager == 0:
 		msg = game["message"] + f"\n\nYou: **" + str(game["player"]) + "**\nComputer is showing: **" + str(game["computer_showing"]) + "**"
+		embe.add_field(name="Blackjack (free game)", value=msg, inline=False)
+	
 	else:
 		msg = game["message"] + f"\n\nYou have {userbalance} turrcoins." + "\nYou: **" + str(game["player"]) + "**\nComputer is showing: **" + str(game["computer_showing"]) + "**\nBet: **" + str(game["wager"]) + "**"
+		embe.add_field(name="Blackjack", value=msg, inline=False)
 
-	embe.add_field(name="Blackjack", value=msg, inline=False)
 	return embe
+
+async def blackjackstand(interaction:discord.Interaction):
+	global money
+	global items
+
+	msg = ""
+
+	embe = discord.Embed(color=embec)
+	
+	embe.set_author(name=str(interaction.user.display_name), icon_url=interaction.user.avatar)
+	embe.set_footer(text=f"{datetime.datetime.now()}")
+	
+	game = bjstand(str(interaction.user.id))
+	userbalance = float(money[find_money(Money(str(interaction.user.id), 0))].balance)
+	w = game["wager"]
+	if game["status"] == "error":
+		msg = "You don't have an active blackjack game. Use **/blackjack** to start one!"
+	elif game["status"] == "lose":
+		msg = f"**YOU LOST!!**" 
+		if w != 0: log(f"{interaction.user.display_name}(" + str(interaction.user.id) + f")lost {w} TRC gambling.")
+
+	elif game["status"] == "win":
+		if w != 0:
+			money[find_money(Money(str(interaction.user.id), 0))].balance = float(float(money[find_money(Money(str(interaction.user.id), 0))].balance) + float(game["wager"]) + float(game["wager"]))
+			
+			save_money()
+			load_money()
+
+			userbalance = float(money[find_money(Money(str(interaction.user.id), 0))].balance)
+			log(f"{interaction.user.display_name}(" + str(interaction.user.id) + f")won {w} TRC gambling.")
+			
+		msg = f"**YOU WON!!**"
+
+	else:
+		if w != 0:
+			money[find_money(Money(str(interaction.user.id), 0))].balance = float(float(money[find_money(Money(str(interaction.user.id), 0))].balance) + float(game["wager"]))
+
+			save_money()
+			load_money()
+
+			userbalance = float(money[find_money(Money(str(interaction.user.id), 0))].balance)
+
+			msg = f"**YOU TIED!!**\n-# (All money wagered has been refunded.)"
+		else:
+			msg = f"**TIE!**"
+		
+	if w != 0:
+		msg += f"\n\nYour balance is now {userbalance} turrcoins.\n**" + str(game["player"]) + "-" + str(game["computer_actual"]) + "**\nBet: **" + str(game["wager"]) + "**"
+	else:
+		msg += f"\nScore: **" + str(game["player"]) + "-" + str(game["computer_actual"]) + "**"
+
+	embe.add_field(name="Blackjack - Stand", value=msg, inline=False)
+
+	await interaction.response.edit_message(embed=embe, view=BlackjackNewButton())
+
+async def blackjackhit(interaction:discord.Interaction):
+	global money
+	global items
+	
+	msg = ""
+
+	game_ended = 0
+
+	embe = discord.Embed(color=embec)
+	
+	embe.set_author(name=str(interaction.user.display_name), icon_url=interaction.user.avatar)
+	embe.set_footer(text=f"{datetime.datetime.now()}")
+	
+	game = bjhit(str(interaction.user.id))
+	userbalance = float(money[find_money(Money(str(interaction.user.id), 0))].balance)
+	if game["status"] == "error":
+		msg = "You don't have an active blackjack game. Use **/blackjack** to start one!"
+		game_ended = 1
+	elif game["status"] == "bust":
+		w = game["wager"]
+		if w != 0:
+			msg = f"**YOU BUSTED!!**\n\nYour balance is now {userbalance} turrcoins.\n**" + str(game["player"]) + "-" + str(game["computer_actual"]) + "**\nBet: **" + str(game["wager"]) + "**"
+			log(f"{interaction.user.display_name}(" + str(interaction.user.id) + f")lost {w} TRC gambling.")
+		else:
+			msg = f"**YOU BUSTED!! (" + str(game["player"]) + "-" + str(game["computer_actual"]) + ")**"
+		
+		game_ended = 1
+	elif game["status"] == "blackjack":
+		await blackjackstand(interaction)
+		return
+	
+	else:
+		if game["wager"] != 0: 
+			msg = f"\n\nYou have {userbalance} turrcoins." + "\nYou: **" + str(game["player"]) + "**\nComputer is showing **" + str(game["computer_showing"]) + "**\nBet: **" + str(game["wager"]) + "**"
+		else: 
+			msg = f"\n\n**" + str(game["player"]) + "**\nComputer is showing **" + str(game["computer_showing"]) + "**"
+
+	embe.add_field(name="Blackjack - Hit", value=msg, inline=False)
+	
+	if game_ended == 0:
+		await interaction.response.edit_message(embed=embe, view=BlackjackButton())
+	else:
+		await interaction.response.edit_message(embed=embe, view=BlackjackNewButton())
 
 async def dostuff(instructions, message):
 	global myid
@@ -957,36 +1007,6 @@ async def dostuff(instructions, message):
 
 				await cant(message)
 
-	if len(instruction) == 6:
-		if instruction[1].lower() == "grade" and instruction[2].lower() == "predict":
-			await message.channel.send('ok, processing...')
-			try:
-				first = float(instruction[3])
-				second = float(instruction[4])
-				third = float(instruction[5])
-				model = keras.models.load_model(pathify("models|grades"), compile=False)
-				model.compile(optimizer="adam", loss="sparse_categorical_crossentropy",metrics=["accuracy"])
-				if first > 100 or first < 0 or second > 100 or second < 0 or third > 100 or third < 0:
-
-					await message.channel.send("Please make sure all the numbers are between 0 and 100!")
-					return
-				else:
-					predictions = model.predict(np.asarray([
-						[first, second, third]
-					]))
-				# LOG
-				log(str(message.author) + " predict the grade as " +
-					str(first) + " " + str(second) + " " + str(third))
-				if first == second == third:
-					await message.channel.send("The turrnut Aritificial Intelligence predict that your final quarter grade will be: " + str(first) + "%")
-					await message.channel.send("100.0% Confidence")
-				else:
-					await message.channel.send("The turrnut Aritificial Intelligence predict that your final quarter grade will be: " + str(round(possibilities[np.argmax(predictions[0])], 2)) + "%")
-					await message.channel.send(str(round(predictions[0][np.argmax(predictions[0])] * 100, 2)) + "% Confidence")
-			except ValueError as e:
-				print(e)
-				await message.channel.send('one of the parameters is not a number!')
-				return
 	if len(instruction) == 2:
 		if instruction[1].lower() == "help":
 			# LOG
@@ -1373,7 +1393,7 @@ async def use(interaction:discord.Interaction, item:app_commands.Choice[str], qu
 @tree.command(name="buy", description="Buy stuff using turrcoins!")
 @app_commands.describe(item=f"What would you like to buy?")
 @app_commands.describe(quantity=f"How many would you like to buy?")
-@app_commands.choices(item=itemslist)
+@app_commands.choices(item=shoplist)
 async def buy(interaction:discord.Interaction,item:app_commands.Choice[str],quantity:int):
 	global money
 	global items
@@ -1387,15 +1407,11 @@ async def buy(interaction:discord.Interaction,item:app_commands.Choice[str],quan
 		cost = str(quantity * float(items[item.value]["price"]))
 		msg = f"{str(quantity)} {item.name} costs {cost} turrcoins, You only have {float(money[find_money(Money(interaction.user.id, 0))].balance)}."
 		embe.add_field(name="Error",value=msg,inline=False)
-	else :
-		if item.value in ("coal", "quartz", "gold", "emerald", "diamond", "tuvalunium", "turrnutium"):
-			msg = f"Unfortunately, you can not buy this {item.name} because it is a mineral. The only way to obtain it is by mining. \nYou can buy a pickaxe using /buy and then use /mine."
-			embe.add_field(name="Error",value=msg,inline=False)
-		else:	
-			cost = str(quantity * float(items[item.value]["price"]))
-			print("COST EVALUTED")
-			msg = f"You bought {str(quantity)} {item.name} for {cost} turrcoins.\nYour balance is {float(money[find_money(Money(interaction.user.id, 0))].balance)}."
-			embe.add_field(name="Success",value=msg,inline=False)
+	else:
+		cost = str(quantity * float(items[item.value]["price"]))
+		print("COST EVALUTED")
+		msg = f"You bought {str(quantity)} {item.name} for {cost} turrcoins.\nYour balance is {float(money[find_money(Money(interaction.user.id, 0))].balance)}."
+		embe.add_field(name="Success",value=msg,inline=False)
 	await interaction.response.send_message(embed=embe)
 	log(str(interaction.user.id) + "wants to buy something")
 
@@ -1536,8 +1552,6 @@ async def calc(interaction:discord.Interaction, expression: str):
 		await interaction.response.send_message(str(error.__repr__()),ephemeral=True)
 	else:
 		await interaction.response.send_message(str(expression) + "=" + str(result.value))
-
-
 	
 @tree.command(name="collect", description="Get your turrcoin award using this command.")
 async def daily(interaction:discord.Interaction):
@@ -1822,29 +1836,6 @@ async def balance(interaction: discord.Interaction, person: discord.User=None):
 	embe.set_footer(text=f"{datetime.datetime.now()}")
 	await interaction.response.send_message(embed=embe)
 
-@tree.command(name="predict-grade", description="Enter your grades for first three quarters to get the prediction of the final quarter!")
-@app_commands.describe(first="First quater grade")
-@app_commands.describe(second="Second quater grade")
-@app_commands.describe(third="Third quater grade")
-async def predictgrade(interaction: discord.Interaction, first:float, second:float, third:float):
-	model = keras.models.load_model(pathify("models|grades"), compile=False)
-	model.compile(optimizer="adam", loss="sparse_categorical_crossentropy",metrics=["accuracy"])
-	if first > 100 or first < 0 or second > 100 or second < 0 or third > 100 or third < 0:
-
-		await interaction.response.send_message("Please make sure all the numbers are between 0 and 100!", ephemeral=True)
-		return
-	else:
-		predictions = model.predict(np.asarray([
-			[first, second, third]
-		]))
-		# LOG
-		log(str(interaction.user) + " predict the grade as " +
-		str(first) + " " + str(second) + " " + str(third))
-		if first == second == third:
-			await interaction.response.send_message(f"{first},{second},{third}\nThe turrnut Aritificial Intelligence predict that your final quarter grade will be: " + str(first) + "%\n100.0% Confidence")
-		else:
-			await interaction.response.send_message(f"{first},{second},{third}\nThe turrnut Aritificial Intelligence predict that your final quarter grade will be: " + str(round(possibilities[np.argmax(predictions[0])], 2)) + "%\n" + str(round(predictions[0][np.argmax(predictions[0])] * 100, 2)) + "% Confidence")
-			
 @tree.command(name="ask", description="Ask the fortune teller a question!")
 @app_commands.describe(question="What question do you have?")
 async def ask(interaction: discord.Interaction, question:str):
@@ -1871,12 +1862,13 @@ async def ask(interaction: discord.Interaction, question:str):
 	app_commands.Choice(name="/never-have-i-ever",value="nhie"),
 	app_commands.Choice(name="/pay",value="pay"),
 	app_commands.Choice(name="/poll",value="poll"),
-	app_commands.Choice(name="/predict-grade",value="grade"),
 	app_commands.Choice(name="/speak",value="speak"),
 	app_commands.Choice(name="/suggest",value="sug"),
 	app_commands.Choice(name="/summon",value="summon"),
 	app_commands.Choice(name="/truth-or-dare",value="tod"),
 	app_commands.Choice(name="/would-you-rather",value="wyr"),
+	app_commands.Choice(name="/mine",value="mine"),
+	app_commands.Choice(name="/minerals",value="minerals"),
 ])
 async def inv(interaction: discord.Interaction, command: app_commands.Choice[str]="None!"):
 	global embec
@@ -1917,7 +1909,7 @@ async def inv(interaction: discord.Interaction, command: app_commands.Choice[str
 		await interaction.response.send_message(embed=embe)
 
 	elif command.value == "day":
-		embe = discord.Embed(title="Command /collect", description=f"Get turrcoins that refreshes every 10 minutes! If you don't have an account, use /balance to create one first.", color=embec)
+		embe = discord.Embed(title="Command /collect", description=f"Get a random amount of turrcoins that refreshes every 10 minutes! If you don't have an account, use /balance to create one first.", color=embec)
 		await interaction.response.send_message(embed=embe)
 
 	elif command.value == "fact":
@@ -1962,13 +1954,6 @@ async def inv(interaction: discord.Interaction, command: app_commands.Choice[str
 		embe = discord.Embed(title="Command /never-have-i-ever", description=f"Play the Never Have I Ever game!", color=embec)
 		await interaction.response.send_message(embed=embe)
 
-	elif command.value == "grade":
-		embe = discord.Embed(title="Command /predict-grade", description=f"A command for students: enter your first, second and third quarter grade to get a prediction of what your final quarter grade might be. This command use turrnut's AI.", color=embec)
-		embe.add_field(name="**Required**: first", value="Your first quarter grade(A number between 0 and 100)", inline=True)
-		embe.add_field(name="**Required**: second", value="Your second quarter grade(A number between 0 and 100)", inline=True)
-		embe.add_field(name="**Required**: third", value="Your third quarter grade(A number between 0 and 100)", inline=True)
-		await interaction.response.send_message(embed=embe)
-
 	elif command.value == "speak":
 		embe = discord.Embed(title="Command /speak", description=f"Make the bot say something.", color=embec)
 		embe.add_field(name="**Required**: message", value="What do you want the bot to say?", inline=True)
@@ -1991,6 +1976,18 @@ async def inv(interaction: discord.Interaction, command: app_commands.Choice[str
 
 	elif command.value == "wyr":
 		embe = discord.Embed(title="Command /wyr", description=f"Play the Would you rather game!", color=embec)
+		await interaction.response.send_message(embed=embe)
+
+	elif command.value == "mine":
+		embe = discord.Embed(title="Command /mine", description=f"Go mining! (requires a pickaxe)\nWho knows what you may find...", color=embec)
+		await interaction.response.send_message(embed=embe)
+
+	elif command.value == "minerals":
+		embe = discord.Embed(title="Command /minerals", description=f"Check your own or another user's minerals.", color=embec)
+		await interaction.response.send_message(embed=embe)
+
+	elif command.value == "blackjack":
+		embe = discord.Embed(title="Command /blackjack", description=f"Play some blackjack! Either play for free, or wager a bet to win some sweet, sweet cash.", color=embec)
 		await interaction.response.send_message(embed=embe)
 
 	else:
