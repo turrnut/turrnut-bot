@@ -1,3 +1,6 @@
+# Copyright (c) 2025 TURRNUT
+# Under the MIT license
+
 import discord
 import numpy as np
 import os
@@ -25,34 +28,6 @@ from discord import app_commands, ButtonStyle
 from discord.ext import commands
 
 from discord.ext.commands import Bot
-
-# Features list:
-#   1. randomly send greeting messages
-#   2. predict grade (Slash)
-#   3. logs
-#   4. spam
-#   5. SuS
-#   6. say something (Slash)
-#   7. MEME (Slash)
-#   8. do math via EXINT (Slash)
-#   9. NUKE
-#   10. detect bad words
-#   11. timeout
-#   12. get user id
-#   13. welcome message
-#   14. fortune-telling (Slash)
-#   15. turrnut bank (Slash only)
-#   16. bank money manipulation
-#   17. truth or dare (Slash only)
-#   18. never have i ever (Slash only)
-#   19. would you rather (Slash only)
-#   20. add reactions
-#	21. gamble (blackjack)
-#	22. go mining
-
-# Links that might be useful
-# FFMPEG: https://stackoverflow.com/questions/63036753/discord-py-bot-how-to-play-audio-from-local-files
-#
 
 intents = discord.Intents.all()
 client = Bot(command_prefix='?', intents=intents)
@@ -304,7 +279,7 @@ class BlackjackNewButton(discord.ui.View):
 	async def blackjacknew(self, interaction:discord.Interaction, button: discord.ui.Button):
 		embe = await blackjack_start(interaction, 0.1, True)
 		if embe != "slime":
-			await interaction.response.edit_message(embed=embe, view=BlackjackButton())
+			await interaction.response.send_message(embed=embe, view=BlackjackButton())
 		
 
 class BlackjackButton(discord.ui.View):
@@ -1869,6 +1844,7 @@ async def ask(interaction: discord.Interaction, question:str):
 	app_commands.Choice(name="/would-you-rather",value="wyr"),
 	app_commands.Choice(name="/mine",value="mine"),
 	app_commands.Choice(name="/minerals",value="minerals"),
+	app_commands.Choice(name="/blackjack",value="blackjack"),
 ])
 async def inv(interaction: discord.Interaction, command: app_commands.Choice[str]="None!"):
 	global embec
@@ -2104,6 +2080,13 @@ async def on_member_join(member):
 		print('new member!')
 	#	await member.send('!!!!!!!!!!!!!!!!!\nHello! Welcome to the Offical Turrnut Republic Discord Server! In this server you can chat, socialize and play games with other people.\nTo customize your experience at our server, please pick your pronoun roles and ping roles in the #roles channel\nAlso, it\'s good to read the #server-rules channel because it contains useful information about what to do and not to do in our server\n\nGoodbye, have fun!')
 	#	await member.send('https://tenor.com/view/morgan-freeman-gif-24496452')
+
+@client.event
+async def on_typing(ch, user, when):
+	if not user.bot:
+		print(f"{user} IS TYPING... {when}", end="\r", flush=True)
+		async with ch.typing():
+			await asyncio.sleep(1)
 
 @client.event
 async def on_member_remove(member):
