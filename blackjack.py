@@ -32,11 +32,11 @@ if os.path.exists(earnings_file):
 def save_games():
     os.makedirs(os.path.dirname(filename), exist_ok=True)
     with open(filename, "w") as f:
-        json.dump({str(k): v for k, v in games.items()}, f)
+        json.dump({str(k): v for k, v in games.items()}, f, indent=4)
 
 def save_earnings():
     with open(earnings_file, "w") as f:
-        json.dump({str(k): v for k, v in earnings.items()}, f)
+        json.dump({str(k): v for k, v in earnings.items()}, f, indent=4)
 
 def pathify(path):
 	return path.replace('|', os.sep)

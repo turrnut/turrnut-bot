@@ -2085,8 +2085,10 @@ async def on_member_join(member):
 async def on_typing(ch, user, when):
 	if not user.bot:
 		print(f"{user} IS TYPING... {when}", end="\r", flush=True)
-		# async with ch.typing():
-		# 	await asyncio.sleep(1)
+		today = datetime.date.today().weekday()
+		if today == 1: # tuesday
+			async with ch.typing():
+				await asyncio.sleep(1)
 
 @client.event
 async def on_member_remove(member):
