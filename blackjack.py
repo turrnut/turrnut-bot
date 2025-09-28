@@ -1,3 +1,6 @@
+# Copyright (c) 2025 TURRNUT
+# Under the MIT license
+
 import json
 import random
 import os

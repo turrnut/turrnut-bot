@@ -1,3 +1,6 @@
+# Copyright (c) 2025 TURRNUT
+# Under the MIT license
+
 import os
 
 
