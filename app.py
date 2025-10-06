@@ -270,16 +270,6 @@ class WYRButton(discord.ui.View):
 		embe.set_footer(text=f"{datetime.datetime.now()}")
 
 		await interaction.response.send_message(embed=embe, view=WYRButton())
-
-class BlackjackNewButton(discord.ui.View):
-	def __init__ (self):
-		super().__init__()
-
-	@discord.ui.button(label="New game?", style=ButtonStyle.green)
-	async def blackjacknew(self, interaction:discord.Interaction, button: discord.ui.Button):
-		embe = await blackjack_start(interaction, 0.1, True)
-		if embe != "slime":
-			await interaction.response.send_message(embed=embe, view=BlackjackButton())
 		
 
 class BlackjackButton(discord.ui.View):
@@ -567,7 +557,7 @@ async def blackjackstand(interaction:discord.Interaction):
 
 	embe.add_field(name="Blackjack - Stand", value=msg, inline=False)
 
-	await interaction.response.edit_message(embed=embe, view=BlackjackNewButton())
+	await interaction.response.edit_message(embed=embe, view=None)
 
 async def blackjackhit(interaction:discord.Interaction):
 	global money
@@ -611,7 +601,7 @@ async def blackjackhit(interaction:discord.Interaction):
 	if game_ended == 0:
 		await interaction.response.edit_message(embed=embe, view=BlackjackButton())
 	else:
-		await interaction.response.edit_message(embed=embe, view=BlackjackNewButton())
+		await interaction.response.edit_message(embed=embe, view=None)
 
 async def dostuff(instructions, message):
 	global myid
@@ -1127,6 +1117,37 @@ def check_sell_items(fromm:str, to:str, item:str, quan:int):
 	if quan > float(items[item]["users"][fromm]):
 		return False
 	return True
+
+actionslist = [
+    app_commands.Choice(name="Rock", value="rock"),
+    app_commands.Choice(name="Paper", value="paper"),
+    app_commands.Choice(name="Scissors", value="scissors")
+]
+
+@tree.command(name="rps", description="Rock, paper, scissors")
+@app_commands.describe(action="Choose between: Rock, paper or scissors.")
+@app_commands.choices(action=actionslist)
+async def rps(interaction:discord.Interaction, action:app_commands.Choice[str]):
+    embe = discord.Embed(color=embec)
+    
+    embe.set_author(name=str(interaction.user.display_name), icon_url=interaction.user.avatar)
+    embe.set_footer(text=f"{datetime.datetime.now()}")
+
+    # Rock Paper Scissors logic
+    bot_choice = random.choice(["rock", "paper", "scissors"])
+    user_choice = action.value.lower()
+    
+    if user_choice == bot_choice:
+        result = "It's a tie!"
+    elif (user_choice == "rock" and bot_choice == "scissors") or \
+         (user_choice == "paper" and bot_choice == "rock") or \
+         (user_choice == "scissors" and bot_choice == "paper"):
+        result = "You win!"
+    else:
+        result = "You lose!"
+    
+    embe.add_field(name="Rock Paper Scissors", value=f"You chose: {action.name}\nBot chose: {bot_choice.title()}\n\n{result}")
+    await interaction.response.send_message(embed=embe)
 
 @tree.command(name="summon", description="🔮(Magically) Summons a person online")
 @app_commands.describe(person="Who do you want to summon?")
