@@ -1215,7 +1215,17 @@ async def cpo(
     )
 
 
-actionslist = [
+opponent_choices = [
+    app_commands.Choice(name="Bot", value="bot"),
+    app_commands.Choice(name="Player", value="player")
+]
+
+gamble_choices = [
+    app_commands.Choice(name="Gamble Money", value="yes"),
+    app_commands.Choice(name="Don't Gamble", value="no")
+]
+
+action_choices = [
     app_commands.Choice(name="Rock", value="rock"),
     app_commands.Choice(name="Paper", value="paper"),
     app_commands.Choice(name="Scissors", value="scissors")
@@ -1223,29 +1233,68 @@ actionslist = [
 
 
 @tree.command(name="rps", description="Rock, paper, scissors")
-@app_commands.describe(action="Choose between: Rock, paper or scissors.")
-@app_commands.choices(action=actionslist)
-async def rps(interaction:discord.Interaction, action:app_commands.Choice[str]):
-    embe = discord.Embed(color=embec)
-    
+@app_commands.describe(
+    opponent="Choose Bot or Player",
+    gamble="Choose if you want to gamble money",
+    action="Choose Rock, Paper, or Scissors"
+)
+@app_commands.choices(
+    opponent=opponent_choices,
+    gamble=gamble_choices,
+    action=action_choices
+)
+async def rps(
+    interaction: discord.Interaction,
+    opponent: app_commands.Choice[str],
+    gamble: app_commands.Choice[str],
+    action: app_commands.Choice[str]
+):
+    embe = discord.Embed(color=0x00ffcc)
     embe.set_author(name=str(interaction.user.display_name), icon_url=interaction.user.avatar)
     embe.set_footer(text=f"{datetime.datetime.now()}")
 
-    # Rock Paper Scissors logic
-    bot_choice = random.choice(["rock", "paper", "scissors"])
     user_choice = action.value.lower()
-    
+
+    #opponent logic
+    if opponent.value == "bot":
+        bot_choice = random.choice(["rock", "paper", "scissors"])
+        opponent_name = "Bot"
+    else:
+        # For player vs player, you'd request another player's action (future expansion)
+        bot_choice = random.choice(["rock", "paper", "scissors"])
+        opponent_name = "Player (placeholder)"
+
+    #rps logic
     if user_choice == bot_choice:
         result = "It's a tie!"
-    elif (user_choice == "rock" and bot_choice == "scissors") or \
-         (user_choice == "paper" and bot_choice == "rock") or \
-         (user_choice == "scissors" and bot_choice == "paper"):
+    elif (
+        (user_choice == "rock" and bot_choice == "scissors") or
+        (user_choice == "paper" and bot_choice == "rock") or
+        (user_choice == "scissors" and bot_choice == "paper")
+    ):
         result = "You win!"
     else:
         result = "You lose!"
-    
-    embe.add_field(name="Rock Paper Scissors", value=f"You chose: {action.name}\nBot chose: {bot_choice.title()}\n\n{result}")
+
+    #gambling logic
+    if gamble.value == "yes":
+        gamble_text = "💰 **You decided to gamble!**"
+    else:
+        gamble_text = "😐 **You chose not to gamble.**"
+
+    embe.add_field(
+        name="Rock Paper Scissors",
+        value=(
+            f"Opponent: **{opponent_name}**\n"
+            f"You chose: **{action.name}**\n"
+            f"{opponent_name} chose: **{bot_choice.title()}**\n\n"
+            f"{result}\n\n"
+            f"{gamble_text}"
+        )
+    )
+
     await interaction.response.send_message(embed=embe)
+
 
 @tree.command(name="summon", description="🔮(Magically) Summons a person online")
 @app_commands.describe(person="Who do you want to summon?")
