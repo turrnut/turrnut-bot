@@ -1122,11 +1122,109 @@ def check_sell_items(fromm:str, to:str, item:str, quan:int):
 		return False
 	return True
 
+class ApprovalView(discord.ui.View):
+    def __init__(self, owner_id, party, member1, member2):
+        super().__init__(timeout=None)
+        self.owner_id = owner_id
+        self.party = party
+        self.member1 = member1
+        self.member2 = member2
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        # Only the OWNER can press the buttons
+        if interaction.user.id != self.owner_id:
+            await interaction.response.send_message(
+                "You are not the owner. You cannot approve this.",
+                ephemeral=True
+            )
+            return False
+        return True
+
+    @discord.ui.button(label="Approve", style=discord.ButtonStyle.green)
+    async def approve(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.message.edit(
+            content=f"✅ **Party '{self.party}' has been approved by the owner!**\n"
+                    f"Members: {self.member1.mention}, {self.member2.mention}",
+            view=None
+        )
+
+    @discord.ui.button(label="Deny", style=discord.ButtonStyle.red)
+    async def deny(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.message.edit(
+            content=f"❌ **Party '{self.party}' has been denied by the owner.**",
+            view=None
+        )
+
+
+bot = commands.Bot(command_prefix="!", intents=discord.Intents.all())
+tree = bot.tree
+
+
+@tree.command(
+    name="cpo",
+    description="Create your own Republic Party"
+)
+@app_commands.describe(
+    party="Enter your party's name",
+    member1="Choose first member",
+    member2="Choose second member"
+)
+async def cpo(
+    interaction: discord.Interaction,
+    party: str,
+    member1: discord.Member,
+    member2: discord.Member
+):
+
+    guild = interaction.guild
+
+    # OWNER who must approve
+    owner_id = 977377574789472278
+    owner = guild.get_member(owner_id)
+    if owner is None:
+        await interaction.response.send_message(
+            "Owner (977377574789472278) not found.",
+            ephemeral=True
+        )
+        return
+
+    # Create the private thread
+    thread = await interaction.channel.create_thread(
+        name=f"Party Approval: {party}",
+        type=discord.ChannelType.private_thread,
+        invitable=False
+    )
+
+    # Add all 3 people to the thread
+    await thread.add_user(owner)
+    await thread.add_user(member1)
+    await thread.add_user(member2)
+
+    # Send approval message with buttons
+    view = ApprovalView(owner_id, party, member1, member2)
+
+    await thread.send(
+        f"📝 **Owner {owner.mention}, do you approve the creation of the party “{party}”?**\n\n"
+        f"Members involved:\n"
+        f"- {member1.mention}\n"
+        f"- {member2.mention}\n\n"
+        f"👥 Members: react if you want to join.\n\n"
+        f"Owner: Use the buttons below.",
+        view=view
+    )
+
+    await interaction.response.send_message(
+        f"Approval thread created: {thread.mention}",
+        ephemeral=True
+    )
+
+
 actionslist = [
     app_commands.Choice(name="Rock", value="rock"),
     app_commands.Choice(name="Paper", value="paper"),
     app_commands.Choice(name="Scissors", value="scissors")
 ]
+
 
 @tree.command(name="rps", description="Rock, paper, scissors")
 @app_commands.describe(action="Choose between: Rock, paper or scissors.")
