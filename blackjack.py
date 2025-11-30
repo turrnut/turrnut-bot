@@ -53,7 +53,7 @@ def update_earnings(userid: str, amount: float):
     earnings[userid] += amount
     save_earnings()
 
-def bj(userid: str, wager: int, gamecontinue: bool):
+def bj(userid: str, wager: int, gamecontinue: bool, ttt=False):
     global games
     if os.path.exists(filename):
         with open(filename, "r") as f:
@@ -140,14 +140,14 @@ def bj(userid: str, wager: int, gamecontinue: bool):
         }
 
 
-def bjhit(userid: str):
+def bjhit(userid: str, ttt=False):
     global games
 
     if str(userid) not in games:
         return {"status": "error"}
 
     player_card = random.randint(1, 13)
-
+    
     if player_card == 1:
         if games[str(userid)][0] < 11:
             player_card = 11
