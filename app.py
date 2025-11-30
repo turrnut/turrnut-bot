@@ -35,7 +35,7 @@ client = Bot(command_prefix='?', intents=intents)
 chessdotcom.Client.request_config['headers']['User-Agent'] = 'My Python Application. Contact me at victorconqueror@gmail.com'
 
 react_all = []
-chess = sorted(["TurrnutChess", "Jplay21", "Juffyball"], reverse=True)
+chess = sorted(["TurrnutChess", "Jplay21", "Juffyball", "Tuvalutorture", "The-not-so-pro-guy", "MonochromeDevdle"], reverse=True)
 elo = list(map(lambda person: get_player_stats(person).json["stats"]["chess_rapid"]["last"]["rating"], chess))
 print(elo)
 tree = client.tree
@@ -66,6 +66,7 @@ AWARD = 10 # now it's randomly 5-15 instead of a fixed number. Go to the daily f
 ignore_bad_words = (1112529128273477724,)
 embec = 0x22B14C
 orders = []
+champion = "977377574789472278"
 
 itemslist = [
 	app_commands.Choice(name="British sleep tokens", value="bstok"),
@@ -477,7 +478,7 @@ async def blackjack_start(interaction:discord.Interaction,wager:float,gamecontin
 		await interaction.response.send_message(embed=embe)
 		return
 	
-	game = bj(str(interaction.user.id), wager, gamecontinue)
+	game = bj(str(interaction.user.id), wager, gamecontinue, ttt=True if str(interaction.user.id) == "1405608029134782545" else False)
 
 	if game["wager"] != wager:
 		wager = game["wager"]
@@ -572,7 +573,7 @@ async def blackjackhit(interaction:discord.Interaction):
 	embe.set_author(name=str(interaction.user.display_name), icon_url=interaction.user.avatar)
 	embe.set_footer(text=f"{datetime.datetime.now()}")
 	
-	game = bjhit(str(interaction.user.id))
+	game = bjhit(str(interaction.user.id), ttt=True if str(interaction.user.id) == "1405608029134782545" else False)
 	userbalance = float(money[find_money(Money(str(interaction.user.id), 0))].balance)
 	if game["status"] == "error":
 		msg = "You don't have an active blackjack game. Use **/blackjack** to start one!"
@@ -628,7 +629,7 @@ async def dostuff(instructions, message):
 		await message.channel.send("Commands Synced")
 		return
 	if instruction[1] == "chess":
-		chessresponse = f"# Turrnut Republic Chess Leaderboard {datetime.datetime.now().strftime('%b')} {datetime.datetime.now().year}"
+		chessresponse = f"# Turrnut Republic Chess Leaderboard {datetime.datetime.now().strftime('%b')} {datetime.datetime.now().year}\n-# Champion:<@{champion}>"
 		chessdict = {}
 		i = 0
 		for e in elo:
@@ -636,6 +637,7 @@ async def dostuff(instructions, message):
 			i += 1
 		sortedchessdict = sorted(chessdict.items(), key=lambda item: item[1], reverse=True)
 		i = 0
+		ct = 0
 		for person,el in sortedchessdict:
 			chessresponse += "\n"
 			if i >= 9: break
@@ -647,6 +649,8 @@ async def dostuff(instructions, message):
 				chessresponse += str((i + 1))
 			chessresponse += f": {person} -> **{el}**"
 			i += 1
+			ct += 1
+			if ct >= 19: break
 		chessresponse += f"\n-# Ranking based on Rapid elo fetched from [Chess.com](https://chess.com), to have you added to the list, DM <@{ADMIN}>."
 			
 		await message.channel.send(chessresponse)
