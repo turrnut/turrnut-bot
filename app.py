@@ -2292,8 +2292,9 @@ async def set_motd(interaction: discord.Interaction, message:str, days:int, pric
     }
     with open(motd_path, "w") as f:
         json.dump(data, f)
-    embe.add_field(name="MOTD Set!", value=f"Message of the day set! Your message will now be printed {days} times (once per day)!", inline=False)
-    await interaction.response.send_message(embed=embe)
+    embe.add_field(name="MOTD Set!", value=f"Message of the day set by <@{interaction.user.id}>! The message will now be printed {days} times (once per day)!", inline=False)
+    await interaction.response.send_message("Set.", ephemeral=True)
+    await interaction.channel.send(embed=embe)
     return
 
 @client.event
