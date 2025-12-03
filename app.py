@@ -14,8 +14,8 @@ import nacl
 import time
 import asyncio
 import traceback
-import schedule
 import interpreter as lang
+import schedule
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
@@ -500,7 +500,44 @@ async def print_motd(): # CHUNKY ass function
 def motd_runner():
     asyncio.create_task(print_motd())
 
-schedule.every().day.at("12:00").do(motd_runner)
+# Load scheduling configuration from an external file so it can be easily edited
+SCHEDULE_CONFIG_PATH = "schedule.json"
+
+def load_schedule_config():
+    """
+    Loads the schedule configuration from SCHEDULE_CONFIG_PATH.
+    Falls back to sensible defaults if the file is missing or invalid.
+    """
+    default_config = {
+        "motd": {
+            "enabled": True,
+            "time": "12:00"  # HH:MM in 24‑hour format, server local time
+        }
+    }
+
+    try:
+        with open(SCHEDULE_CONFIG_PATH, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            if not isinstance(data, dict):
+                return default_config
+            return data
+    except (FileNotFoundError, json.JSONDecodeError):
+        # If anything goes wrong, just use defaults
+        return default_config
+
+
+_schedule_cfg = load_schedule_config()
+_motd_cfg = _schedule_cfg.get("motd", {})
+
+if _motd_cfg.get("enabled", True):
+    _motd_time = _motd_cfg.get("time", "12:00")
+    try:
+        # Register the MOTD job using the configured time
+        schedule.every().day.at(str(_motd_time)).do(motd_runner)
+    except Exception as e:
+        # If the time format is bad, fall back to the default
+        print(f"[schedule] Invalid MOTD time '{_motd_time}', falling back to 12:00. Error: {e}")
+        schedule.every().day.at("12:00").do(motd_runner)
 
 async def motd_scheduler():
     while True:
