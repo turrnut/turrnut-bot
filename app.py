@@ -1156,13 +1156,10 @@ class ApprovalView(discord.ui.View):
         )
 
 
-bot = commands.Bot(command_prefix="!", intents=discord.Intents.all())
-tree = bot.tree
-
 
 @tree.command(
     name="cpo",
-    description="Create your own Republic Party"
+    description="Create your own party(usage in Turrnut Republic only)"
 )
 @app_commands.describe(
     party="Enter your party's name",
@@ -1177,6 +1174,20 @@ async def cpo(
 ):
 
     guild = interaction.guild
+
+    if member1.id == member2.id:
+        await interaction.response.send_message(
+			f"The two members you provided are the same person.",
+			ephemeral=False
+    	)
+        return
+	
+    if str(guild.id) != "977378215360335952":
+        await interaction.response.send_message(
+			f"This command can only be used in the Turrnut Republic server.",
+			ephemeral=False
+    	)
+        return
 
     # OWNER who must approve
     owner_id = 977377574789472278
