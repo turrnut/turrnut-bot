@@ -500,21 +500,42 @@ async def print_motd(): # CHUNKY ass function
 def motd_runner():
     asyncio.create_task(print_motd())
 
-# Load scheduling configuration from an external file so it can be easily edited
+# Load scheduling configuration from environment variables (Railway-friendly) or file
 SCHEDULE_CONFIG_PATH = "schedule.json"
 
 def load_schedule_config():
     """
-    Loads the schedule configuration from SCHEDULE_CONFIG_PATH.
-    Falls back to sensible defaults if the file is missing or invalid.
+    Loads the schedule configuration, checking environment variables first (Railway-friendly),
+    then falling back to SCHEDULE_CONFIG_PATH file, then defaults.
+    Times are in UTC (Railway's default timezone).
     """
     default_config = {
         "motd": {
             "enabled": True,
-            "time": "12:00"  # HH:MM in 24‑hour format, server local time
+            "time": "12:00"  # HH:MM in 24-hour format, UTC timezone (Railway default)
         }
     }
 
+    # Check environment variables first (Railway-friendly)
+    motd_enabled = os.getenv("MOTD_ENABLED")
+    motd_time = os.getenv("MOTD_TIME")
+    
+    if motd_enabled is not None or motd_time is not None:
+        config = {"motd": {}}
+        if motd_enabled is not None:
+            # Accept "true", "1", "yes" as enabled
+            config["motd"]["enabled"] = motd_enabled.lower() in ("true", "1", "yes", "on")
+        else:
+            config["motd"]["enabled"] = default_config["motd"]["enabled"]
+        
+        if motd_time is not None:
+            config["motd"]["time"] = motd_time
+        else:
+            config["motd"]["time"] = default_config["motd"]["time"]
+        
+        return config
+
+    # Fall back to file-based configuration
     try:
         with open(SCHEDULE_CONFIG_PATH, "r", encoding="utf-8") as f:
             data = json.load(f)
