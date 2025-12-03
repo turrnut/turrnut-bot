@@ -2,3 +2,4 @@ discord==2.3.2
 numpy
 pynacl
 chess.com
+schedule
