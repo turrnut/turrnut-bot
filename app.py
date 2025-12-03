@@ -14,6 +14,7 @@ import nacl
 import time
 import asyncio
 import traceback
+import schedule
 import interpreter as lang
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
@@ -67,6 +68,7 @@ ignore_bad_words = (1112529128273477724,)
 embec = 0x22B14C
 orders = []
 champion = "977377574789472278"
+motdchannel = 1445587277232209992
 
 itemslist = [
 	app_commands.Choice(name="British sleep tokens", value="bstok"),
@@ -448,6 +450,62 @@ def validInteraction(mes):
 	global LIST
 	return str(mes.user.id) in LIST
 
+async def print_motd(): # CHUNKY ass function
+	global motdchannel;
+	channel = client.get_channel(motdchannel);
+	if channel is None:
+		log("Cannot find the MOTD channel! Try setting it, maybe? " + str(motdchannel));
+		return;
+	embe = discord.Embed(color=embec);
+	embe.set_footer(text="You can use /motd to pay for a slot to get your very own MOTD here!")
+	motd_info = {};
+	motd_path = pathify("motd|motd.json");
+	motd_buyer = None;
+	motd_message = None;
+	motd_time = None;
+	with open(motd_path, "r") as f:
+		try:
+			motd_info = json.load(f);
+			motd_buyer = motd_info["motd_buyer"];
+			motd_message = motd_info["motd_message"];
+			motd_time = motd_info["motd_time"];
+			payment = motd_info["payment"];
+		except json.JSONDecodeError:
+			motd_info = {};
+	embe.set_author(name="Message of the Day");
+	if motd_buyer == None or motd_time < 1:
+		embe.add_field(name="MOTD", value=f"There is no message of the day! You can use /motd to pay for a slot to get your very own MOTD here!", inline=False);
+		await channel.send("<@&1445594462439870484>", embed=embe);
+		return;
+	else:
+		embe.add_field(name="MOTD", value=motd_message, inline=False);
+		embe.add_field(name="Sponsor", value=f"This message was paid for by <@{motd_buyer}>.");
+	motd_time -= 1;
+	if motd_time < 1: 
+		motd_buyer = None;
+		motd_message = None;
+		motd_time = None;
+		payment = None;
+	data = {
+		"motd_buyer": motd_buyer,
+		"motd_message": motd_message,
+		"motd_time": motd_time,
+		"payment": payment
+	};
+	with open(motd_path, "w") as f:
+		json.dump(data, f);
+	await channel.send("<@&1445594462439870484>", embed=embe);
+	return;
+
+def motd_runner():
+    asyncio.create_task(print_motd())
+
+schedule.every().day.at("12:00").do(motd_runner)
+
+async def motd_scheduler():
+    while True:
+        schedule.run_pending()
+        await asyncio.sleep(1)
 
 async def cant(mes):
 	await mes.channel.send("You don't have proper permissions!")
@@ -1156,13 +1214,10 @@ class ApprovalView(discord.ui.View):
         )
 
 
-bot = commands.Bot(command_prefix="!", intents=discord.Intents.all())
-tree = bot.tree
-
 
 @tree.command(
     name="cpo",
-    description="Create your own Republic Party"
+    description="Create your own party(usage in Turrnut Republic only)"
 )
 @app_commands.describe(
     party="Enter your party's name",
@@ -1177,6 +1232,20 @@ async def cpo(
 ):
 
     guild = interaction.guild
+
+    if member1.id == member2.id:
+        await interaction.response.send_message(
+			f"The two members you provided are the same person.",
+			ephemeral=False
+    	)
+        return
+	
+    if str(guild.id) != "977378215360335952":
+        await interaction.response.send_message(
+			f"This command can only be used in the Turrnut Republic server.",
+			ephemeral=False
+    	)
+        return
 
     # OWNER who must approve
     owner_id = 977377574789472278
@@ -2219,6 +2288,62 @@ async def speakkc(interaction: discord.Interaction, message:str, replyto:str=Non
 			mesg = await channel.fetch_message(msg_id)
 			await mesg.reply(message)
 			return	
+@tree.command(name="motd", description="Pay to get your very own message of the day! (no refunds)")
+@app_commands.describe(message="What would you like to say?")
+@app_commands.describe(days="How many days would you like for this message to be repeated?")
+@app_commands.describe(price="How much would you like to pay? (per day; minimum 50 coins)")
+async def set_motd(interaction: discord.Interaction, message:str, days:int, price:float):
+    motd_path = pathify("motd|motd.json")
+    embe = discord.Embed(color=embec)
+    userbalance = float(money[find_money(Money(str(interaction.user.id), 0))].balance)
+    motd_info = {}; motd_path = pathify("motd|motd.json"); motd_buyer = None; motd_time = None; payment = None
+    embe.set_author(name=str(interaction.user.display_name), icon_url=interaction.user.avatar)
+    embe.set_footer(text=f"{datetime.datetime.now()}")
+    with open(motd_path, "r") as f:
+        try:
+            motd_info = json.load(f)
+            motd_buyer = motd_info["motd_buyer"]
+            motd_time = motd_info["motd_time"]
+            payment = motd_info["payment"]
+        except json.JSONDecodeError:
+            motd_info = {}
+    if motd_buyer == interaction.user.id:
+        embe.add_field(name="Already have a MOTD!", value=f"You already have a MOTD set for {motd_time}!", inline=False)
+        await interaction.response.send_message(embed=embe)
+        return
+    if userbalance < (price * days):
+        embe.add_field(name="Not enough money!", value=f"You need {price * days} turrcoins, but you only have {userbalance}!", inline=False)
+        await interaction.response.send_message(embed=embe)
+        return
+    if price < 50:
+        embe.add_field(name="Not enough money!", value="You need to pay more than that; 50 is the minimum.", inline=False)
+        await interaction.response.send_message(embed=embe)
+        return
+    if payment != None:
+        if price * days <= payment * days or price <= payment:
+            embe.add_field(name="Not enough money!", value=f"You need to pay more than the current MOTD holder {payment * days} to take their slot!", inline=False)
+            await interaction.response.send_message(embed=embe)
+            return
+        if price * days > payment * days and price > payment:
+            money[find_money(Money(str(motd_buyer), 0))].balance = float(money[find_money(Money(str(motd_buyer), 0))].balance) + (payment * motd_time) # refund for unused time
+            save_money()
+            load_money()
+            
+    money[find_money(Money(str(interaction.user.id), 0))].balance = float(money[find_money(Money(str(interaction.user.id), 0))].balance) - (price * days)
+    save_money()
+    load_money()
+    userbalance = float(money[find_money(Money(str(interaction.user.id), 0))].balance)
+    data = {
+        "motd_buyer": interaction.user.id,
+        "motd_message": message,
+        "motd_time": days,
+        "payment": price
+    }
+    with open(motd_path, "w") as f:
+        json.dump(data, f)
+    embe.add_field(name="MOTD Set!", value=f"Message of the day set! Your message will now be printed {days} times (once per day)!", inline=False)
+    await interaction.response.send_message(embed=embe)
+    return
 
 @client.event
 async def on_reaction_add(reaction, user):
@@ -2242,6 +2367,7 @@ async def on_ready():
 	# await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"members from {num_of_servers} servers"))
 	await client.change_presence(status=discord.Status.idle, activity=discord.Activity(name="Insomnia Competition",type=5))
 	print("\n\n\n")
+	client.loop.create_task(motd_scheduler())
 
 
 @client.event
