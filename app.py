@@ -1188,30 +1188,81 @@ class ApprovalView(discord.ui.View):
         self.member1 = member1
         self.member2 = member2
 
-    async def interaction_check(self, interaction: discord.Interaction) -> bool:
-        # Only the OWNER can press the buttons
+        self.owner_approved = False
+        self.member1_approved = False
+        self.member2_approved = False
+
+    # ---------- MEMBER JOIN BUTTONS ----------
+    @discord.ui.button(label="Member1 Join", style=discord.ButtonStyle.blurple)
+    async def m1_join(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.member1.id:
+            return await interaction.response.send_message("Not for you.", ephemeral=True)
+
+        self.member1_approved = True
+        button.disabled = True
+        await interaction.response.send_message("👍 You joined!", ephemeral=True)
+        await interaction.message.edit(view=self)
+        await self.check_all(interaction)
+
+    @discord.ui.button(label="Member2 Join", style=discord.ButtonStyle.blurple)
+    async def m2_join(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.member2.id:
+            return await interaction.response.send_message("Not for you.", ephemeral=True)
+
+        self.member2_approved = True
+        button.disabled = True
+        await interaction.response.send_message("👍 You joined!", ephemeral=True)
+        await interaction.message.edit(view=self)
+        await self.check_all(interaction)
+
+    # ---------- OWNER BUTTONS ----------
+    @discord.ui.button(label="Owner Approve", style=discord.ButtonStyle.green)
+    async def owner_approve(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.owner_id:
-            await interaction.response.send_message(
-                "You are not the owner. You cannot approve this.",
-                ephemeral=True
+            return await interaction.response.send_message("You are not the owner.", ephemeral=True)
+
+        self.owner_approved = True
+        button.disabled = True
+        await interaction.response.send_message("✅ Owner approved!", ephemeral=True)
+        await interaction.message.edit(view=self)
+        await self.check_all(interaction)
+
+    @discord.ui.button(label="Owner Deny", style=discord.ButtonStyle.red)
+    async def owner_deny(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.owner_id:
+            return await interaction.response.send_message("You are not the owner.", ephemeral=True)
+
+        await interaction.message.edit(
+            content=f"❌ Party **{self.party}** has been denied by the owner.",
+            view=None
+        )
+
+    # ---------- FINAL CHECK ----------
+   	    # ---------- FINAL CHECK ----------
+    async def check_all(self, interaction: discord.Interaction):
+        if self.owner_approved and self.member1_approved and self.member2_approved:
+            await interaction.message.edit(
+                content=(
+                    f"🎉 **Party '{self.party}' has been fully approved!**\n"
+                    f"Owner + both members accepted.\n\n"
+                    f"Members:\n"
+                    f"- {self.member1.mention}\n"
+                    f"- {self.member2.mention}"
+                ),
+                view=None
             )
-            return False
-        return True
 
-    @discord.ui.button(label="Approve", style=discord.ButtonStyle.green)
-    async def approve(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.message.edit(
-            content=f"✅ **Party '{self.party}' has been approved by the owner!**\n"
-                    f"Members: {self.member1.mention}, {self.member2.mention}",
-            view=None
-        )
+            # ADD YOUR PARTY CREATION LOGIC HERE
+            # e.g. create roles, channel, database entry, etc.
+            data = {
+                "party": self.party,
+                "members": [self.member1.id, self.member2.id],
+                "owner": self.owner_id
+            }
 
-    @discord.ui.button(label="Deny", style=discord.ButtonStyle.red)
-    async def deny(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.message.edit(
-            content=f"❌ **Party '{self.party}' has been denied by the owner.**",
-            view=None
-        )
+            with open("partys/main.json", "w") as f:
+                json.dump(data, f, indent=4)
+
 
 
 
@@ -1240,12 +1291,6 @@ async def cpo(
     	)
         return
 	
-    if str(guild.id) != "977378215360335952":
-        await interaction.response.send_message(
-			f"This command can only be used in the Turrnut Republic server.",
-			ephemeral=False
-    	)
-        return
 
     # OWNER who must approve
     owner_id = 977377574789472278
@@ -1286,6 +1331,9 @@ async def cpo(
         f"Approval thread created: {thread.mention}",
         ephemeral=True
     )
+
+
+		
 
 
 opponent_choices = [
