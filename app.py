@@ -14,8 +14,8 @@ import nacl
 import time
 import asyncio
 import traceback
-import schedule
 import interpreter as lang
+import schedule
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
@@ -500,7 +500,44 @@ async def print_motd(): # CHUNKY ass function
 def motd_runner():
     asyncio.create_task(print_motd())
 
-schedule.every().day.at("12:00").do(motd_runner)
+# Load scheduling configuration from an external file so it can be easily edited
+SCHEDULE_CONFIG_PATH = "schedule.json"
+
+def load_schedule_config():
+    """
+    Loads the schedule configuration from SCHEDULE_CONFIG_PATH.
+    Falls back to sensible defaults if the file is missing or invalid.
+    """
+    default_config = {
+        "motd": {
+            "enabled": True,
+            "time": "12:00"  # HH:MM in 24‑hour format, server local time
+        }
+    }
+
+    try:
+        with open(SCHEDULE_CONFIG_PATH, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            if not isinstance(data, dict):
+                return default_config
+            return data
+    except (FileNotFoundError, json.JSONDecodeError):
+        # If anything goes wrong, just use defaults
+        return default_config
+
+
+_schedule_cfg = load_schedule_config()
+_motd_cfg = _schedule_cfg.get("motd", {})
+
+if _motd_cfg.get("enabled", True):
+    _motd_time = _motd_cfg.get("time", "12:00")
+    try:
+        # Register the MOTD job using the configured time
+        schedule.every().day.at(str(_motd_time)).do(motd_runner)
+    except Exception as e:
+        # If the time format is bad, fall back to the default
+        print(f"[schedule] Invalid MOTD time '{_motd_time}', falling back to 12:00. Error: {e}")
+        schedule.every().day.at("12:00").do(motd_runner)
 
 async def motd_scheduler():
     while True:
@@ -1188,30 +1225,81 @@ class ApprovalView(discord.ui.View):
         self.member1 = member1
         self.member2 = member2
 
-    async def interaction_check(self, interaction: discord.Interaction) -> bool:
-        # Only the OWNER can press the buttons
+        self.owner_approved = False
+        self.member1_approved = False
+        self.member2_approved = False
+
+    # ---------- MEMBER JOIN BUTTONS ----------
+    @discord.ui.button(label="Member1 Join", style=discord.ButtonStyle.blurple)
+    async def m1_join(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.member1.id:
+            return await interaction.response.send_message("Not for you.", ephemeral=True)
+
+        self.member1_approved = True
+        button.disabled = True
+        await interaction.response.send_message("👍 You joined!", ephemeral=True)
+        await interaction.message.edit(view=self)
+        await self.check_all(interaction)
+
+    @discord.ui.button(label="Member2 Join", style=discord.ButtonStyle.blurple)
+    async def m2_join(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.member2.id:
+            return await interaction.response.send_message("Not for you.", ephemeral=True)
+
+        self.member2_approved = True
+        button.disabled = True
+        await interaction.response.send_message("👍 You joined!", ephemeral=True)
+        await interaction.message.edit(view=self)
+        await self.check_all(interaction)
+
+    # ---------- OWNER BUTTONS ----------
+    @discord.ui.button(label="Owner Approve", style=discord.ButtonStyle.green)
+    async def owner_approve(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.owner_id:
-            await interaction.response.send_message(
-                "You are not the owner. You cannot approve this.",
-                ephemeral=True
+            return await interaction.response.send_message("You are not the owner.", ephemeral=True)
+
+        self.owner_approved = True
+        button.disabled = True
+        await interaction.response.send_message("✅ Owner approved!", ephemeral=True)
+        await interaction.message.edit(view=self)
+        await self.check_all(interaction)
+
+    @discord.ui.button(label="Owner Deny", style=discord.ButtonStyle.red)
+    async def owner_deny(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.owner_id:
+            return await interaction.response.send_message("You are not the owner.", ephemeral=True)
+
+        await interaction.message.edit(
+            content=f"❌ Party **{self.party}** has been denied by the owner.",
+            view=None
+        )
+
+    # ---------- FINAL CHECK ----------
+   	    # ---------- FINAL CHECK ----------
+    async def check_all(self, interaction: discord.Interaction):
+        if self.owner_approved and self.member1_approved and self.member2_approved:
+            await interaction.message.edit(
+                content=(
+                    f"🎉 **Party '{self.party}' has been fully approved!**\n"
+                    f"Owner + both members accepted.\n\n"
+                    f"Members:\n"
+                    f"- {self.member1.mention}\n"
+                    f"- {self.member2.mention}"
+                ),
+                view=None
             )
-            return False
-        return True
 
-    @discord.ui.button(label="Approve", style=discord.ButtonStyle.green)
-    async def approve(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.message.edit(
-            content=f"✅ **Party '{self.party}' has been approved by the owner!**\n"
-                    f"Members: {self.member1.mention}, {self.member2.mention}",
-            view=None
-        )
+            # ADD YOUR PARTY CREATION LOGIC HERE
+            # e.g. create roles, channel, database entry, etc.
+            data = {
+                "party": self.party,
+                "members": [self.member1.id, self.member2.id],
+                "owner": self.owner_id
+            }
 
-    @discord.ui.button(label="Deny", style=discord.ButtonStyle.red)
-    async def deny(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.message.edit(
-            content=f"❌ **Party '{self.party}' has been denied by the owner.**",
-            view=None
-        )
+            with open("partys/main.json", "w") as f:
+                json.dump(data, f, indent=4)
+
 
 
 
@@ -1240,12 +1328,6 @@ async def cpo(
     	)
         return
 	
-    if str(guild.id) != "977378215360335952":
-        await interaction.response.send_message(
-			f"This command can only be used in the Turrnut Republic server.",
-			ephemeral=False
-    	)
-        return
 
     # OWNER who must approve
     owner_id = 977377574789472278
@@ -1288,7 +1370,20 @@ async def cpo(
     )
 
 
-actionslist = [
+		
+
+
+opponent_choices = [
+    app_commands.Choice(name="Bot", value="bot"),
+    app_commands.Choice(name="Player", value="player")
+]
+
+gamble_choices = [
+    app_commands.Choice(name="Gamble Money", value="yes"),
+    app_commands.Choice(name="Don't Gamble", value="no")
+]
+
+action_choices = [
     app_commands.Choice(name="Rock", value="rock"),
     app_commands.Choice(name="Paper", value="paper"),
     app_commands.Choice(name="Scissors", value="scissors")
@@ -1296,29 +1391,68 @@ actionslist = [
 
 
 @tree.command(name="rps", description="Rock, paper, scissors")
-@app_commands.describe(action="Choose between: Rock, paper or scissors.")
-@app_commands.choices(action=actionslist)
-async def rps(interaction:discord.Interaction, action:app_commands.Choice[str]):
-    embe = discord.Embed(color=embec)
-    
+@app_commands.describe(
+    opponent="Choose Bot or Player",
+    gamble="Choose if you want to gamble money",
+    action="Choose Rock, Paper, or Scissors"
+)
+@app_commands.choices(
+    opponent=opponent_choices,
+    gamble=gamble_choices,
+    action=action_choices
+)
+async def rps(
+    interaction: discord.Interaction,
+    opponent: app_commands.Choice[str],
+    gamble: app_commands.Choice[str],
+    action: app_commands.Choice[str]
+):
+    embe = discord.Embed(color=0x00ffcc)
     embe.set_author(name=str(interaction.user.display_name), icon_url=interaction.user.avatar)
     embe.set_footer(text=f"{datetime.datetime.now()}")
 
-    # Rock Paper Scissors logic
-    bot_choice = random.choice(["rock", "paper", "scissors"])
     user_choice = action.value.lower()
-    
+
+    #opponent logic
+    if opponent.value == "bot":
+        bot_choice = random.choice(["rock", "paper", "scissors"])
+        opponent_name = "Bot"
+    else:
+        # For player vs player, you'd request another player's action (future expansion)
+        bot_choice = random.choice(["rock", "paper", "scissors"])
+        opponent_name = "Player (placeholder)"
+
+    #rps logic
     if user_choice == bot_choice:
         result = "It's a tie!"
-    elif (user_choice == "rock" and bot_choice == "scissors") or \
-         (user_choice == "paper" and bot_choice == "rock") or \
-         (user_choice == "scissors" and bot_choice == "paper"):
+    elif (
+        (user_choice == "rock" and bot_choice == "scissors") or
+        (user_choice == "paper" and bot_choice == "rock") or
+        (user_choice == "scissors" and bot_choice == "paper")
+    ):
         result = "You win!"
     else:
         result = "You lose!"
-    
-    embe.add_field(name="Rock Paper Scissors", value=f"You chose: {action.name}\nBot chose: {bot_choice.title()}\n\n{result}")
+
+    #gambling logic
+    if gamble.value == "yes":
+        gamble_text = "💰 **You decided to gamble!**"
+    else:
+        gamble_text = "😐 **You chose not to gamble.**"
+
+    embe.add_field(
+        name="Rock Paper Scissors",
+        value=(
+            f"Opponent: **{opponent_name}**\n"
+            f"You chose: **{action.name}**\n"
+            f"{opponent_name} chose: **{bot_choice.title()}**\n\n"
+            f"{result}\n\n"
+            f"{gamble_text}"
+        )
+    )
+
     await interaction.response.send_message(embed=embe)
+
 
 @tree.command(name="summon", description="🔮(Magically) Summons a person online")
 @app_commands.describe(person="Who do you want to summon?")
@@ -2405,9 +2539,18 @@ async def on_message(message):
 				await message.author.timeout(datetime.datetime(datetime.datetime.now().year, datetime.datetime.now().month, datetime.datetime.now().day, hour=datetime.datetime.now().hour, minute=datetime.datetime.now().minute + 10).astimezone())
 	if len(instructions) > 0 and instructions[0].lower() == 'turrnut':
 		await dostuff(instructions, message)
-token = ""
-with open("token.token") as t:
-	token = t.read()
+import os
+from dotenv import load_dotenv
+import discord
 
-if token != None:
-	client.run(token)
+# Load .env file
+load_dotenv()
+
+# Get token from environment variable
+TOKEN = os.getenv("DISCORD_TOKEN")
+
+if TOKEN is None or TOKEN == "":
+    print("❌ ERROR: Token is missing! Add DISCORD_TOKEN in your .env file.")
+else:
+    client = discord.Client(intents=discord.Intents.all())
+    client.run(TOKEN)
