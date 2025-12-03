@@ -3,3 +3,4 @@ numpy
 pynacl
 chess.com
 schedule
+python-dotenv
