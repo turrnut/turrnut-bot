@@ -2502,9 +2502,18 @@ async def on_message(message):
 				await message.author.timeout(datetime.datetime(datetime.datetime.now().year, datetime.datetime.now().month, datetime.datetime.now().day, hour=datetime.datetime.now().hour, minute=datetime.datetime.now().minute + 10).astimezone())
 	if len(instructions) > 0 and instructions[0].lower() == 'turrnut':
 		await dostuff(instructions, message)
-token = ""
-with open("token.token") as t:
-	token = t.read()
+import os
+from dotenv import load_dotenv
+import discord
 
-if token != None:
-	client.run(token)
+# Load .env file
+load_dotenv()
+
+# Get token from environment variable
+TOKEN = os.getenv("DISCORD_TOKEN")
+
+if TOKEN is None or TOKEN == "":
+    print("❌ ERROR: Token is missing! Add DISCORD_TOKEN in your .env file.")
+else:
+    client = discord.Client(intents=discord.Intents.all())
+    client.run(TOKEN)
