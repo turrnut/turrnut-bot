@@ -1727,7 +1727,8 @@ async def daily(interaction:discord.Interaction):
 
 	AWARD = round(random.Random().uniform(5.0,15.0), 3)
 	if str(interaction.user.id) == "1405608029134782545": # Mergeaso
-		AWARD = math.pi
+		# AWARD = math.pi
+		AWARD = round(random.Random().uniform(5.0,15.0), 3)
 
 	load_money()
 
