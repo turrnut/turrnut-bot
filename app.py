@@ -70,31 +70,10 @@ orders = []
 champion = "977377574789472278"
 motdchannel = 1445587277232209992
 
-itemslist = [
-	app_commands.Choice(name="British sleep tokens", value="bstok"),
-	app_commands.Choice(name="Coal", value="coal"),
-	app_commands.Choice(name="Diamond", value="diamond"),
-	app_commands.Choice(name="Emerald", value="emerald"),
-	app_commands.Choice(name="Ferret pets", value="ferret"),
-	app_commands.Choice(name="Ferret toy weapons", value="ftoy"),
-	app_commands.Choice(name="Gold", value="gold"),
-	app_commands.Choice(name="Pickaxe", value="pick"),
-	app_commands.Choice(name="Quartz", value="quartz"),
-	app_commands.Choice(name="Russian War bonds", value="ruswarbonds"),
-	app_commands.Choice(name="Turrnut Cars", value="car"),
-	app_commands.Choice(name="Turrnut Homes", value="home"),
-	app_commands.Choice(name="Turrnut Jr. Pumpkin Pie", value="ppslice"),
-	app_commands.Choice(name="Turrnut Rings", value="ring"),
-	app_commands.Choice(name="Turrnutium", value="turrnutium"),
-	app_commands.Choice(name="TurrTaco", value="taco"),
-	app_commands.Choice(name="TurrTanks", value="tank"),
-	app_commands.Choice(name="Tuvaluan War Bonds", value="tvwarbonds"),
-	app_commands.Choice(name="Tuvalunium", value="tuvalunium"),
-]
-
 shoplist = [
 	app_commands.Choice(name="British sleep tokens", value="bstok"),
 	app_commands.Choice(name="Ferret pets", value="ferret"),
+	app_commands.Choice(name="Ferret toy weapons", value="ftoy"),
 	app_commands.Choice(name="Pickaxe", value="pick"),
 	app_commands.Choice(name="Russian War bonds", value="ruswarbonds"),
 	app_commands.Choice(name="Turrnut Cars", value="car"),
@@ -104,6 +83,16 @@ shoplist = [
 	app_commands.Choice(name="TurrTaco", value="taco"),
 	app_commands.Choice(name="TurrTanks", value="tank"),
 	app_commands.Choice(name="Tuvaluan War Bonds", value="tvwarbonds"),
+]
+
+itemslist = shoplist + [
+	app_commands.Choice(name="Coal", value="coal"),
+	app_commands.Choice(name="Diamond", value="diamond"),
+	app_commands.Choice(name="Emerald", value="emerald"),
+	app_commands.Choice(name="Gold", value="gold"),
+	app_commands.Choice(name="Quartz", value="quartz"),
+	app_commands.Choice(name="Turrnutium", value="turrnutium"),
+	app_commands.Choice(name="Tuvalunium", value="tuvalunium"),
 ]
 
 # Generating a list of 200 G-rated, non-personal compliments/words of affirmation in a single line.
@@ -1296,6 +1285,8 @@ actionslist = [
 
 
 @tree.command(name="rps", description="Rock, paper, scissors")
+@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@app_commands.allowed_installs(guilds=True, users=True)
 @app_commands.describe(action="Choose between: Rock, paper or scissors.")
 @app_commands.choices(action=actionslist)
 async def rps(interaction:discord.Interaction, action:app_commands.Choice[str]):
@@ -1321,6 +1312,8 @@ async def rps(interaction:discord.Interaction, action:app_commands.Choice[str]):
     await interaction.response.send_message(embed=embe)
 
 @tree.command(name="summon", description="🔮(Magically) Summons a person online")
+@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@app_commands.allowed_installs(guilds=True, users=True)
 @app_commands.describe(person="Who do you want to summon?")
 async def summon(interaction:discord.Interaction, person:discord.User):
 	if int(person.id) == int(interaction.user.id): await interaction.response.send_message(f"You can't summon yourself.")
@@ -1332,6 +1325,8 @@ async def summon(interaction:discord.Interaction, person:discord.User):
 	log(str(interaction.user.id) + "tried to summon" + str(person.id))
 
 @tree.command(name="poll", description="Make a new poll using this command")
+@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@app_commands.allowed_installs(guilds=True, users=True)
 @app_commands.describe(question="What is the poll about?")
 @app_commands.describe(choices="Seperate poll choices by comma. You can only have ten choices maximum.")
 async def poll(interaction:discord.Interaction, question:str, choices:str=None):
@@ -1361,6 +1356,8 @@ async def poll(interaction:discord.Interaction, question:str, choices:str=None):
 	log(str(interaction.user.id) + "made a poll")
 
 @tree.command(name="give", description="Give away items!")
+@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@app_commands.allowed_installs(guilds=True, users=True)
 @app_commands.describe(item=f"What item?")
 @app_commands.describe(quantity=f"How many would you like to give")
 @app_commands.describe(message="Optional message attached to your gift.")
@@ -1404,6 +1401,8 @@ def get_item_msg(id):
 	else: return "Nothing happened."
 
 @tree.command(name="mine", description="Go mining!")
+@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@app_commands.allowed_installs(guilds=True, users=True)
 async def mine(interaction:discord.Interaction):
 	log(str(interaction.user.id) + "mines")
 	item = app_commands.Choice(name="Pickaxe", value="pick")
@@ -1488,6 +1487,8 @@ async def mine(interaction:discord.Interaction):
 		embe.add_field(name=f"You used {str(quantity)} {item.name}...", value=e)
 	await interaction.response.send_message(embed=embe)
 @tree.command(name="use", description="Use items!")
+@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@app_commands.allowed_installs(guilds=True, users=True)
 @app_commands.describe(item=f"What item?")
 @app_commands.describe(quantity=f"How many would you like to use?")
 @app_commands.choices(item=itemslist)
@@ -1558,6 +1559,8 @@ async def use(interaction:discord.Interaction, item:app_commands.Choice[str], qu
 
 
 @tree.command(name="buy", description="Buy stuff using turrcoins!")
+@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@app_commands.allowed_installs(guilds=True, users=True)
 @app_commands.describe(item=f"What would you like to buy?")
 @app_commands.describe(quantity=f"How many would you like to buy?")
 @app_commands.choices(item=shoplist)
@@ -1583,12 +1586,16 @@ async def buy(interaction:discord.Interaction,item:app_commands.Choice[str],quan
 	log(str(interaction.user.id) + "wants to buy something")
 
 @tree.command(name="blackjack", description="Start a new game of blackjack and play against the computer for a chance to win Turrcoins!")
+@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@app_commands.allowed_installs(guilds=True, users=True)
 @app_commands.describe(wager=f"How many Turrcoins do you bet?")
 async def blackjack(interaction:discord.Interaction,wager:float):
 	embe = await blackjack_start(interaction, wager, False)
 	await interaction.response.send_message(embed=embe, view=BlackjackButton())
 
 @tree.command(name="earnings", description="Check a user's lifetime blackjack earnings")
+@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@app_commands.allowed_installs(guilds=True, users=True)
 @app_commands.describe(user=f"Which user do you want to check? Leave blank for self.")
 async def earnings(interaction:discord.Interaction,user:discord.User=None):
     global items
@@ -1618,6 +1625,8 @@ async def earnings(interaction:discord.Interaction,user:discord.User=None):
     log(str(interaction.user.id) + "earnings check")
 
 @tree.command(name="coin", description="Flip a coin!")
+@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@app_commands.allowed_installs(guilds=True, users=True)
 async def coin(interaction:discord.Interaction):
 	embe = discord.Embed(color=embec)
 	
@@ -1631,6 +1640,8 @@ async def coin(interaction:discord.Interaction):
 
 
 @tree.command(name="item", description="Check Item")
+@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@app_commands.allowed_installs(guilds=True, users=True)
 @app_commands.describe(item=f"What item would you like to check")
 @app_commands.describe(user=f"What user do you want to check the item on? Leave blank to check your own.")
 @app_commands.choices(item=itemslist)
@@ -1664,6 +1675,8 @@ async def item_check(interaction:discord.Interaction,item:app_commands.Choice[st
 	log(str(interaction.user.id) + "checks on items")
 
 @tree.command(name="minerals", description="Check a user's minerals")
+@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@app_commands.allowed_installs(guilds=True, users=True)
 @app_commands.describe(user=f"Which user do you want to check? Leave blank for self.")
 async def minerals_check(interaction:discord.Interaction,user:discord.User=None):
 	global items
@@ -1710,6 +1723,8 @@ async def minerals_check(interaction:discord.Interaction,user:discord.User=None)
 
 
 @tree.command(name="calculate", description="Try the turrnut mathematic and logical calculator!")
+@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@app_commands.allowed_installs(guilds=True, users=True)
 @app_commands.describe(expression="Arithmetic or boolean expression")
 async def calc(interaction:discord.Interaction, expression: str):
 
@@ -1721,6 +1736,8 @@ async def calc(interaction:discord.Interaction, expression: str):
 		await interaction.response.send_message(str(expression) + "=" + str(result.value))
 	
 @tree.command(name="collect", description="Get your turrcoin award using this command.")
+@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@app_commands.allowed_installs(guilds=True, users=True)
 async def daily(interaction:discord.Interaction):
 	global money
 	global AWARD
@@ -1766,6 +1783,8 @@ async def daily(interaction:discord.Interaction):
 	log(str(interaction.user.id) + "loves money")
 
 @tree.command(name="factorial", description="Calculator but with factorials")
+@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@app_commands.allowed_installs(guilds=True, users=True)
 @app_commands.describe(expression="Arithmetic expression")
 async def fact(interaction:discord.Interaction, expression: str):
 	result, error = lang.run("<discord_runtime>", expression)
@@ -1779,6 +1798,8 @@ async def fact(interaction:discord.Interaction, expression: str):
 			return
 
 @tree.command(name="never-have-i-ever", description="Never have I ever...?")
+@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@app_commands.allowed_installs(guilds=True, users=True)
 async def nh(interaction: discord.Interaction):
 	global nhie
 	embe = discord.Embed(title=f"Never Have I Ever", description=f"Type: NHIE, Requested by <@{interaction.user.id}>", color=embec)
@@ -1789,6 +1810,8 @@ async def nh(interaction: discord.Interaction):
 	await interaction.response.send_message(embed=embe, view=NHIEButton())
 
 @tree.command(name="suggest", description="Suggestion a new feature!")
+@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@app_commands.allowed_installs(guilds=True, users=True)
 @app_commands.describe(suggestion="What feature would you like to suggest?")
 async def sugg(interaction: discord.Interaction, suggestion:str):
 	global embec
@@ -1805,6 +1828,8 @@ async def sugg(interaction: discord.Interaction, suggestion:str):
 	await interaction.response.send_message(embed=embe)
 
 @tree.command(name="would-you-rather", description="Play the would you rather game!")
+@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@app_commands.allowed_installs(guilds=True, users=True)
 async def wy(interaction: discord.Interaction):
 	global wyr
 	embe = discord.Embed(title=f"Would You Rather", description=f"Type: WYR, Requested by <@{interaction.user.id}>", color=embec)
@@ -1815,6 +1840,8 @@ async def wy(interaction: discord.Interaction):
 	await interaction.response.send_message(embed=embe, view=WYRButton())
 
 @tree.command(name="truth-or-dare", description="TRUTH or DARE??!! Use this command to play!")
+@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@app_commands.allowed_installs(guilds=True, users=True)
 @app_commands.describe(type="Leave blank for a random question")
 @app_commands.choices(type=[
 	app_commands.Choice(name="Truth",value=1),
@@ -1849,10 +1876,13 @@ async def tod(interaction: discord.Interaction, type: app_commands.Choice[int]=N
 	embe.set_footer(text=f"{datetime.datetime.now()}")
 
 	await interaction.response.send_message(embed=embe, view=TODButton())
+	
 @tree.command(name="pay", description="Give someone an amount of turrcoins")
+@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@app_commands.allowed_installs(guilds=True, users=True)
 @app_commands.describe(receiver="The person who receive this money")
 @app_commands.describe(amount="How much money to transfer")
-async def pay(interaction: discord.Interaction, receiver: discord.Member, amount: float):
+async def pay(interaction: discord.Interaction, receiver: discord.User, amount: float):
 	global money
 	load_money()
 	send = ""
@@ -1937,6 +1967,8 @@ def mykey(obj: Money):
 	return float(obj.balance)
 
 @tree.command(name="leaderboard", description="See the top ranked turrcoin owners")
+@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@app_commands.allowed_installs(guilds=True, users=True)
 async def rank(interaction: discord.Interaction):
 	global money
 	global embec
@@ -1973,6 +2005,8 @@ async def rank(interaction: discord.Interaction):
 	await interaction.response.send_message(embed=embe)
 
 @tree.command(name="balance", description="Check how much turrcoins you have")
+@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@app_commands.allowed_installs(guilds=True, users=True)
 @app_commands.describe(person="Leave blank to check your own balance")
 async def balance(interaction: discord.Interaction, person: discord.User=None):
 	global money
@@ -2005,6 +2039,8 @@ async def balance(interaction: discord.Interaction, person: discord.User=None):
 	await interaction.response.send_message(embed=embe)
 
 @tree.command(name="ask", description="Ask the fortune teller a question!")
+@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@app_commands.allowed_installs(guilds=True, users=True)
 @app_commands.describe(question="What question do you have?")
 async def ask(interaction: discord.Interaction, question:str):
 	q = f"<@{str(interaction.user.id)}> asks: ** {question}"
@@ -2014,6 +2050,8 @@ async def ask(interaction: discord.Interaction, question:str):
 	await interaction.response.send_message(q)
 
 @tree.command(name="help", description="Need technical support or learn more about the bot? Use this command!")
+@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@app_commands.allowed_installs(guilds=True, users=True)
 @app_commands.describe(command="Which command would you like to look at?")
 @app_commands.choices(command=[
 	app_commands.Choice(name="/ask",value="ask"),
@@ -2047,7 +2085,7 @@ async def inv(interaction: discord.Interaction, command: app_commands.Choice[str
 		for server in client.guilds:
 			num_of_servers += 1
 
-		await interaction.response.send_message(f"# hi.\nI am <@{str(client.user.id)}>\n# I am currently in {num_of_servers} servers!\n## My pronouns are she/her.\n### Click this link to invite me to your server: https://discord.com/oauth2/authorize?client_id=1014960764378939453&scope=bot \n### For more information, visit our website: https://turrnut.github.io/discordbot\n### For technical support, join our server: https://discord.gg/Xbt2mCjaz6")
+		await interaction.response.send_message(f"# hi.\nI am <@{str(client.user.id)}>\n# I am currently in {num_of_servers} servers!\n## My pronouns are she/her.\n### Click this link to invite me to your server: https://discord.com/oauth2/authorize?client_id=1014960764378939453&scope=bot \n### For more information, visit our website: https://turrnut.github.io/discordbot\n### For technical support, join our server: https://discord.gg/F8mpvVgjNs")
 		return
 
 	elif command.value == "ask":
@@ -2166,6 +2204,8 @@ async def inv(interaction: discord.Interaction, command: app_commands.Choice[str
 
 
 @tree.command(name="meme", description="Get a random meme!")
+@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@app_commands.allowed_installs(guilds=True, users=True)
 async def mem(interaction: discord.Interaction):
 	log(str(interaction.user) + " prompted a random meme")
 
@@ -2176,6 +2216,8 @@ async def mem(interaction: discord.Interaction):
 	# await interaction.channel.send("\nAs suggested by: " + str(meme.suggested))
 
 @tree.command(name="compliment", description="Get a compliment!")
+@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@app_commands.allowed_installs(guilds=True, users=True)
 @app_commands.describe(to="Who do you want to give the compliment to? Leave blank for yourself.")
 async def compliment(interaction: discord.Interaction, to: discord.User=None):
 	global compliments
@@ -2192,7 +2234,17 @@ async def compliment(interaction: discord.Interaction, to: discord.User=None):
 	await interaction.response.send_message(embed=embe)
 	# await interaction.channel.send("\nAs suggested by: " + str(meme.suggested))
 
+# @tree.command(name="fifa", description="Limited time command for the FIFA world cup 2026")
+# @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+# @app_commands.allowed_installs(guilds=True, users=True)
+# @app_commands.describe(amount="The amount of Turrcoins you want to bet on.")
+# async def fifa(interaction: discord.Interaction, amount:float):
+#	await interaction.response.send_message(f"<@{interaction.user.id}> bets {amount} Turrcoins")
+#	log(f"<@{interaction.user.id}> bets {amount} Turrcoins")
+
 @tree.command(name="speak", description="Make me say something!")
+@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@app_commands.allowed_installs(guilds=True, users=True)
 @app_commands.describe(message="What to do you want me to say?")
 @app_commands.describe(replyto="Reply to a message(link). Leave blank if none.")
 async def speakkc(interaction: discord.Interaction, message:str, replyto:str=None):
