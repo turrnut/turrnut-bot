@@ -93,6 +93,7 @@ itemslist = shoplist + [
 	app_commands.Choice(name="Quartz", value="quartz"),
 	app_commands.Choice(name="Turrnutium", value="turrnutium"),
 	app_commands.Choice(name="Tuvalunium", value="tuvalunium"),
+	app_commands.Choice(name="Quartz Sword", value="qsword"),
 ]
 
 # Generating a list of 200 G-rated, non-personal compliments/words of affirmation in a single line.
@@ -320,7 +321,8 @@ def buy_items(userid:str, item:str, quantity:int):
 	except KeyError:
 		items[item]["users"][userid] = "0"
 	
-	if item in ("coal", "quartz", "gold", "emerald", "diamond", "tuvalunium", "turrnutium"):
+	if item in ("coal", "quartz", "gold", "emerald", "diamond", "tuvalunium", "turrnutium",
+			 	"qsword"):
 		items[item]["users"][userid] = str(float(items[item]["users"][userid]) + quantity)
 		
 		save_money()
@@ -1400,6 +1402,49 @@ def get_item_msg(id):
 	if id == "": pass
 	else: return "Nothing happened."
 
+@tree.command(name="craft", description="Craft an otherwise unobtainable item.")
+@app_commands.describe(item=f"What item?")
+@app_commands.describe(quantity=f"How many do you wish to craft?")
+@app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+@app_commands.allowed_installs(guilds=True, users=True)
+@app_commands.choices(item=[
+	app_commands.Choice(name="Quartz Sword", value="qsword"),
+])
+async def craft(interaction:discord.Interaction, item:app_commands.Choice[str], quantity:int):
+	embe = discord.Embed(color=embec)
+	
+	embe.set_author(name=str(interaction.user.display_name), icon_url=interaction.user.avatar)
+	embe.set_footer(text=f"{datetime.datetime.now()}")
+
+	if quantity <= 0:
+		embe.add_field(name="Error", value="Quantity is 0 or negative.", inline=False)
+		await interaction.response.send_message(embed=embe)
+		return
+	# if not check_sell_items(str(interaction.user.id), str(interaction.user.id), str(item.value), quantity):
+	# 	embe.add_field(name="Error", value=f"You don't have enough {item.name}.", inline=False)
+	# 	await interaction.response.send_message(embed=embe)
+	# 	return
+
+	if item.value == "qsword":
+		if not check_sell_items(str(interaction.user.id), str(interaction.user.id), "quartz", quantity * 5):
+			embe.add_field(name="Error", value=f"You need 5 Quartz to craft this item. You don't have enough.", inline=False)
+			await interaction.response.send_message(embed=embe)
+			return
+		else:
+			items["quartz"]["users"][str(interaction.user.id)] = str(float(items["quartz"]["users"][str(interaction.user.id)]) - float(quantity * 5))
+			buy_items(str(interaction.user.id), "qsword", 1)
+		
+	embe.add_field(name="Crafting", value=f"<@{str(interaction.user.id)}> obtained {quantity} {item.name} via crafting.", inline=False)
+
+	save_items()
+	load_items()
+
+	# buy_items(str(interaction.user.id), "diamond", 1)
+
+	await interaction.response.send_message(embed=embe)
+	log(f"<@{interaction.user.id}> obtained {quantity} {item.name} via crafting.")
+
+
 @tree.command(name="mine", description="Go mining!")
 @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
 @app_commands.allowed_installs(guilds=True, users=True)
@@ -1624,17 +1669,59 @@ async def earnings(interaction:discord.Interaction,user:discord.User=None):
     await interaction.response.send_message(embed=embe)
     log(str(interaction.user.id) + "earnings check")
 
-@tree.command(name="coin", description="Flip a coin!")
+@tree.command(name="coin", description="Flip a coin! And optionally bet on it")
 @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
 @app_commands.allowed_installs(guilds=True, users=True)
-async def coin(interaction:discord.Interaction):
+@app_commands.describe(result=f"(Optional) where do you think the coin will land?")
+@app_commands.describe(amount=f"(Optional) The amount that you want to bet.")
+@app_commands.choices(result=[
+	app_commands.Choice(name="Heads!", value="heads"),
+	app_commands.Choice(name="Tails!", value="tails"),
+])
+async def coin(interaction:discord.Interaction, result:app_commands.Choice[str]=None, amount:float=None):
+	global myid
+	global possibilities
+	global spamhalt
+	global logflag
+	global susflag
+	global memes
+	global ADMIN
+	global money
+	global tree
+	global ignore_bad_words
+	global react_all
+	global elo
+	global chess
 	embe = discord.Embed(color=embec)
 	
 	embe.set_author(name=str(interaction.user.display_name), icon_url=interaction.user.avatar)
 	embe.set_footer(text=f"{datetime.datetime.now()}")
 
-	face = random.Random().choice(seq=("HEADS!!!", "TAILS!!!"))
-	embe.add_field(name=face, value=face, inline=False)
+	if amount != None and result != None:
+		person = int(str(interaction.user.id))
+		if amount <= 0:
+			embe.add_field(name="No", value="It seems like your amount is 0 or lower.")
+			await interaction.response.send_message(embed=embe)
+			return
+		load_money()
+		idx = find_money(Money(person, amount))
+		if amount > float(money[idx].balance) : 
+			embe.add_field(name="No", value="No, you can't bet more than you have.")
+			await interaction.response.send_message(embed=embe)
+			return
+		gambleresultBoolean = True if result.value == random.Random().choice(seq=("heads", "tails")) else False
+		gambleresult = "won" if gambleresultBoolean else "lost"
+		if gambleresultBoolean:
+			money[idx].balance = str(float(money[idx].balance) + float(amount))
+		else:
+			money[idx].balance = str(float(money[idx].balance) - float(amount))
+		save_money()
+		load_money()
+		embe.add_field(name=f"YOU {gambleresult.upper()}!", value=f"<@{interaction.user.id}> , you {gambleresult} {amount} Turrcoins by betting on {result.name}.\nYour balance is now {float(money[idx].balance)}")
+		log(f"<@{interaction.user.id}> {gambleresult} {amount} by betting on {result.name}.\nTheir balance is now {float(money[idx].balance)}")
+	else:
+		face = random.Random().choice(seq=("HEADS!!!", "TAILS!!!"))
+		embe.add_field(name=face, value=face, inline=False)
 
 	await interaction.response.send_message(embed=embe)
 

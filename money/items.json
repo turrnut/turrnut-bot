@@ -249,7 +249,7 @@
                   "You named the quartz. It doesn't care."
             ],
             "users": {
-                  "977377574789472278": "234.0",
+                  "977377574789472278": "179.0",
                   "820541682415960064": "189.0",
                   "1405608029134782545": "14.0",
                   "1321897497991446568": "9.0",
@@ -372,6 +372,20 @@
             ],
             "users": {
                   "977377574789472278": "23.0",
+                  "1486526399144787999": "0.0"
+            }
+      },
+      "qsword": {
+            "price": "125",
+            "desc": "A sword made of Quartz. Obtainable via crafting 5 pieces of Quartz together.",
+            "usable": "0",
+            "use": [
+                  "You took out your Quartz Sword and looked at it in admiration... nothing happened.",
+                  "You took your Quartz Sword to a cosplay convention. Everyone ignored you.",
+                  "You showed the Quartz Sword to your mom. She called the police."
+            ],
+            "users": {
+                  "977377574789472278": "2.0",
                   "1486526399144787999": "0.0"
             }
       }
