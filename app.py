@@ -7,7 +7,7 @@ import os
 import math
 import datetime
 import json
-from blackjack import bj, bjhit, bjstand
+from blackjack import bj, bjhit, bjstand, update_earnings
 import bruh
 import random
 import nacl
@@ -1427,12 +1427,12 @@ async def craft(interaction:discord.Interaction, item:app_commands.Choice[str], 
 
 	if item.value == "qsword":
 		if not check_sell_items(str(interaction.user.id), str(interaction.user.id), "quartz", quantity * 5):
-			embe.add_field(name="Error", value=f"You need 5 Quartz to craft this item. You don't have enough.", inline=False)
+			embe.add_field(name="Error", value=f"You need 5 Quartz to for each Quartz Sword. You don't have enough.", inline=False)
 			await interaction.response.send_message(embed=embe)
 			return
 		else:
 			items["quartz"]["users"][str(interaction.user.id)] = str(float(items["quartz"]["users"][str(interaction.user.id)]) - float(quantity * 5))
-			buy_items(str(interaction.user.id), "qsword", 1)
+			buy_items(str(interaction.user.id), "qsword", quantity)
 		
 	embe.add_field(name="Crafting", value=f"<@{str(interaction.user.id)}> obtained {quantity} {item.name} via crafting.", inline=False)
 
@@ -1719,6 +1719,7 @@ async def coin(interaction:discord.Interaction, result:app_commands.Choice[str]=
 		load_money()
 		embe.add_field(name=f"YOU {gambleresult.upper()}!", value=f"<@{interaction.user.id}> , you {gambleresult} {amount} Turrcoins by betting on {result.name}.\nYour balance is now {float(money[idx].balance)}")
 		log(f"<@{interaction.user.id}> {gambleresult} {amount} by betting on {result.name}.\nTheir balance is now {float(money[idx].balance)}")
+		update_earnings(str(interaction.user.id), amount if gambleresultBoolean else -amount)
 	else:
 		face = random.Random().choice(seq=("HEADS!!!", "TAILS!!!"))
 		embe.add_field(name=face, value=face, inline=False)
