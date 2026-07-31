@@ -49,6 +49,7 @@ spamhalt = False
 SERVER_NAME = ""
 howmanywords = "20"
 MYSERVER = "Turrnut Republic(拖鞋社)"
+RUNPATH = "c:\\$qile\\vsworkspace\\test\\discord\\"
 ADMIN = "977377574789472278" # turrnut
 #ADMIN = "820541682415960064" # tuvalu (testing)
 TREASURER = "964894108164423800" # mrgeaso
@@ -443,6 +444,7 @@ def validInteraction(mes):
 
 async def print_motd(): # CHUNKY ass function
 	global motdchannel;
+	global RUNPATH
 	channel = client.get_channel(motdchannel);
 	if channel is None:
 		log("Cannot find the MOTD channel! Try setting it, maybe? " + str(motdchannel));
@@ -485,13 +487,24 @@ async def print_motd(): # CHUNKY ass function
 	};
 	with open(motd_path, "w") as f:
 		json.dump(data, f);
-	await channel.send("<@&1445594462439870484>", embed=embe);
+	try:
+		# autoupdate
+		m = datetime.datetime.now().strftime("%m")
+		d = datetime.datetime.now().strftime("d")
+
+		with open(pathify("motd|last_update.txt"), "w", encoding="utf-8") as file:
+			file.write(f"Auto Update {m}\/{d}\/{datetime.datetime.now().year}")
+
+		os.system(f"cd {RUNPATH} && git add * && git commit -m \"Auto Update {m}\/{d}\/{datetime.datetime.now().year}\" && git push")
+	except:
+		print("Ineligible for auto-update.")
+	# await channel.send("<@&1445594462439870484>", embed=embe);
 	return;
 
 def motd_runner():
     asyncio.create_task(print_motd())
 
-schedule.every().day.at("12:00").do(motd_runner)
+schedule.every().day.at("16:40").do(motd_runner)
 
 async def motd_scheduler():
     while True:
