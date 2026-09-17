@@ -294,13 +294,28 @@ class Money:
 def pathify(path):
 	return path.replace('|', os.sep)
 
+def monify():
+	path = pathify("money|money.json")
+
+	with open(path, "r") as f:
+		monies = json.load(f)
+
+	monies = {
+		key: round(float(value), 3)
+		for key, value in monies.items()
+	}
+
+	with open(path, "w") as f:
+		json.dump(monies, f, indent=4)
+	load_money()
+
 with open(pathify("models|grades|possibilites.json"), "r") as fobj:
 	possibilities = json.load(fobj)
 
-items = {}
+	items = {}
 
-with open(pathify("money|items.json"), "r") as fobj:
-	items = json.load(fobj)
+	with open(pathify("money|items.json"), "r") as fobj:
+		items = json.load(fobj)
 
 memesjson = {}
 memes = []
@@ -444,6 +459,19 @@ def validInteraction(mes):
 	global LIST
 	return str(mes.user.id) in LIST
 
+def autoupdate():
+	try:
+		# autoupdate
+		m = datetime.datetime.now().strftime("%m")
+		d = datetime.datetime.now().strftime("%d")
+
+		with open(pathify("motd|last_update.txt"), "w", encoding="utf-8") as file:
+			file.write(f"Auto Update {m}-{d}-{datetime.datetime.now().year}")
+
+		os.system(f"cd {RUNPATH} && git add * && git commit -m \"Auto Update {m}-{d}-{datetime.datetime.now().year}\" && git push")
+	except:
+		print("Ineligible for auto-update.")
+
 async def print_motd(): # CHUNKY ass function
 	global motdchannel;
 	global RUNPATH
@@ -490,17 +518,7 @@ async def print_motd(): # CHUNKY ass function
 	with open(motd_path, "w") as f:
 		json.dump(data, f);
 	####################################
-	try:
-		# autoupdate
-		m = datetime.datetime.now().strftime("%m")
-		d = datetime.datetime.now().strftime("%d")
-
-		with open(pathify("motd|last_update.txt"), "w", encoding="utf-8") as file:
-			file.write(f"Auto Update {m}-{d}-{datetime.datetime.now().year}")
-
-		os.system(f"cd {RUNPATH} && git add * && git commit -m \"Auto Update {m}-{d}-{datetime.datetime.now().year}\" && git push")
-	except:
-		print("Ineligible for auto-update.")
+	autoupdate()
 	####################################	
 	await channel.send("<@&1445594462439870484>", embed=embe);
 	return;
@@ -693,6 +711,10 @@ async def dostuff(instructions, message):
 	if instruction[1] == "sync":
 		await tree.sync()
 		await message.channel.send("Commands Synced")
+		return
+	if instruction[1] == "update":
+		autoupdate()
+		await message.channel.send("Updated.")
 		return
 	if instruction[1] == "chess":
 		chessresponse = f"# Turrnut Republic Chess Leaderboard {datetime.datetime.now().strftime('%b')} {datetime.datetime.now().year}\n-# Champion:<@{champion}>"
@@ -2510,6 +2532,8 @@ async def on_message(message):
 	global react_all
 	global susflag
 	mensaje = message
+
+	monify()
 
 	for react in react_all:
 		try:
