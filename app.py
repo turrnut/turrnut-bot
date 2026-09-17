@@ -517,16 +517,17 @@ async def print_motd(): # CHUNKY ass function
 	};
 	with open(motd_path, "w") as f:
 		json.dump(data, f);
-	####################################
-	autoupdate()
-	####################################	
 	await channel.send("<@&1445594462439870484>", embed=embe);
 	return;
 
 def motd_runner():
     asyncio.create_task(print_motd())
 
+def autoupdate_runner():
+    asyncio.create_task(autoupdate())
+
 schedule.every().day.at("12:00").do(motd_runner)
+schedule.every().day.at("19:06").do(autoupdate_runner)
 
 async def motd_scheduler():
     while True:
