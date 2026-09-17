@@ -459,7 +459,7 @@ def validInteraction(mes):
 	global LIST
 	return str(mes.user.id) in LIST
 
-def autoupdate():
+async def autoupdate():
 	try:
 		# autoupdate
 		m = datetime.datetime.now().strftime("%m")
@@ -527,7 +527,7 @@ def autoupdate_runner():
     asyncio.create_task(autoupdate())
 
 schedule.every().day.at("12:00").do(motd_runner)
-schedule.every().day.at("19:06").do(autoupdate_runner)
+schedule.every().day.at("19:10").do(autoupdate_runner)
 
 async def motd_scheduler():
     while True:
