@@ -527,7 +527,7 @@ def autoupdate_runner():
     asyncio.create_task(autoupdate())
 
 schedule.every().day.at("12:00").do(motd_runner)
-schedule.every().day.at("19:10").do(autoupdate_runner)
+schedule.every().day.at("01:00").do(autoupdate_runner)
 
 async def motd_scheduler():
     while True:
