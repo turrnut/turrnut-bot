@@ -800,7 +800,7 @@ async def dostuff(instructions, message):
 			log(f"COINS {str(amount)} GRANT BY {message.author}({message.author.id}) to {person}")
 			return
 
-		if instruction[1].lower() == "coins" and instruction[2].lower() == "take":
+		if instruction[1].lower() == "coins" and (instruction[2].lower() == "take" or instruction[2].lower() == "forcetake"):
 			if not str(message.author.id) in (TREASURER, ADMIN):
 				await cant(message)
 				return
@@ -814,7 +814,7 @@ async def dostuff(instructions, message):
 				return
 			load_money()
 			idx = find_money(Money(person, amount))
-			if amount > float(money[idx].balance) : 
+			if amount > float(money[idx].balance) and instruction[2].lower() == "take": 
 				await message.channel.send("e")
 				return
 			money[idx].balance = str(float(money[idx].balance) - float(amount))
@@ -1905,9 +1905,10 @@ async def daily(interaction:discord.Interaction):
 	
 
 	money[i] = Money(str(interaction.user.id), str(float(money[i].balance) + AWARD))
-	await interaction.response.send_message(f"Congrats <@{interaction.user.id}>, you have just earned {str(AWARD)} turrcoins!")
+
 	save_money()
 	load_money()
+	await interaction.response.send_message(f"Congrats <@{interaction.user.id}>, you have just earned {str(AWARD)} turrcoins!")
 	log(str(interaction.user.id) + "loves money")
 
 @tree.command(name="factorial", description="Calculator but with factorials")
